@@ -101,6 +101,7 @@ let shake = 0;
 let heartFlash = 0;
 let audioContext = null;
 let muted = localStorage.getItem("starCatcherMuted") === "true";
+let nightMode = localStorage.getItem("starCatcherNight") === "true";
 let touchTargetX = null;
 let fpsEnabled = false;
 let fpsWindowStart = 0;
@@ -352,7 +353,10 @@ function draw() {
     ctx.translate((Math.random() * 2 - 1) * SHAKE_AMOUNT, (Math.random() * 2 - 1) * SHAKE_AMOUNT);
   }
 
-  if (isReady("background")) {
+  if (nightMode) {
+    ctx.fillStyle = "#1b0f2e";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  } else if (isReady("background")) {
     const pattern = ctx.createPattern(images.background, "repeat");
     if (pattern) {
       ctx.fillStyle = pattern;
@@ -490,6 +494,13 @@ document.addEventListener("keydown", (e) => {
     if (!e.repeat) {
       muted = !muted;
       localStorage.setItem("starCatcherMuted", String(muted));
+    }
+    return;
+  }
+  if (e.key.toLowerCase() === "n") {
+    if (!e.repeat) {
+      nightMode = !nightMode;
+      localStorage.setItem("starCatcherNight", String(nightMode));
     }
     return;
   }
