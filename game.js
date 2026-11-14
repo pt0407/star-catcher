@@ -4,6 +4,7 @@ import {
   playCatchSound, playPauseSound, playNewBestSound, playGustSound, playMissSound,
 } from "./audio.js";
 import { SIZE, FALLBACK, images, isReady, drawSprite } from "./sprites.js";
+import { keys, touch, bindInput } from "./input.js";
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
@@ -124,7 +125,6 @@ let perfectFlashRemaining = 0;
 let perfectFlash = null;
 let starsPopRemaining = 0;
 let nightMode = loadItem("starCatcherNight", "false") === "true";
-let touchTargetX = null;
 let fpsEnabled = false;
 let fpsWindowStart = 0;
 let fpsFrameCount = 0;
@@ -132,7 +132,6 @@ let fpsText = "";
 let fpsValue = 0;
 let bgPattern = null;
 let vignette = null;
-const keys = {};
 
 function reset() {
   for (const bit of bits) inactiveBits.push(bit);
@@ -377,8 +376,8 @@ function update(dt) {
   }
 
   const previousPlayerX = player.x;
-  if (touchTargetX !== null) {
-    const distance = touchTargetX - player.x;
+  if (touch.targetX !== null) {
+    const distance = touch.targetX - player.x;
     player.x += Math.sign(distance) * Math.min(Math.abs(distance), PLAYER_SPEED * dt);
   } else {
     const move = (keys["arrowright"] || keys["d"] ? 1 : 0) - (keys["arrowleft"] || keys["a"] ? 1 : 0);
@@ -831,40 +830,7 @@ function draw() {
   if (shaking) ctx.restore();
 }
 
-function setTouchTarget(event) {
-  event.preventDefault();
-  const rect = canvas.getBoundingClientRect();
-  const touchX = (event.touches[0].clientX - rect.left) * canvas.width / rect.width;
-  touchTargetX = Math.max(0, Math.min(canvas.width - SIZE.player, touchX - SIZE.player / 2));
-}
-
-document.addEventListener("pointerdown", () => {
-  initializeAudio();
-  if (state === "ready" || (state === "over" && performance.now() - gameOverTime >= RESTART_DELAY_MS)) startGame();
-});
-canvas.addEventListener("touchstart", setTouchTarget, { passive: false });
-canvas.addEventListener("touchmove", setTouchTarget, { passive: false });
-canvas.addEventListener("touchend", () => {
-  touchTargetX = null;
-});
-canvas.addEventListener("contextmenu", (e) => e.preventDefault());
-canvas.addEventListener("touchcancel", () => {
-  touchTargetX = null;
-});
-
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "hidden" && state === "playing") {
-    state = "paused";
-    pauseStartTime = performance.now();
-  }
-});
-
-window.addEventListener("blur", () => {
-  for (const key of Object.keys(keys)) keys[key] = false;
-});
-
-document.addEventListener("keydown", (e) => {
-  initializeAudio();
+function onKeyDown(e) {
   if (["ready", "over"].includes(state) && ["1", "2", "3"].includes(e.key)) {
     difficultyIndex = Number(e.key) - 1;
     difficulty = DIFFICULTIES[difficultyIndex];
@@ -919,10 +885,22 @@ document.addEventListener("keydown", (e) => {
   }
   if (e.key.startsWith("Arrow")) e.preventDefault();
   keys[e.key.toLowerCase()] = true;
-});
+}
 
-document.addEventListener("keyup", (e) => {
-  keys[e.key.toLowerCase()] = false;
+bindInput({
+  onPointerStart() {
+    if (state === "ready" || (state === "over" && performance.now() - gameOverTime >= RESTART_DELAY_MS)) startGame();
+  },
+  onHidden() {
+    if (state === "playing") {
+      state = "paused";
+      pauseStartTime = performance.now();
+    }
+  },
+  onKeyDown,
+  onKeyUp(e) {
+    keys[e.key.toLowerCase()] = false;
+  },
 });
 
 let lastTime = performance.now();
