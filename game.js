@@ -266,6 +266,25 @@ function playGustSound() {
   oscillator.stop(now + GUST_DURATION);
 }
 
+function playMissSound() {
+  if (muted || !audioContext) return;
+
+  const oscillator = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+  const now = audioContext.currentTime;
+
+  oscillator.type = "sine";
+  oscillator.frequency.setValueAtTime(320, now);
+  oscillator.frequency.exponentialRampToValueAtTime(140, now + 0.18);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.08, now + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+  oscillator.connect(gain);
+  gain.connect(audioContext.destination);
+  oscillator.start(now);
+  oscillator.stop(now + 0.18);
+}
+
 function reset() {
   for (const bit of bits) inactiveBits.push(bit);
   bits.length = 0;
@@ -603,7 +622,10 @@ function update(dt) {
     }
     if (item.type === "star" && !hit && !item.missed && item.y > player.y + SIZE.player) {
       item.missed = true;
-      if (streak >= 2) pops.push({ x: item.x + SIZE.star / 2, y: item.y, age: 0, text: `miss x${streak}`, color: "#ff9d9d" });
+      if (streak >= 2) {
+        pops.push({ x: item.x + SIZE.star / 2, y: item.y, age: 0, text: `miss x${streak}`, color: "#ff9d9d" });
+        playMissSound();
+      }
       streak = 0;
     }
     if (item.type === "rock" && !item.nearMiss && !hit) {
