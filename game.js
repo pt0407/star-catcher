@@ -550,6 +550,7 @@ function update(dt) {
     if (item.type === "star" && !hit && !item.missed && item.y > player.y + SIZE.player) {
       item.missed = true;
       streak = 0;
+      pops.push({ x: item.x + SIZE.star / 2, y: item.y, age: 0, text: "miss" });
     }
     if (item.type === "rock" && !item.nearMiss && !hit) {
       const verticallyClose = item.y < player.y + SIZE.player && item.y + SIZE.rock > player.y;
