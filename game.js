@@ -230,6 +230,25 @@ function playNewBestSound() {
   });
 }
 
+function playGustSound() {
+  if (muted || !audioContext) return;
+
+  const oscillator = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+  const now = audioContext.currentTime;
+
+  oscillator.type = "sawtooth";
+  oscillator.frequency.setValueAtTime(180, now);
+  oscillator.frequency.exponentialRampToValueAtTime(420, now + GUST_DURATION);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.06, now + 0.05);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + GUST_DURATION);
+  oscillator.connect(gain);
+  gain.connect(audioContext.destination);
+  oscillator.start(now);
+  oscillator.stop(now + GUST_DURATION);
+}
+
 function reset() {
   for (const bit of bits) inactiveBits.push(bit);
   bits.length = 0;
@@ -439,6 +458,7 @@ function update(dt) {
       gustDirection = Math.random() < 0.5 ? -1 : 1;
       gustRemaining = GUST_DURATION;
       gustTimer = GUST_WAIT_MIN + Math.random() * (GUST_WAIT_MAX - GUST_WAIT_MIN);
+      playGustSound();
       gustPushTime = Math.min(dt, gustRemaining);
       gustRemaining -= gustPushTime;
     }
