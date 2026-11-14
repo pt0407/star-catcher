@@ -1,6 +1,7 @@
 body {
   box-sizing: border-box;
   margin: 0;
+  overscroll-behavior: none;
   min-height: 100vh;
   padding: 24px 16px;
   display: flex;
