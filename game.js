@@ -543,8 +543,10 @@ function update(dt) {
     }
   }
 
-  for (const pop of pops) pop.age += dt;
-  pops = pops.filter((pop) => pop.age < POP_DURATION);
+  for (let i = pops.length - 1; i >= 0; i--) {
+    pops[i].age += dt;
+    if (pops[i].age >= POP_DURATION) pops.splice(i, 1);
+  }
 
   fallSpeed = difficulty.fallSpeed + Math.floor(score / SPEED_UP_EVERY) * SPEED_UP_AMOUNT;
   if (lives <= 0) gameOver();
