@@ -55,11 +55,15 @@ Put PNG files in the `assets/` folder using these exact names. Until a file exis
 | `magnet.png` | 32×32 | Magnet pickup |
 | `background.png` | 400×600 | Optional background |
 
-Use transparent backgrounds for the sprites. If you change a size, also update the `SIZE` table in `game.js`.
+The `*_sheet.png` files (`player_sheet`, `star_sheet`, `rock_sheet`, `heart_sheet`) are animation strips that `make_sprites.py` builds next to the stills — star spin, rock tumble, heart beat, basket wobble. The game uses a sheet when it loads and falls back to the single PNG.
+
+Use transparent backgrounds for the sprites. If you change a size, also update the `SIZE` table in `sprites.js`.
+
+The code is split into ES modules: `game.js` is the game loop and state, `sprites.js` images and drawing, `particles.js` the pixel bursts, `audio.js` the sounds, `input.js` keys and touch, `persist.js` localStorage, `starfield.js` the background dots.
 
 ## Change the game
 
-The settings are the constants at the top of `game.js`:
+The gameplay settings are the constants at the top of `game.js` (sound frequencies live in `audio.js`):
 
 - `START_LIVES`: how many hearts you start with
 - `PLAYER_SPEED`: how fast the player moves
