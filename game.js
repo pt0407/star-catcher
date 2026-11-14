@@ -63,6 +63,7 @@ function drawSprite(name, x, y) {
 let best = Number(localStorage.getItem("starCatcherBest") || 0);
 let state, player, items, pops, lives, score, starsCaught, rocksHit, streak, fallSpeed, spawnTimer;
 let gameOverTime = 0;
+let newBest = false;
 let shake = 0;
 let audioContext = null;
 let muted = localStorage.getItem("starCatcherMuted") === "true";
@@ -115,6 +116,7 @@ function reset() {
   fallSpeed = START_FALL_SPEED;
   spawnTimer = 0;
   shake = 0;
+  newBest = false;
 }
 
 function spawnItem() {
@@ -140,7 +142,8 @@ function touchesPlayer(item) {
 function gameOver() {
   state = "over";
   gameOverTime = performance.now();
-  if (score > best) {
+  newBest = score > best;
+  if (newBest) {
     best = score;
     localStorage.setItem("starCatcherBest", String(best));
   }
@@ -245,7 +248,12 @@ function draw() {
   ctx.fillText(`M: sound ${muted ? "off" : "on"}`, canvas.width - 20, 78);
 
   if (state === "ready") drawText([["Star Catcher", 28], ["Press Space to start", 14]]);
-  if (state === "over") drawText([["Game over", 28], [`Score ${score}   Best ${best}`, 14], [`Stars ${starsCaught}  Rocks ${rocksHit}`, 14], ["Press Space to play again", 14]]);
+  if (state === "over") {
+    const gameOverLines = [["Game over", 28], [`Score ${score}   Best ${best}`, 14]];
+    if (newBest) gameOverLines.push(["New best!", 14]);
+    gameOverLines.push([`Stars ${starsCaught}  Rocks ${rocksHit}`, 14], ["Press Space to play again", 14]);
+    drawText(gameOverLines);
+  }
   if (state === "paused") drawText([["Paused", 28]]);
   ctx.restore();
 }
