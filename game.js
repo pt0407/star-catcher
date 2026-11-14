@@ -3,6 +3,7 @@ import {
   initializeAudio, isMuted, toggleMute,
   playCatchSound, playPauseSound, playNewBestSound, playGustSound, playMissSound,
 } from "./audio.js";
+import { SIZE, FALLBACK, images, isReady, drawSprite } from "./sprites.js";
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
@@ -60,58 +61,19 @@ const COMBO_EVERY = 5;
 const COMBO_FLASH_DURATION = 1;
 const PERFECT_FLASH_DURATION = 1;
 const RESTART_DELAY_MS = 600;
-
-const SPRITES = {
-  background: "assets/background.png",
-  player: "assets/player.png",
-  star: "assets/star.png",
-  rock: "assets/rock.png",
-  heart: "assets/heart.png",
-  magnet: "assets/magnet.png",
-};
-const SIZE = { player: 64, star: 32, rock: 32, magnet: 32, heart: 24 };
-const FALLBACK = { player: "#4fc3f7", star: "#ffd93b", rock: "#8a8a8a", heart: "#ff5577", magnet: "#4fa3ff" };
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const FONT = '\"Press Start 2P\", monospace';
-
-const images = {};
-const imageReady = {};
-for (const [name, src] of Object.entries(SPRITES)) {
-  const image = new Image();
-  imageReady[name] = false;
-  image.addEventListener("load", () => {
-    imageReady[name] = true;
-  });
-  image.addEventListener("error", () => {
-    imageReady[name] = false;
-  });
-  image.src = src;
-  images[name] = image;
-}
-
-function isReady(name) {
-  return imageReady[name];
-}
-
-function drawSprite(name, x, y) {
-  if (isReady(name)) {
-    ctx.drawImage(images[name], x, y, SIZE[name], SIZE[name]);
-  } else {
-    ctx.fillStyle = FALLBACK[name];
-    ctx.fillRect(x, y, SIZE[name], SIZE[name]);
-  }
-}
+const FONT = '"Press Start 2P", monospace';
 
 function drawPlayer(x = player.x, yOffset = 0) {
   if (!playerFacingLeft) {
-    drawSprite("player", x, player.y + yOffset);
+    drawSprite(ctx, "player", x, player.y + yOffset);
     return;
   }
 
   ctx.save();
   ctx.translate(x * 2 + SIZE.player, 0);
   ctx.scale(-1, 1);
-  drawSprite("player", x, player.y + yOffset);
+  drawSprite(ctx, "player", x, player.y + yOffset);
   ctx.restore();
 }
 
@@ -665,7 +627,7 @@ function draw() {
   }
   for (const item of items) {
     if (item.type === "magnet") {
-      drawSprite("magnet", item.x, item.y);
+      drawSprite(ctx, "magnet", item.x, item.y);
     } else if (item.type === "star" && item.golden) {
       ctx.globalAlpha = reducedMotion ? 1 : 0.8 + 0.2 * Math.sin(now / 250 + item.x);
       const goldenSize = SIZE.star + 8;
@@ -684,14 +646,14 @@ function draw() {
       ctx.globalAlpha = 1;
     } else if (item.type === "rock" && item.speedMultiplier > 1.4) {
       ctx.filter = "sepia(1) saturate(4) hue-rotate(-50deg)";
-      drawSprite("rock", item.x, item.y);
+      drawSprite(ctx, "rock", item.x, item.y);
       ctx.filter = "none";
     } else if (item.type === "star" && magnetRemaining > 0) {
       ctx.filter = "hue-rotate(160deg) saturate(1.4)";
-      drawSprite("star", item.x, item.y);
+      drawSprite(ctx, "star", item.x, item.y);
       ctx.filter = "none";
     } else {
-      drawSprite(item.type, item.x, item.y);
+      drawSprite(ctx, item.type, item.x, item.y);
     }
   }
   for (const bit of bits) {
@@ -747,7 +709,7 @@ function draw() {
 
   ctx.globalAlpha = heartFlash > 0 ? 0.3 : 1;
   if (lives !== 1 || heartVisible) {
-    for (let i = 0; i < lives; i++) drawSprite("heart", 10 + i * 30, 10);
+    for (let i = 0; i < lives; i++) drawSprite(ctx, "heart", 10 + i * 30, 10);
   }
   ctx.globalAlpha = 1;
   if (heartPopupRemaining > 0) {
