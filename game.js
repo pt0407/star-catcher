@@ -146,10 +146,10 @@ function update(dt) {
     spawnTimer = getSpawnInterval();
   }
 
-  for (const item of items) {
+  for (let i = items.length - 1; i >= 0; i--) {
+    const item = items[i];
     item.y += fallSpeed * dt;
     if (touchesPlayer(item)) {
-      item.caught = true;
       playCatchSound(item.type);
       if (item.type === "star") {
         starsCaught += 1;
@@ -161,8 +161,8 @@ function update(dt) {
         shake = SHAKE_DURATION;
       }
     }
+    if (touchesPlayer(item) || item.y >= canvas.height) items.splice(i, 1);
   }
-  items = items.filter((item) => !item.caught && item.y < canvas.height);
 
   for (const pop of pops) pop.age += dt;
   pops = pops.filter((pop) => pop.age < POP_DURATION);
