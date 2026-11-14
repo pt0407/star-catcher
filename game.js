@@ -29,6 +29,7 @@ const SPRITES = {
 };
 const SIZE = { player: 64, star: 32, rock: 32, heart: 24 };
 const FALLBACK = { player: "#4fc3f7", star: "#ffd93b", rock: "#8a8a8a", heart: "#ff5577" };
+const FONT = '"Press Start 2P", monospace';
 
 const images = {};
 const imageReady = {};
@@ -185,7 +186,7 @@ function drawText(lines) {
   ctx.textAlign = "center";
   ctx.fillStyle = "#fff";
   lines.forEach(([text, size], i) => {
-    ctx.font = `${size}px sans-serif`;
+    ctx.font = `${size}px ${FONT}`;
     ctx.fillText(text, canvas.width / 2, canvas.height / 2 - 40 + i * 40);
   });
 }
@@ -205,7 +206,7 @@ function draw() {
     const progress = pop.age / POP_DURATION;
     ctx.globalAlpha = 1 - progress;
     ctx.fillStyle = "#fff";
-    ctx.font = "20px sans-serif";
+    ctx.font = `20px ${FONT}`;
     ctx.textAlign = "center";
     ctx.fillText("+1", pop.x, pop.y - progress * 30);
   }
@@ -214,9 +215,9 @@ function draw() {
   for (let i = 0; i < lives; i++) drawSprite("heart", 10 + i * 30, 10);
   ctx.textAlign = "right";
   ctx.fillStyle = "#fff";
-  ctx.font = "20px sans-serif";
+  ctx.font = `10px ${FONT}`;
   ctx.fillText(`Score ${score}`, canvas.width - 10, 28);
-  ctx.font = "12px sans-serif";
+  ctx.font = `8px ${FONT}`;
   ctx.fillText(`M: sound ${muted ? "off" : "on"}`, canvas.width - 10, 46);
 
   if (state === "ready") drawText([["Star Catcher", 36], ["Press Space to start", 20]]);
