@@ -480,15 +480,11 @@ function draw() {
         ctx.fillRect(item.x, item.y, SIZE.star, SIZE.star);
       }
     } else if (item.type === "rock" && item.speedMultiplier > 1) {
-      if (isReady("rock")) {
-        ctx.save();
-        ctx.filter = "hue-rotate(160deg)";
-        drawSprite("rock", item.x, item.y);
-        ctx.restore();
-      } else {
-        ctx.fillStyle = "#e53935";
-        ctx.fillRect(item.x, item.y, SIZE.rock, SIZE.rock);
-      }
+      drawSprite("rock", item.x, item.y);
+      ctx.globalCompositeOperation = "source-atop";
+      ctx.fillStyle = "rgba(229, 57, 53, 0.6)";
+      ctx.fillRect(item.x, item.y, SIZE.rock, SIZE.rock);
+      ctx.globalCompositeOperation = "source-over";
     } else {
       drawSprite(item.type, item.x, item.y);
     }
