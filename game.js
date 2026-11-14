@@ -845,7 +845,7 @@ function draw() {
     drawPixelText(milestoneFlash, canvas.width / 2, 32, 20, "center");
   }
   if (comboFlashRemaining > 0) {
-    drawPixelText(comboFlash, canvas.width / 2, 56, 20, "center");
+    drawPixelText(comboFlash, canvas.width / 2, 56, reducedMotion ? 20 : Math.round(20 + Math.sin(now / 80) * 2), "center");
   }
   if (perfectFlashRemaining > 0) {
     drawPixelText(perfectFlash, canvas.width / 2, 84, 14, 'center');
