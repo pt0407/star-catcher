@@ -676,7 +676,7 @@ function draw() {
   for (const pop of pops) {
     const progress = pop.age / POP_DURATION;
     ctx.globalAlpha = 1 - progress;
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = pop.text ? "#9fd0ff" : "#fff";
     drawPixelText(pop.text || `+${pop.value || 1}`, pop.x, pop.y - progress * 30, 20, "center");
   }
   ctx.globalAlpha = 1;
