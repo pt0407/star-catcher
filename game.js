@@ -165,6 +165,7 @@ let comboFlashRemaining = 0;
 let comboFlash = null;
 let perfectFlashRemaining = 0;
 let perfectFlash = null;
+let starsPopRemaining = 0;
 let audioContext = null;
 let muted = localStorage.getItem("starCatcherMuted") === "true";
 let nightMode = localStorage.getItem("starCatcherNight") === "true";
@@ -307,6 +308,7 @@ function reset() {
   comboFlash = null;
   perfectFlashRemaining = 0;
   perfectFlash = null;
+  starsPopRemaining = 0;
   newBest = false;
   bestAnnounced = false;
 }
@@ -443,6 +445,7 @@ function update(dt) {
   milestoneFlashRemaining = Math.max(0, milestoneFlashRemaining - dt);
   comboFlashRemaining = Math.max(0, comboFlashRemaining - dt);
   perfectFlashRemaining = Math.max(0, perfectFlashRemaining - dt);
+  starsPopRemaining = Math.max(0, starsPopRemaining - dt);
 
   if (lives === 1) {
     heartBlinkTimer += dt;
@@ -550,6 +553,7 @@ function update(dt) {
       if (item.type === "star") {
         starsCaught += 1;
         totalStars += 1;
+        starsPopRemaining = 0.5;
         if (item.golden) goldenCaught += 1;
         streak += 1;
         if (streak % COMBO_EVERY === 0) {
@@ -620,6 +624,7 @@ function update(dt) {
       playCatchSound("star", Math.min(streak, 10) * 40);
       starsCaught += 1;
       totalStars += 1;
+      starsPopRemaining = 0.5;
       streak += 1;
       runBestStreak = Math.max(runBestStreak, streak);
       if (streak % COMBO_EVERY === 0) {
@@ -860,7 +865,9 @@ function draw() {
     drawPixelText(`Magnet ${Math.ceil(magnetRemaining)}s`, canvas.width / 2, 108, 10, "center");
   }
   if (starsCaught > 0) {
+    ctx.fillStyle = starsPopRemaining > 0 ? "#ffd93b" : "#fff";
     drawPixelText(`Stars ${starsCaught}`, 10, canvas.height - 26, 8, "left");
+    ctx.fillStyle = "#fff";
   }
   drawPixelText(`M: sound ${muted ? "off" : "on"}`, 10, canvas.height - 10, 10, "left");
 
