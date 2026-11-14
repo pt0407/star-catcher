@@ -23,6 +23,7 @@ const MIN_SPAWN_EVERY = 0.45;
 const STAR_CHANCE = 0.7;
 const GOLDEN_STAR_CHANCE = 1 / 12;
 const MAGNET_CHANCE = 1 / 25;
+const FAST_ROCK_CHANCE = 0.2;
 const MAGNET_DURATION = 4;
 const MAGNET_SPEED = 300;
 const SHOOTING_STAR_INTERVAL = 20;
@@ -225,7 +226,8 @@ function spawnItem() {
     type = Math.random() < STAR_CHANCE ? "star" : "rock";
   }
   const golden = type === "star" && Math.random() < GOLDEN_STAR_CHANCE;
-  items.push({ type, golden, x: Math.random() * (canvas.width - SIZE[type]), y: -SIZE[type] });
+  const speedMultiplier = type === "rock" && Math.random() < FAST_ROCK_CHANCE ? 1.5 : 1;
+  items.push({ type, golden, speedMultiplier, x: Math.random() * (canvas.width - SIZE[type]), y: -SIZE[type] });
 }
 
 function getSpawnInterval() {
@@ -354,7 +356,7 @@ function update(dt) {
         item.y += dy / distance * step;
       }
     } else {
-      item.y += fallSpeed * dt;
+      item.y += fallSpeed * item.speedMultiplier * dt;
     }
 
     if (touchesPlayer(item)) {
@@ -467,6 +469,16 @@ function draw() {
       } else {
         ctx.fillStyle = "#ffb300";
         ctx.fillRect(item.x, item.y, SIZE.star, SIZE.star);
+      }
+    } else if (item.type === "rock" && item.speedMultiplier > 1) {
+      if (isReady("rock")) {
+        ctx.save();
+        ctx.filter = "hue-rotate(160deg)";
+        drawSprite("rock", item.x, item.y);
+        ctx.restore();
+      } else {
+        ctx.fillStyle = "#e53935";
+        ctx.fillRect(item.x, item.y, SIZE.rock, SIZE.rock);
       }
     } else {
       drawSprite(item.type, item.x, item.y);
