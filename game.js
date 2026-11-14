@@ -113,6 +113,7 @@ function drawPlayer(x = player.x) {
 
 let best = Number(localStorage.getItem("starCatcherBest") || 0);
 let bestStreak = Number(localStorage.getItem("starCatcherBestStreak") || 0);
+let totalStars = Number(localStorage.getItem("starCatcherTotalStars") || 0);
 let hasSeenControlsTip = localStorage.getItem("starCatcherSeen") === "true";
 let state, player, items, pops, lives, score, starsCaught, rocksHit, streak, fallSpeed, spawnTimer;
 let runBestStreak = 0;
@@ -327,6 +328,7 @@ function gameOver() {
     bestStreak = runBestStreak;
     localStorage.setItem("starCatcherBestStreak", String(bestStreak));
   }
+  localStorage.setItem("starCatcherTotalStars", String(totalStars));
 }
 
 function checkHeartBonus() {
@@ -459,6 +461,7 @@ function update(dt) {
       playCatchSound(item.type === "heart" ? "star" : item.type, item.type === "star" ? Math.min(streak, 10) * 40 : 0);
       if (item.type === "star") {
         starsCaught += 1;
+        totalStars += 1;
         streak += 1;
         if (streak % COMBO_EVERY === 0) {
           comboFlash = `COMBO ${streak}!`;
@@ -513,6 +516,7 @@ function update(dt) {
     if (overlapsPlayerX) {
       playCatchSound("star", Math.min(streak, 10) * 40);
       starsCaught += 1;
+      totalStars += 1;
       streak += 1;
       runBestStreak = Math.max(runBestStreak, streak);
       score += 5;
@@ -704,7 +708,7 @@ function draw() {
   if (state === "over") {
     const gameOverLines = [["Game over", 28], [`Score ${score}   Best ${best}`, 14]];
     if (newBest) gameOverLines.push(["New best!", 14]);
-    gameOverLines.push([`Stars ${starsCaught}  Rocks ${rocksHit}`, 14]);
+    gameOverLines.push([`Stars ${starsCaught}  Rocks ${rocksHit}  Total ${totalStars}`, 14]);
 
     const panelWidth = 380;
     const panelHeight = 240;
