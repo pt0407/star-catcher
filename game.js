@@ -492,8 +492,8 @@ function update(dt) {
         if (lives < MAX_LIVES) {
           lives += 1;
           heartPopupRemaining = HEART_POPUP_DURATION;
+          pops.push({ x: item.x + SIZE.heart / 2, y: item.y + SIZE.heart / 2, age: 0, value: "heart" });
         }
-        pops.push({ x: item.x + SIZE.heart / 2, y: item.y + SIZE.heart / 2, age: 0, value: "heart" });
       } else {
         spawnRockBits(item.x + SIZE.rock / 2, item.y + SIZE.rock / 2);
         rocksHit += 1;
