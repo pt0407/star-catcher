@@ -261,7 +261,7 @@ function draw() {
     gameOverLines.push([`Stars ${starsCaught}  Rocks ${rocksHit}`, 14], ["Press Space to play again", 14]);
     drawText(gameOverLines);
   }
-  if (state === "paused") drawText([["Paused", 28]]);
+  if (state === "paused") drawText([["Paused", 28], ["Press P or Esc to resume", 14]]);
   ctx.restore();
 }
 
