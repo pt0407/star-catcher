@@ -642,6 +642,10 @@ document.addEventListener("keydown", (e) => {
     if (!e.repeat) fpsEnabled = !fpsEnabled;
     return;
   }
+  if (e.key.toLowerCase() === "r") {
+    if (!e.repeat && (state === "playing" || state === "paused")) reset();
+    return;
+  }
   if (e.key.toLowerCase() === "p" || e.key === "Escape") {
     if (!e.repeat && (state === "playing" || state === "paused")) {
       state = state === "playing" ? "paused" : "playing";
