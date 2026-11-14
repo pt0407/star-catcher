@@ -19,7 +19,14 @@ Live version: https://star-catcher-virid.vercel.app
 ## Controls
 
 - Arrow keys or A/D: move
-- Space: start or restart
+- Space or Enter: start or restart
+- Drag on the canvas: move (touch works too)
+- P or Esc: pause
+- R: restart mid-run
+- M: mute
+- N: night mode
+- F: FPS counter
+- 1, 2, 3: difficulty on the menus, arrow keys cycle it too
 
 ## Built with
 
@@ -27,9 +34,9 @@ Plain HTML, CSS, and JavaScript, no build step. The sprites are placeholders dra
 
 ## Known issues
 
-- Not playtested in a browser yet. Check controls, collisions, and game over.
-- No sound, no title screen, no pause.
-- Touch controls are missing. Keyboard only.
+- Not playtested on a real phone. Touch dragging works in desktop Chrome but nobody has tried it on iOS or Android.
+- The sounds are Web Audio beeps, checked in code but nobody has listened to them yet.
+- The sprites are still the generated placeholders, not real art.
 
 ## Add your sprites
 
