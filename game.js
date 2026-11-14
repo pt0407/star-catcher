@@ -875,7 +875,7 @@ function draw() {
       pauseLines.push(["Press P or Esc to resume", 14]);
     }
     const speedLevel = 1 + Math.floor(score / SPEED_UP_EVERY);
-    pauseLines.push([`Score ${score}`, 14], [`Difficulty: ${difficulty.name}   Speed ${speedLevel}   R restarts`, 10]);
+    pauseLines.push([`Score ${score}   Stars ${starsCaught}`, 14], [`Difficulty: ${difficulty.name}   Speed ${speedLevel}   R restarts`, 10]);
     drawText(pauseLines);
   }
   ctx.restore();
