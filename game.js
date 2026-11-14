@@ -341,7 +341,7 @@ function spawnStarSparkles(x, y, color = "#fff3a0", count = SPARKLE_COUNT) {
 
 function spawnItem() {
   let type;
-  if (Math.random() < HEART_CHANCE) {
+  if (lives < MAX_LIVES && Math.random() < HEART_CHANCE) {
     type = "heart";
   } else if (Math.random() < MAGNET_CHANCE) {
     type = "magnet";
