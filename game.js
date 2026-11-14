@@ -687,6 +687,7 @@ function draw() {
   ctx.fillStyle = "#fff";
   drawPixelText(`Score ${score}`, canvas.width - 10, 28, 10, "right");
   drawPixelText(`Best ${best}`, canvas.width - 10, 52, 10, "right");
+  if (goldenCaught > 0) drawPixelText(`Gold ${goldenCaught}`, canvas.width - 10, 64, 10, "right");
   let hudY = 76;
   if (bestStreak >= 2) {
     drawPixelText(`Best streak ${bestStreak}`, canvas.width - 10, hudY, 10, "right");
