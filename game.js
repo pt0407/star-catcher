@@ -5,6 +5,7 @@ import {
 } from "./audio.js";
 import { SIZE, FALLBACK, images, isReady, drawSprite } from "./sprites.js";
 import { keys, touch, bindInput } from "./input.js";
+import { createStarfield, drawStarfield } from "./starfield.js";
 import { SPARKLE_COUNT, clearParticles, spawnRockBits, spawnStarSparkles, updateParticles, drawParticles } from "./particles.js";
 
 const canvas = document.getElementById("game");
@@ -78,13 +79,7 @@ let totalScore = Number(loadItem("starCatcherTotalScore", "0"));
 let hasSeenControlsTip = loadItem("starCatcherSeen", "false") === "true";
 let state, player, items, pops, lives, score, starsCaught, goldenCaught, rocksHit, streak, fallSpeed, spawnTimer;
 let runBestStreak = 0;
-const STARFIELD_COUNT = 40;
-const starfield = Array.from({ length: STARFIELD_COUNT }, () => ({
-  x: Math.random() * canvas.width,
-  y: Math.random() * canvas.height,
-  phase: Math.random() * Math.PI * 2,
-  speed: 1 + Math.random() * 2,
-}));
+const starfield = createStarfield(canvas.width, canvas.height);
 let gustTimer, gustRemaining, gustDirection, magnetRemaining;
 let shootingStar, shootingStarTimer, shootingStarTrailTimer;
 let difficultyIndex = Number(loadItem("starCatcherDifficulty", "1"));
@@ -525,18 +520,7 @@ function draw() {
     }
   }
 
-  ctx.fillStyle = "#fff";
-  const twinkleBoost = gustRemaining > 0 ? 1.5 : 1;
-  if (reducedMotion) {
-    ctx.globalAlpha = 0.4;
-    for (const dot of starfield) ctx.fillRect(dot.x, dot.y, 2, 2);
-  } else {
-    for (const dot of starfield) {
-      ctx.globalAlpha = 0.25 + 0.25 * Math.sin(now / 500 * dot.speed * twinkleBoost + dot.phase);
-      ctx.fillRect(dot.x, dot.y, 2, 2);
-    }
-  }
-  ctx.globalAlpha = 1;
+  drawStarfield(ctx, starfield, now, gustRemaining > 0, reducedMotion);
 
   if (milestoneFlashRemaining > 0) {
     ctx.fillStyle = `rgba(255, 255, 255, ${(milestoneFlashRemaining / MILESTONE_FLASH_DURATION) * 0.2})`;
