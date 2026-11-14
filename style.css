@@ -16,6 +16,10 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+body * {
+  -webkit-tap-highlight-color: transparent;
+}
+
 h1 {
   margin: 16px 0 24px;
   color: #ffdc62;
