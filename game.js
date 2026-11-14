@@ -635,6 +635,7 @@ function update(dt) {
     pops[i].age += dt;
     if (pops[i].age >= POP_DURATION) pops.splice(i, 1);
   }
+  if (pops.length > 24) pops.splice(0, pops.length - 24);
 
   fallSpeed = difficulty.fallSpeed + Math.floor(score / SPEED_UP_EVERY) * SPEED_UP_AMOUNT;
   if (lives <= 0) gameOver();
