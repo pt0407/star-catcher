@@ -622,13 +622,15 @@ function draw() {
       ctx.fillStyle = "#4fa3ff";
       ctx.fillRect(item.x, item.y, SIZE.magnet, SIZE.magnet);
     } else if (item.type === "star" && item.golden) {
+      const goldenSize = SIZE.star + 8;
+      const goldenOffset = (SIZE.star - goldenSize) / 2;
       if (isReady("star")) {
         ctx.filter = "hue-rotate(-20deg) saturate(1.8) brightness(1.15)";
-        ctx.drawImage(images.star, item.x, item.y, SIZE.star, SIZE.star);
+        ctx.drawImage(images.star, item.x + goldenOffset, item.y + goldenOffset, goldenSize, goldenSize);
         ctx.filter = "none";
       } else {
         ctx.fillStyle = "#ffb300";
-        ctx.fillRect(item.x, item.y, SIZE.star, SIZE.star);
+        ctx.fillRect(item.x + goldenOffset, item.y + goldenOffset, goldenSize, goldenSize);
       }
     } else if (item.type === "rock" && item.speedMultiplier > 1) {
       ctx.filter = "sepia(1) saturate(4) hue-rotate(-50deg)";
