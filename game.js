@@ -110,9 +110,13 @@ function getSpawnInterval() {
 }
 
 function touchesPlayer(item) {
-  const s = SIZE[item.type];
-  return item.x < player.x + SIZE.player && item.x + s > player.x &&
-         item.y < player.y + SIZE.player && item.y + s > player.y;
+  const size = SIZE[item.type];
+  const hitboxSize = item.type === "rock" ? size * 0.8 : size;
+  const inset = (size - hitboxSize) / 2;
+  const x = item.x + inset;
+  const y = item.y + inset;
+  return x < player.x + SIZE.player && x + hitboxSize > player.x &&
+         y < player.y + SIZE.player && y + hitboxSize > player.y;
 }
 
 function gameOver() {
