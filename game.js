@@ -29,7 +29,7 @@ const SPRITES = {
 };
 const SIZE = { player: 64, star: 32, rock: 32, heart: 24 };
 const FALLBACK = { player: "#4fc3f7", star: "#ffd93b", rock: "#8a8a8a", heart: "#ff5577" };
-const FONT = '"Press Start 2P", monospace';
+const FONT = '\"Press Start 2P\", monospace';
 
 const images = {};
 const imageReady = {};
@@ -223,6 +223,7 @@ function draw() {
   ctx.fillStyle = "#fff";
   ctx.font = `10px ${FONT}`;
   ctx.fillText(`Score ${score}`, canvas.width - 10, 28);
+  ctx.fillText(`Best ${best}`, canvas.width - 10, 46);
   ctx.font = `8px ${FONT}`;
   ctx.fillText(`M: sound ${muted ? "off" : "on"}`, canvas.width - 20, 58);
 
