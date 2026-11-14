@@ -622,7 +622,7 @@ function draw() {
     const progress = pop.age / POP_DURATION;
     ctx.globalAlpha = 1 - progress;
     ctx.fillStyle = pop.color || "#fff";
-    drawPixelText(pop.text || `+${pop.value || 1}`, pop.x, pop.y - progress * 30, 20, "center");
+    drawPixelText(pop.text || `+${pop.value || 1}`, pop.x, pop.y - progress * 30, pop.value >= 3 ? 24 : 20, "center");
   }
   ctx.globalAlpha = 1;
 
