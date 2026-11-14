@@ -879,6 +879,13 @@ document.addEventListener("keydown", (e) => {
     difficulty = DIFFICULTIES[Number(e.key) - 1];
     return;
   }
+  if (["ready", "over"].includes(state) && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+    e.preventDefault();
+    const index = DIFFICULTIES.indexOf(difficulty);
+    const direction = e.key === "ArrowRight" ? 1 : -1;
+    difficulty = DIFFICULTIES[(index + direction + DIFFICULTIES.length) % DIFFICULTIES.length];
+    return;
+  }
   if (e.key.toLowerCase() === "m") {
     if (!e.repeat) {
       muted = !muted;
