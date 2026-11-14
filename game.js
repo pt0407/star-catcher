@@ -134,6 +134,7 @@ let playerSpeed = 0;
 let gameOverTime = 0;
 let pauseStartTime = 0;
 let newBest = false;
+let bestAnnounced = false;
 let shake = 0;
 let heartFlash = 0;
 let heartBlinkTimer = 0;
@@ -240,6 +241,7 @@ function reset() {
   comboFlashRemaining = 0;
   comboFlash = null;
   newBest = false;
+  bestAnnounced = false;
 }
 
 function startGame() {
@@ -338,6 +340,14 @@ function checkMilestone() {
   lastMilestoneShown = milestone;
   milestoneFlash = `${milestone}!`;
   milestoneFlashRemaining = MILESTONE_FLASH_DURATION;
+}
+
+function checkNewBest() {
+  if (!bestAnnounced && best > 0 && score > best) {
+    bestAnnounced = true;
+    comboFlash = "NEW BEST!";
+    comboFlashRemaining = COMBO_FLASH_DURATION;
+  }
 }
 
 function update(dt) {
@@ -450,6 +460,7 @@ function update(dt) {
         runBestStreak = Math.max(runBestStreak, streak);
         const value = item.golden ? 3 : 1;
         score += value;
+        checkNewBest();
         checkHeartBonus();
         checkMilestone();
         spawnStarSparkles(item.x + SIZE.star / 2, item.y + SIZE.star / 2);
@@ -484,6 +495,7 @@ function update(dt) {
       streak += 1;
       runBestStreak = Math.max(runBestStreak, streak);
       score += 5;
+      checkNewBest();
       checkHeartBonus();
       checkMilestone();
       pops.push({
