@@ -558,6 +558,8 @@ function update(dt) {
           heartPopupRemaining = HEART_POPUP_DURATION;
           spawnStarSparkles(item.x + SIZE.heart / 2, item.y + SIZE.heart / 2, "#ff8fb3");
           pops.push({ x: item.x + SIZE.heart / 2, y: item.y + SIZE.heart / 2, age: 0, value: "heart", color: "#ff8fb3" });
+        } else {
+          pops.push({ x: item.x + SIZE.heart / 2, y: item.y + SIZE.heart / 2, age: 0, text: "full!", color: "#ff8fb3" });
         }
       } else {
         spawnRockBits(item.x + SIZE.rock / 2, item.y + SIZE.rock / 2, item.speedMultiplier > 1.4 ? "#ff7777" : "#888");
