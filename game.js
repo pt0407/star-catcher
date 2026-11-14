@@ -479,6 +479,8 @@ function update(dt) {
       }
     } else {
       item.y += fallSpeed * item.speedMultiplier * dt;
+      item.x += gustDirection * GUST_SPEED * 0.25 * gustPushTime;
+      item.x = Math.max(0, Math.min(canvas.width - SIZE[item.type], item.x));
     }
 
     const hit = touchesPlayer(item);
