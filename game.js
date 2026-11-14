@@ -539,6 +539,7 @@ function update(dt) {
         if (lives < MAX_LIVES) {
           lives += 1;
           heartPopupRemaining = HEART_POPUP_DURATION;
+          spawnStarSparkles(item.x + SIZE.heart / 2, item.y + SIZE.heart / 2, "#ff8fb3");
           pops.push({ x: item.x + SIZE.heart / 2, y: item.y + SIZE.heart / 2, age: 0, value: "heart" });
         }
       } else {
