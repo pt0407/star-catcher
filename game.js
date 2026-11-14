@@ -245,7 +245,7 @@ function draw() {
   ctx.fillText(`M: sound ${muted ? "off" : "on"}`, canvas.width - 20, 78);
 
   if (state === "ready") drawText([["Star Catcher", 28], ["Press Space to start", 14]]);
-  if (state === "over") drawText([["Game over", 28], [`Score ${score}   Best ${best}`, 14], [`Caught ${starsCaught} stars, hit ${rocksHit} rocks`, 14], ["Press Space to play again", 14]]);
+  if (state === "over") drawText([["Game over", 28], [`Score ${score}   Best ${best}`, 14], [`Stars ${starsCaught}  Rocks ${rocksHit}`, 14], ["Press Space to play again", 14]]);
   if (state === "paused") drawText([["Paused", 28]]);
   ctx.restore();
 }
