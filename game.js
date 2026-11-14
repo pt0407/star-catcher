@@ -345,7 +345,7 @@ function spawnItem() {
   let type;
   if (lives < MAX_LIVES && Math.random() < HEART_CHANCE) {
     type = "heart";
-  } else if (Math.random() < MAGNET_CHANCE) {
+  } else if (magnetRemaining <= 0 && Math.random() < MAGNET_CHANCE) {
     type = "magnet";
   } else {
     type = Math.random() < STAR_CHANCE ? "star" : "rock";
