@@ -23,6 +23,7 @@ const MIN_SPAWN_EVERY = 0.45;
 const STAR_CHANCE = 0.7;
 const GOLDEN_STAR_CHANCE = 1 / 12;
 const MAGNET_CHANCE = 1 / 25;
+const HEART_CHANCE = 1 / 30;
 const FAST_ROCK_CHANCE = 0.2;
 const MAGNET_DURATION = 4;
 const MAGNET_SPEED = 300;
@@ -279,7 +280,9 @@ function spawnStarSparkles(x, y) {
 
 function spawnItem() {
   let type;
-  if (Math.random() < MAGNET_CHANCE) {
+  if (Math.random() < HEART_CHANCE) {
+    type = "heart";
+  } else if (Math.random() < MAGNET_CHANCE) {
     type = "magnet";
   } else {
     type = Math.random() < STAR_CHANCE ? "star" : "rock";
@@ -436,7 +439,7 @@ function update(dt) {
     }
 
     if (touchesPlayer(item)) {
-      playCatchSound(item.type, item.type === 'star' ? Math.min(streak, 10) * 40 : 0);
+      playCatchSound(item.type === "heart" ? "star" : item.type, item.type === "star" ? Math.min(streak, 10) * 40 : 0);
       if (item.type === "star") {
         starsCaught += 1;
         streak += 1;
@@ -453,6 +456,12 @@ function update(dt) {
         pops.push({ x: item.x + SIZE.star / 2, y: item.y + SIZE.star / 2, age: 0, value });
       } else if (item.type === "magnet") {
         magnetRemaining = MAGNET_DURATION;
+      } else if (item.type === "heart") {
+        if (lives < MAX_LIVES) {
+          lives += 1;
+          heartPopupRemaining = HEART_POPUP_DURATION;
+        }
+        pops.push({ x: item.x + SIZE.heart / 2, y: item.y + SIZE.heart / 2, age: 0, value: "heart" });
       } else {
         spawnRockBits(item.x + SIZE.rock / 2, item.y + SIZE.rock / 2);
         rocksHit += 1;
