@@ -602,7 +602,7 @@ function update(dt) {
   }
 
   if (shootingStar) {
-    shootingStar.x += SHOOTING_STAR_SPEED * dt + gustDirection * GUST_SPEED * 0.25 * gustPushTime;
+    shootingStar.x += SHOOTING_STAR_SPEED * shootingStar.dir * dt + gustDirection * GUST_SPEED * 0.25 * gustPushTime;
     const overlapsPlayerX = shootingStar.x < player.x + SIZE.player &&
       shootingStar.x + SHOOTING_STAR_SIZE > player.x;
     if (overlapsPlayerX) {
@@ -624,13 +624,14 @@ function update(dt) {
         value: 5,
       });
       shootingStar = null;
-    } else if (shootingStar.x >= canvas.width) {
+    } else if (shootingStar.dir === 1 ? shootingStar.x >= canvas.width : shootingStar.x <= -SHOOTING_STAR_SIZE) {
       shootingStar = null;
     }
   } else {
     shootingStarTimer -= dt;
     if (shootingStarTimer <= 0) {
-      shootingStar = { x: -SHOOTING_STAR_SIZE, y: SHOOTING_STAR_Y };
+      const dir = Math.random() < 0.5 ? 1 : -1;
+      shootingStar = { x: dir === 1 ? -SHOOTING_STAR_SIZE : canvas.width, y: SHOOTING_STAR_Y, dir };
       shootingStarTimer = SHOOTING_STAR_INTERVAL;
     }
   }
@@ -753,15 +754,16 @@ function draw() {
   }
 
   if (shootingStar) {
-    const trail = ctx.createLinearGradient(shootingStar.x - 20, 0, shootingStar.x + 2, 0);
+    const dir = shootingStar.dir || 1;
+    const trail = ctx.createLinearGradient(shootingStar.x - 20 * dir, 0, shootingStar.x + 2 * dir, 0);
     trail.addColorStop(0, "rgba(255, 255, 255, 0)");
     trail.addColorStop(1, "rgba(255, 255, 255, 0.9)");
     ctx.strokeStyle = trail;
     ctx.lineWidth = 3;
     ctx.lineCap = "round";
     ctx.beginPath();
-    ctx.moveTo(shootingStar.x - 20, shootingStar.y + SHOOTING_STAR_SIZE / 2);
-    ctx.lineTo(shootingStar.x + 2, shootingStar.y + SHOOTING_STAR_SIZE / 2);
+    ctx.moveTo(shootingStar.x - 20 * dir, shootingStar.y + SHOOTING_STAR_SIZE / 2);
+    ctx.lineTo(shootingStar.x + 2 * dir, shootingStar.y + SHOOTING_STAR_SIZE / 2);
     ctx.stroke();
     if (isReady("star")) {
       ctx.drawImage(images.star, shootingStar.x, shootingStar.y, SHOOTING_STAR_SIZE, SHOOTING_STAR_SIZE);
