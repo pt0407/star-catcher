@@ -125,7 +125,7 @@ let bestStreak = Number(localStorage.getItem("starCatcherBestStreak") || 0);
 let totalStars = Number(localStorage.getItem("starCatcherTotalStars") || 0);
 let totalScore = Number(localStorage.getItem("starCatcherTotalScore") || 0);
 let hasSeenControlsTip = localStorage.getItem("starCatcherSeen") === "true";
-let state, player, items, pops, lives, score, starsCaught, rocksHit, streak, fallSpeed, spawnTimer;
+let state, player, items, pops, lives, score, starsCaught, goldenCaught, rocksHit, streak, fallSpeed, spawnTimer;
 let runBestStreak = 0;
 let bits = [];
 const inactiveBits = Array.from({ length: BIT_POOL_SIZE }, () => ({ x: 0, y: 0, vx: 0, vy: 0, age: 0 }));
@@ -283,6 +283,7 @@ function reset() {
   lives = START_LIVES;
   score = 0;
   starsCaught = 0;
+  goldenCaught = 0;
   rocksHit = 0;
   streak = 0;
   runBestStreak = 0;
@@ -547,6 +548,7 @@ function update(dt) {
       if (item.type === "star") {
         starsCaught += 1;
         totalStars += 1;
+        if (item.golden) goldenCaught += 1;
         streak += 1;
         if (streak % COMBO_EVERY === 0) {
           comboFlash = `COMBO ${streak}!`;
@@ -890,10 +892,11 @@ function draw() {
     if (newBest) gameOverLines.push(["New best!", 14]);
     const attempts = starsCaught + rocksHit;
     const accuracy = attempts > 0 ? Math.round((starsCaught / attempts) * 100) : 0;
-    gameOverLines.push([`Stars ${starsCaught}  Rocks ${rocksHit}  Total ${totalStars}  Acc ${accuracy}%`, 14]);
+    gameOverLines.push([`Stars ${starsCaught}  Rocks ${rocksHit}  Acc ${accuracy}%`, 14]);
+    gameOverLines.push([`All time ${totalStars}${goldenCaught > 0 ? `   Gold ${goldenCaught}` : ""}`, 14]);
 
     const panelWidth = 380;
-    const panelHeight = 240;
+    const panelHeight = 240 + Math.max(0, gameOverLines.length - 4) * 40;
     const panelX = (canvas.width - panelWidth) / 2;
     const panelY = (canvas.height - panelHeight) / 2;
     ctx.fillStyle = "rgba(4, 12, 32, 0.9)";
