@@ -89,6 +89,7 @@ function drawPlayer(x = player.x) {
 }
 
 let best = Number(localStorage.getItem("starCatcherBest") || 0);
+let hasSeenControlsTip = localStorage.getItem("starCatcherSeen") === "true";
 let state, player, items, pops, bits, lives, score, starsCaught, rocksHit, streak, fallSpeed, spawnTimer;
 let gustTimer, gustRemaining, gustDirection, magnetRemaining;
 let shootingStar, shootingStarTimer;
@@ -163,6 +164,14 @@ function reset() {
   shake = 0;
   heartFlash = 0;
   newBest = false;
+}
+
+function startGame() {
+  if (!hasSeenControlsTip) {
+    localStorage.setItem("starCatcherSeen", "true");
+    hasSeenControlsTip = true;
+  }
+  reset();
 }
 
 function spawnRockBits(x, y) {
@@ -442,6 +451,12 @@ function draw() {
   if (state === "ready") {
     const titleBob = Math.sin(performance.now() / 300) * 4;
     drawText([["Star Catcher", 28], ["Press Space to start", 14]], [titleBob]);
+    if (!hasSeenControlsTip) {
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#fff";
+      ctx.font = `10px ${FONT}`;
+      ctx.fillText("arrows or a/d to move", canvas.width / 2, canvas.height / 2 + 70);
+    }
   }
   if (state === "over") {
     const gameOverLines = [["Game over", 28], [`Score ${score}   Best ${best}`, 14]];
@@ -516,7 +531,7 @@ document.addEventListener("keydown", (e) => {
   }
   if (e.key === " " || e.key === "Enter") {
     e.preventDefault();
-    if (state === "ready" || (state === "over" && performance.now() - gameOverTime >= RESTART_DELAY_MS)) reset();
+    if (state === "ready" || (state === "over" && performance.now() - gameOverTime >= RESTART_DELAY_MS)) startGame();
     return;
   }
   if (e.key.startsWith("Arrow")) e.preventDefault();
