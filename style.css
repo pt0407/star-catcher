@@ -48,3 +48,15 @@ p {
   user-select: none;
   -webkit-user-select: none;
 }
+
+@media (max-height: 760px) {
+  body {
+    padding: 10px 8px;
+  }
+  h1 {
+    margin: 8px 0 12px;
+  }
+  p {
+    margin: 14px 0 8px;
+  }
+}
