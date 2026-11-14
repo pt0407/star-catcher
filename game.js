@@ -159,6 +159,7 @@ let fpsEnabled = false;
 let fpsWindowStart = 0;
 let fpsFrameCount = 0;
 let fpsText = "FPS 0";
+let bgPattern = null;
 const keys = {};
 
 function initializeAudio() {
@@ -573,9 +574,9 @@ function draw() {
     ctx.fillStyle = "#1b0f2e";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   } else if (isReady("background")) {
-    const pattern = ctx.createPattern(images.background, "repeat");
-    if (pattern) {
-      ctx.fillStyle = pattern;
+    if (!bgPattern) bgPattern = ctx.createPattern(images.background, "repeat");
+    if (bgPattern) {
+      ctx.fillStyle = bgPattern;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
   }
