@@ -117,6 +117,7 @@ function drawPlayer(x = player.x, yOffset = 0) {
 let best = Number(localStorage.getItem("starCatcherBest") || 0);
 let bestStreak = Number(localStorage.getItem("starCatcherBestStreak") || 0);
 let totalStars = Number(localStorage.getItem("starCatcherTotalStars") || 0);
+let totalScore = Number(localStorage.getItem("starCatcherTotalScore") || 0);
 let hasSeenControlsTip = localStorage.getItem("starCatcherSeen") === "true";
 let state, player, items, pops, lives, score, starsCaught, rocksHit, streak, fallSpeed, spawnTimer;
 let runBestStreak = 0;
@@ -387,6 +388,8 @@ function gameOver() {
     localStorage.setItem("starCatcherBestStreak", String(bestStreak));
   }
   localStorage.setItem("starCatcherTotalStars", String(totalStars));
+  totalScore += score;
+  localStorage.setItem("starCatcherTotalScore", String(totalScore));
 }
 
 function checkHeartBonus() {
@@ -842,6 +845,9 @@ function draw() {
     }
     if (totalStars > 0) {
       drawPixelText(`Stars ${totalStars} all time`, canvas.width / 2, canvas.height / 2 + 142, 8, "center");
+    }
+    if (totalScore > 0) {
+      drawPixelText(`Points ${totalScore} all time`, canvas.width / 2, canvas.height / 2 + 158, 8, "center");
     }
     if (!hasSeenControlsTip) {
       drawPixelText("arrows or a/d to move", canvas.width / 2, canvas.height / 2 + 90, 10, "center");
