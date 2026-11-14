@@ -658,6 +658,7 @@ function update(dt) {
     if (shootingStarTimer <= 0) {
       const dir = Math.random() < 0.5 ? 1 : -1;
       shootingStar = { x: dir === 1 ? -SHOOTING_STAR_SIZE : canvas.width, y: SHOOTING_STAR_Y + Math.random() * 40, dir };
+      shootingStarTrailTimer = 0;
       shootingStarTimer = SHOOTING_STAR_INTERVAL;
     }
   }
