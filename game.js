@@ -101,8 +101,10 @@ function drawPlayer(x = player.x) {
 }
 
 let best = Number(localStorage.getItem("starCatcherBest") || 0);
+let bestStreak = Number(localStorage.getItem("starCatcherBestStreak") || 0);
 let hasSeenControlsTip = localStorage.getItem("starCatcherSeen") === "true";
 let state, player, items, pops, lives, score, starsCaught, rocksHit, streak, fallSpeed, spawnTimer;
+let runBestStreak = 0;
 let bits = [];
 const inactiveBits = Array.from({ length: BIT_POOL_SIZE }, () => ({ x: 0, y: 0, vx: 0, vy: 0, age: 0 }));
 let gustTimer, gustRemaining, gustDirection, magnetRemaining;
@@ -178,6 +180,7 @@ function reset() {
   starsCaught = 0;
   rocksHit = 0;
   streak = 0;
+  runBestStreak = 0;
   fallSpeed = difficulty.fallSpeed;
   spawnTimer = 0;
   gustTimer = GUST_WAIT_MIN + Math.random() * (GUST_WAIT_MAX - GUST_WAIT_MIN);
@@ -252,6 +255,10 @@ function gameOver() {
   if (newBest) {
     best = score;
     localStorage.setItem("starCatcherBest", String(best));
+  }
+  if (runBestStreak > bestStreak) {
+    bestStreak = runBestStreak;
+    localStorage.setItem("starCatcherBestStreak", String(bestStreak));
   }
 }
 
@@ -364,6 +371,7 @@ function update(dt) {
       if (item.type === "star") {
         starsCaught += 1;
         streak += 1;
+        runBestStreak = Math.max(runBestStreak, streak);
         const value = item.golden ? 3 : 1;
         score += value;
         checkHeartBonus();
@@ -391,6 +399,7 @@ function update(dt) {
       playCatchSound("star");
       starsCaught += 1;
       streak += 1;
+      runBestStreak = Math.max(runBestStreak, streak);
       score += 5;
       checkHeartBonus();
       checkMilestone();
@@ -533,9 +542,14 @@ function draw() {
   ctx.fillStyle = "#fff";
   drawPixelText(`Score ${score}`, canvas.width - 10, 28, 10, "right");
   drawPixelText(`Best ${best}`, canvas.width - 10, 52, 10, "right");
-  if (streak >= 2) drawPixelText(`Streak ${streak}`, canvas.width - 10, 76, 10, "right");
+  let hudY = 76;
+  if (bestStreak >= 2) {
+    drawPixelText(`Best streak ${bestStreak}`, canvas.width - 10, hudY, 10, "right");
+    hudY += 24;
+  }
+  if (streak >= 2) drawPixelText(`Streak ${streak}`, canvas.width - 10, hudY, 10, "right");
   const speedLevel = 1 + Math.floor(score / SPEED_UP_EVERY);
-  if (speedLevel >= 2) drawPixelText(`Speed ${speedLevel}`, canvas.width - 10, 100, 10, "right");
+  if (speedLevel >= 2) drawPixelText(`Speed ${speedLevel}`, canvas.width - 10, hudY + 24, 10, "right");
   if (milestoneFlashRemaining > 0) {
     drawPixelText(milestoneFlash, canvas.width / 2, 32, 20, "center");
   }
