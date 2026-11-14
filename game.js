@@ -610,6 +610,10 @@ function draw() {
       ctx.filter = "sepia(1) saturate(4) hue-rotate(-50deg)";
       drawSprite("rock", item.x, item.y);
       ctx.filter = "none";
+    } else if (item.type === "star" && magnetRemaining > 0) {
+      ctx.filter = "hue-rotate(160deg) saturate(1.4)";
+      drawSprite("star", item.x, item.y);
+      ctx.filter = "none";
     } else {
       drawSprite(item.type, item.x, item.y);
     }
