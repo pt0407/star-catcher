@@ -5,6 +5,7 @@ ctx.imageSmoothingEnabled = false;
 const START_LIVES = 3;
 const MAX_LIVES = 5;
 const PLAYER_SPEED = 300;
+const NEAR_MISS_DISTANCE = 24;
 const GUST_WAIT_MIN = 12;
 const GUST_WAIT_MAX = 20;
 const GUST_DURATION = 2;
@@ -494,6 +495,14 @@ function update(dt) {
         heartFlash = HEART_FLASH_DURATION;
       }
     }
+    if (item.type === "rock" && !item.nearMiss && !touchesPlayer(item)) {
+      const verticallyClose = item.y < player.y + SIZE.player && item.y + SIZE.rock > player.y;
+      const horizontallyClose = Math.abs((item.x + SIZE.rock / 2) - (player.x + SIZE.player / 2)) < (SIZE.rock + SIZE.player) / 2 + NEAR_MISS_DISTANCE;
+      if (verticallyClose && horizontallyClose) {
+        item.nearMiss = true;
+        pops.push({ x: item.x + SIZE.rock / 2, y: item.y + SIZE.rock / 2, age: 0, text: 'close!' });
+      }
+    }
     if (touchesPlayer(item) || item.y >= canvas.height) items.splice(i, 1);
   }
 
@@ -628,7 +637,7 @@ function draw() {
     const progress = pop.age / POP_DURATION;
     ctx.globalAlpha = 1 - progress;
     ctx.fillStyle = "#fff";
-    drawPixelText(`+${pop.value || 1}`, pop.x, pop.y - progress * 30, 20, "center");
+    drawPixelText(pop.text || `+${pop.value || 1}`, pop.x, pop.y - progress * 30, 20, "center");
   }
   ctx.globalAlpha = 1;
 
