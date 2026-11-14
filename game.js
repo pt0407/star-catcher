@@ -300,7 +300,7 @@ function startGame() {
   reset();
 }
 
-function spawnRockBits(x, y) {
+function spawnRockBits(x, y, color = "#888") {
   for (let i = 0; i < BIT_COUNT; i++) {
     const bit = inactiveBits.pop();
     if (!bit) break;
@@ -310,6 +310,7 @@ function spawnRockBits(x, y) {
     bit.vx = (Math.random() * 2 - 1) * 150;
     bit.vy = (Math.random() * 2 - 1) * 150;
     bit.age = 0;
+    bit.color = color;
     bits.push(bit);
   }
 }
@@ -541,7 +542,7 @@ function update(dt) {
           pops.push({ x: item.x + SIZE.heart / 2, y: item.y + SIZE.heart / 2, age: 0, value: "heart" });
         }
       } else {
-        spawnRockBits(item.x + SIZE.rock / 2, item.y + SIZE.rock / 2);
+        spawnRockBits(item.x + SIZE.rock / 2, item.y + SIZE.rock / 2, item.speedMultiplier > 1.4 ? "#ff7777" : "#888");
         rocksHit += 1;
         streak = 0;
         lives -= 1;
@@ -696,8 +697,10 @@ function draw() {
       drawSprite(item.type, item.x, item.y);
     }
   }
-  ctx.fillStyle = "#888";
-  for (const bit of bits) ctx.fillRect(bit.x, bit.y, 3, 3);
+  for (const bit of bits) {
+    ctx.fillStyle = bit.color;
+    ctx.fillRect(bit.x, bit.y, 3, 3);
+  }
   for (const sparkle of sparkles) {
     ctx.fillStyle = sparkle.color;
     ctx.fillRect(sparkle.x, sparkle.y, 2, 2);
