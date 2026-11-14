@@ -554,9 +554,19 @@ function update(dt) {
   if (lives <= 0) gameOver();
 }
 
+let lastTextFont = "";
+let lastTextAlign = "";
+
 function drawPixelText(text, x, y, size, align) {
-  ctx.font = `${size}px ${FONT}`;
-  ctx.textAlign = align;
+  const font = `${size}px ${FONT}`;
+  if (font !== lastTextFont) {
+    ctx.font = font;
+    lastTextFont = font;
+  }
+  if (align !== lastTextAlign) {
+    ctx.textAlign = align;
+    lastTextAlign = align;
+  }
   ctx.fillText(text, x, y);
 }
 
