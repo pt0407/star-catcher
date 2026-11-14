@@ -894,7 +894,7 @@ document.addEventListener("keydown", (e) => {
     localStorage.setItem("starCatcherDifficulty", String(difficultyIndex));
     return;
   }
-  if (["ready", "over"].includes(state) && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+  if (["ready", "over"].includes(state) && !e.repeat && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
     e.preventDefault();
     const direction = e.key === "ArrowRight" ? 1 : -1;
     difficultyIndex = (difficultyIndex + direction + DIFFICULTIES.length) % DIFFICULTIES.length;
