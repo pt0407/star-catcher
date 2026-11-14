@@ -740,6 +740,13 @@ function draw() {
   const idleBob = state === "playing" && playerSpeed < 1 ? Math.sin(now / 500) * 2 : 0;
   const hop = hopTimer > 0 ? Math.sin((1 - hopTimer / HOP_DURATION) * Math.PI) * 8 : 0;
   drawPlayer(state === "ready" ? player.x + Math.sin(now / 400) * 30 : player.x, idleBob - hop);
+  if (magnetRemaining > 0 && state === "playing") {
+    ctx.strokeStyle = "rgba(79, 163, 255, 0.25)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(player.x + SIZE.player / 2, player.y + SIZE.player / 2, 110, 0, Math.PI * 2);
+    ctx.stroke();
+  }
   for (const item of items) {
     if (item.type === "magnet") {
       ctx.fillStyle = "#4fa3ff";
