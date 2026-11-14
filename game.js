@@ -620,7 +620,7 @@ function draw() {
     for (const x of playerTrail) drawPlayer(x);
     ctx.globalAlpha = 1;
   }
-  drawPlayer();
+  drawPlayer(state === "ready" ? player.x + Math.sin(now / 400) * 30 : player.x);
   for (const item of items) {
     if (item.type === "magnet") {
       ctx.fillStyle = "#4fa3ff";
