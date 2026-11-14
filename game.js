@@ -139,7 +139,7 @@ const starfield = Array.from({ length: STARFIELD_COUNT }, () => ({
   speed: 1 + Math.random() * 2,
 }));
 let gustTimer, gustRemaining, gustDirection, magnetRemaining;
-let shootingStar, shootingStarTimer;
+let shootingStar, shootingStarTimer, shootingStarTrailTimer;
 let difficultyIndex = Number(localStorage.getItem("starCatcherDifficulty") || 1);
 let difficulty = DIFFICULTIES[difficultyIndex];
 let playerFacingLeft = false;
@@ -281,6 +281,7 @@ function reset() {
   pops = [];
   shootingStar = null;
   shootingStarTimer = SHOOTING_STAR_INTERVAL;
+  shootingStarTrailTimer = 0;
   lives = START_LIVES;
   score = 0;
   starsCaught = 0;
@@ -618,6 +619,11 @@ function update(dt) {
 
   if (shootingStar) {
     shootingStar.x += SHOOTING_STAR_SPEED * shootingStar.dir * dt + gustDirection * GUST_SPEED * 0.25 * gustPushTime;
+    shootingStarTrailTimer -= dt;
+    if (shootingStarTrailTimer <= 0) {
+      shootingStarTrailTimer = 0.08;
+      spawnStarSparkles(shootingStar.x + SHOOTING_STAR_SIZE / 2 - shootingStar.dir * 10, shootingStar.y + SHOOTING_STAR_SIZE / 2, "#ffffff", 1);
+    }
     const overlapsPlayerX = shootingStar.x < player.x + SIZE.player &&
       shootingStar.x + SHOOTING_STAR_SIZE > player.x;
     if (overlapsPlayerX) {
