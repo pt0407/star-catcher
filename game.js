@@ -489,9 +489,10 @@ function update(dt) {
 
   for (let i = items.length - 1; i >= 0; i--) {
     const item = items[i];
-    if (item.type === "star" && magnetRemaining > 0) {
-      const dx = player.x + SIZE.player / 2 - (item.x + SIZE.star / 2);
-      const dy = player.y + SIZE.player / 2 - (item.y + SIZE.star / 2);
+    if ((item.type === "star" || item.type === "heart") && magnetRemaining > 0) {
+      const half = SIZE[item.type] / 2;
+      const dx = player.x + SIZE.player / 2 - (item.x + half);
+      const dy = player.y + SIZE.player / 2 - (item.y + half);
       const distance = Math.hypot(dx, dy);
       if (distance > 0) {
         const step = Math.min(MAGNET_SPEED * dt, distance);
