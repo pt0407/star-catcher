@@ -125,6 +125,7 @@ let playerFacingLeft = false;
 let playerTrail = [];
 let playerSpeed = 0;
 let gameOverTime = 0;
+let pauseStartTime = 0;
 let newBest = false;
 let shake = 0;
 let heartFlash = 0;
@@ -638,7 +639,12 @@ function draw() {
     }
   }
   if (state === "paused") {
-    drawText([["Paused", 28], ["Press P or Esc to resume", 14], [`Score ${score}`, 14]]);
+    const pauseLines = [["Paused", 28]];
+    if (performance.now() - pauseStartTime < 5000) {
+      pauseLines.push(["Press P or Esc to resume", 14]);
+    }
+    pauseLines.push([`Score ${score}`, 14]);
+    drawText(pauseLines);
   }
   ctx.restore();
 }
@@ -660,7 +666,10 @@ canvas.addEventListener("touchcancel", () => {
 });
 
 document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "hidden" && state === "playing") state = "paused";
+  if (document.visibilityState === "hidden" && state === "playing") {
+    state = "paused";
+    pauseStartTime = performance.now();
+  }
 });
 
 window.addEventListener("blur", () => {
@@ -697,7 +706,12 @@ document.addEventListener("keydown", (e) => {
   }
   if (e.key.toLowerCase() === "p" || e.key === "Escape") {
     if (!e.repeat && (state === "playing" || state === "paused")) {
-      state = state === "playing" ? "paused" : "playing";
+      if (state === "playing") {
+        state = "paused";
+        pauseStartTime = performance.now();
+      } else {
+        state = "playing";
+      }
       playPauseSound();
     }
     return;
