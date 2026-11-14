@@ -1,3 +1,9 @@
+import { loadItem, saveItem } from "./persist.js";
+import {
+  initializeAudio, isMuted, toggleMute,
+  playCatchSound, playPauseSound, playNewBestSound, playGustSound, playMissSound,
+} from "./audio.js";
+
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 ctx.imageSmoothingEnabled = false;
@@ -33,12 +39,6 @@ const SHOOTING_STAR_INTERVAL = 20;
 const SHOOTING_STAR_SPEED = 500;
 const SHOOTING_STAR_SIZE = 24;
 const SHOOTING_STAR_Y = 40;
-const STAR_FREQUENCY = 600;
-const STAR_DURATION = 0.08;
-const ROCK_FREQUENCY = 140;
-const PAUSE_FREQUENCY = 220;
-const PAUSE_DURATION = 0.07;
-const ROCK_DURATION = 0.15;
 const POP_DURATION = 0.8;
 const HEART_POPUP_DURATION = 0.8;
 const BIT_COUNT = 6;
@@ -93,12 +93,6 @@ function isReady(name) {
   return imageReady[name];
 }
 
-function saveItem(key, value) {
-  try {
-    localStorage.setItem(key, value);
-  } catch (e) {}
-}
-
 function drawSprite(name, x, y) {
   if (isReady(name)) {
     ctx.drawImage(images[name], x, y, SIZE[name], SIZE[name]);
@@ -121,11 +115,11 @@ function drawPlayer(x = player.x, yOffset = 0) {
   ctx.restore();
 }
 
-let best = Number(localStorage.getItem("starCatcherBest") || 0);
-let bestStreak = Number(localStorage.getItem("starCatcherBestStreak") || 0);
-let totalStars = Number(localStorage.getItem("starCatcherTotalStars") || 0);
-let totalScore = Number(localStorage.getItem("starCatcherTotalScore") || 0);
-let hasSeenControlsTip = localStorage.getItem("starCatcherSeen") === "true";
+let best = Number(loadItem("starCatcherBest", "0"));
+let bestStreak = Number(loadItem("starCatcherBestStreak", "0"));
+let totalStars = Number(loadItem("starCatcherTotalStars", "0"));
+let totalScore = Number(loadItem("starCatcherTotalScore", "0"));
+let hasSeenControlsTip = loadItem("starCatcherSeen", "false") === "true";
 let state, player, items, pops, lives, score, starsCaught, goldenCaught, rocksHit, streak, fallSpeed, spawnTimer;
 let runBestStreak = 0;
 let bits = [];
@@ -141,7 +135,7 @@ const starfield = Array.from({ length: STARFIELD_COUNT }, () => ({
 }));
 let gustTimer, gustRemaining, gustDirection, magnetRemaining;
 let shootingStar, shootingStarTimer, shootingStarTrailTimer;
-let difficultyIndex = Number(localStorage.getItem("starCatcherDifficulty") || 1);
+let difficultyIndex = Number(loadItem("starCatcherDifficulty", "1"));
 let difficulty = DIFFICULTIES[difficultyIndex];
 let playerFacingLeft = false;
 let playerTrail = [];
@@ -167,9 +161,7 @@ let comboFlash = null;
 let perfectFlashRemaining = 0;
 let perfectFlash = null;
 let starsPopRemaining = 0;
-let audioContext = null;
-let muted = localStorage.getItem("starCatcherMuted") === "true";
-let nightMode = localStorage.getItem("starCatcherNight") === "true";
+let nightMode = loadItem("starCatcherNight", "false") === "true";
 let touchTargetX = null;
 let fpsEnabled = false;
 let fpsWindowStart = 0;
@@ -179,112 +171,6 @@ let fpsValue = 0;
 let bgPattern = null;
 let vignette = null;
 const keys = {};
-
-function initializeAudio() {
-  if (!audioContext) {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return;
-    audioContext = new AudioContextClass();
-  }
-  if (audioContext.state === "suspended") audioContext.resume();
-}
-
-function playCatchSound(type, pitchStep = 0) {
-  if (muted || !audioContext) return;
-
-  const isStar = type === "star";
-  const oscillator = audioContext.createOscillator();
-  const gain = audioContext.createGain();
-  const now = audioContext.currentTime;
-  const duration = isStar ? STAR_DURATION : ROCK_DURATION;
-
-  oscillator.type = isStar ? "sine" : "square";
-  oscillator.frequency.value = isStar ? STAR_FREQUENCY + pitchStep : ROCK_FREQUENCY;
-  gain.gain.setValueAtTime(0.0001, now);
-  gain.gain.exponentialRampToValueAtTime(0.15, now + 0.01);
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-  oscillator.connect(gain);
-  gain.connect(audioContext.destination);
-  oscillator.start(now);
-  oscillator.stop(now + duration);
-}
-
-function playPauseSound() {
-  if (muted || !audioContext) return;
-
-  const oscillator = audioContext.createOscillator();
-  const gain = audioContext.createGain();
-  const now = audioContext.currentTime;
-
-  oscillator.type = "square";
-  oscillator.frequency.value = PAUSE_FREQUENCY;
-  gain.gain.setValueAtTime(0.0001, now);
-  gain.gain.exponentialRampToValueAtTime(0.08, now + 0.01);
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + PAUSE_DURATION);
-  oscillator.connect(gain);
-  gain.connect(audioContext.destination);
-  oscillator.start(now);
-  oscillator.stop(now + PAUSE_DURATION);
-}
-
-function playNewBestSound() {
-  if (muted || !audioContext) return;
-
-  const notes = [523, 659, 784];
-  notes.forEach((frequency, i) => {
-    const oscillator = audioContext.createOscillator();
-    const gain = audioContext.createGain();
-    const start = audioContext.currentTime + i * 0.09;
-
-    oscillator.type = "square";
-    oscillator.frequency.value = frequency;
-    gain.gain.setValueAtTime(0.0001, start);
-    gain.gain.exponentialRampToValueAtTime(0.1, start + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.12);
-    oscillator.connect(gain);
-    gain.connect(audioContext.destination);
-    oscillator.start(start);
-    oscillator.stop(start + 0.12);
-  });
-}
-
-function playGustSound() {
-  if (muted || !audioContext) return;
-
-  const oscillator = audioContext.createOscillator();
-  const gain = audioContext.createGain();
-  const now = audioContext.currentTime;
-
-  oscillator.type = "sawtooth";
-  oscillator.frequency.setValueAtTime(180, now);
-  oscillator.frequency.exponentialRampToValueAtTime(420, now + GUST_DURATION);
-  gain.gain.setValueAtTime(0.0001, now);
-  gain.gain.exponentialRampToValueAtTime(0.06, now + 0.05);
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + GUST_DURATION);
-  oscillator.connect(gain);
-  gain.connect(audioContext.destination);
-  oscillator.start(now);
-  oscillator.stop(now + GUST_DURATION);
-}
-
-function playMissSound() {
-  if (muted || !audioContext) return;
-
-  const oscillator = audioContext.createOscillator();
-  const gain = audioContext.createGain();
-  const now = audioContext.currentTime;
-
-  oscillator.type = "sine";
-  oscillator.frequency.setValueAtTime(320, now);
-  oscillator.frequency.exponentialRampToValueAtTime(140, now + 0.18);
-  gain.gain.setValueAtTime(0.0001, now);
-  gain.gain.exponentialRampToValueAtTime(0.08, now + 0.01);
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
-  oscillator.connect(gain);
-  gain.connect(audioContext.destination);
-  oscillator.start(now);
-  oscillator.stop(now + 0.18);
-}
 
 function reset() {
   for (const bit of bits) inactiveBits.push(bit);
@@ -917,7 +803,7 @@ function draw() {
     drawPixelText(`Stars ${starsCaught}`, 10, canvas.height - 26, 8, "left");
     ctx.fillStyle = "#fff";
   }
-  drawPixelText(`M: sound ${muted ? "off" : "on"}`, 10, canvas.height - 10, 10, "left");
+  drawPixelText(`M: sound ${isMuted() ? "off" : "on"}`, 10, canvas.height - 10, 10, "left");
 
   if (state === "paused" || state === "over") {
     ctx.fillStyle = "rgba(0, 0, 0, 0.55)";
@@ -1033,8 +919,7 @@ document.addEventListener("keydown", (e) => {
   }
   if (e.key.toLowerCase() === "m") {
     if (!e.repeat) {
-      muted = !muted;
-      saveItem("starCatcherMuted", String(muted));
+      toggleMute();
     }
     return;
   }
@@ -1099,3 +984,17 @@ function frame(time) {
 reset();
 state = "ready";
 requestAnimationFrame(frame);
+
+// handy for poking at in the console
+window.__game = {
+  get state() { return state; },
+  get score() { return score; },
+  get lives() { return lives; },
+  get starsCaught() { return starsCaught; },
+  get items() { return items; },
+  get pops() { return pops; },
+  get muted() { return isMuted(); },
+  get magnetRemaining() { return magnetRemaining; },
+  get gustRemaining() { return gustRemaining; },
+  get difficulty() { return difficulty.name; },
+};
