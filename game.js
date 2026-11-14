@@ -139,6 +139,8 @@ let playerFacingLeft = false;
 let playerTrail = [];
 let playerSpeed = 0;
 let gameOverTime = 0;
+let runStartTime = 0;
+let runTimeText = "0:00";
 let pauseStartTime = 0;
 let newBest = false;
 let bestAnnounced = false;
@@ -260,6 +262,7 @@ function reset() {
   for (const sparkle of sparkles) inactiveSparkles.push(sparkle);
   sparkles.length = 0;
   state = "playing";
+  runStartTime = performance.now();
   player = { x: canvas.width / 2 - SIZE.player / 2, y: canvas.height - 90 };
   playerFacingLeft = false;
   playerTrail = [];
@@ -368,6 +371,8 @@ function touchesPlayer(item) {
 function gameOver() {
   state = "over";
   gameOverTime = performance.now();
+  const elapsed = Math.floor((gameOverTime - runStartTime) / 1000);
+  runTimeText = `${Math.floor(elapsed / 60)}:${String(elapsed % 60).padStart(2, "0")}`;
   newBest = score > best;
   if (newBest) {
     best = score;
@@ -841,7 +846,7 @@ function draw() {
     }
   }
   if (state === "over") {
-    const gameOverLines = [["Game over", 28], [`Score ${score}   Best ${best}`, 14]];
+    const gameOverLines = [["Game over", 28], [`Score ${score}   Best ${best}   ${runTimeText}`, 14]];
     if (newBest) gameOverLines.push(["New best!", 14]);
     const attempts = starsCaught + rocksHit;
     const accuracy = attempts > 0 ? Math.round((starsCaught / attempts) * 100) : 0;
