@@ -131,7 +131,8 @@ const starfield = Array.from({ length: STARFIELD_COUNT }, () => ({
 }));
 let gustTimer, gustRemaining, gustDirection, magnetRemaining;
 let shootingStar, shootingStarTimer;
-let difficulty = DIFFICULTIES[1];
+let difficultyIndex = Number(localStorage.getItem("starCatcherDifficulty") || 1);
+let difficulty = DIFFICULTIES[difficultyIndex];
 let playerFacingLeft = false;
 let playerTrail = [];
 let playerSpeed = 0;
@@ -886,14 +887,17 @@ window.addEventListener("blur", () => {
 document.addEventListener("keydown", (e) => {
   initializeAudio();
   if (["ready", "over"].includes(state) && ["1", "2", "3"].includes(e.key)) {
-    difficulty = DIFFICULTIES[Number(e.key) - 1];
+    difficultyIndex = Number(e.key) - 1;
+    difficulty = DIFFICULTIES[difficultyIndex];
+    localStorage.setItem("starCatcherDifficulty", String(difficultyIndex));
     return;
   }
   if (["ready", "over"].includes(state) && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
     e.preventDefault();
-    const index = DIFFICULTIES.indexOf(difficulty);
     const direction = e.key === "ArrowRight" ? 1 : -1;
-    difficulty = DIFFICULTIES[(index + direction + DIFFICULTIES.length) % DIFFICULTIES.length];
+    difficultyIndex = (difficultyIndex + direction + DIFFICULTIES.length) % DIFFICULTIES.length;
+    difficulty = DIFFICULTIES[difficultyIndex];
+    localStorage.setItem("starCatcherDifficulty", String(difficultyIndex));
     return;
   }
   if (e.key.toLowerCase() === "m") {
