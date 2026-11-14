@@ -39,6 +39,8 @@ const SHAKE_DURATION = 0.3;
 const SHAKE_AMOUNT = 4;
 const HEART_FLASH_DURATION = 0.2;
 const HEART_BLINK_INTERVAL = 0.25;
+const MILESTONES = [25, 50, 100];
+const MILESTONE_FLASH_DURATION = 1;
 const RESTART_DELAY_MS = 600;
 
 const SPRITES = {
@@ -108,6 +110,9 @@ let shake = 0;
 let heartFlash = 0;
 let heartBlinkTimer = 0;
 let heartVisible = true;
+let lastMilestoneShown = 0;
+let milestoneFlashRemaining = 0;
+let milestoneFlash = null;
 let audioContext = null;
 let muted = localStorage.getItem("starCatcherMuted") === "true";
 let nightMode = localStorage.getItem("starCatcherNight") === "true";
@@ -173,6 +178,9 @@ function reset() {
   heartFlash = 0;
   heartBlinkTimer = 0;
   heartVisible = true;
+  lastMilestoneShown = 0;
+  milestoneFlashRemaining = 0;
+  milestoneFlash = null;
   newBest = false;
 }
 
@@ -231,9 +239,19 @@ function gameOver() {
   }
 }
 
+function checkMilestone() {
+  const milestone = MILESTONES.find((value) => value > lastMilestoneShown && score >= value);
+  if (milestone === undefined) return;
+
+  lastMilestoneShown = milestone;
+  milestoneFlash = `${milestone}!`;
+  milestoneFlashRemaining = MILESTONE_FLASH_DURATION;
+}
+
 function update(dt) {
   shake = Math.max(0, shake - dt);
   heartFlash = Math.max(0, heartFlash - dt);
+  milestoneFlashRemaining = Math.max(0, milestoneFlashRemaining - dt);
 
   if (lives === 1) {
     heartBlinkTimer += dt;
@@ -317,6 +335,7 @@ function update(dt) {
         starsCaught += 1;
         streak += 1;
         score += 1;
+        checkMilestone();
         pops.push({ x: item.x + SIZE.star / 2, y: item.y + SIZE.star / 2, age: 0 });
       } else if (item.type === "magnet") {
         magnetRemaining = MAGNET_DURATION;
@@ -341,6 +360,7 @@ function update(dt) {
       starsCaught += 1;
       streak += 1;
       score += 5;
+      checkMilestone();
       pops.push({
         x: shootingStar.x + SHOOTING_STAR_SIZE / 2,
         y: shootingStar.y + SHOOTING_STAR_SIZE / 2,
@@ -458,6 +478,9 @@ function draw() {
   drawPixelText(`Score ${score}`, canvas.width - 10, 28, 10, "right");
   drawPixelText(`Best ${best}`, canvas.width - 10, 52, 10, "right");
   if (streak >= 2) drawPixelText(`Streak ${streak}`, canvas.width - 10, 76, 10, "right");
+  if (milestoneFlashRemaining > 0) {
+    drawPixelText(milestoneFlash, canvas.width / 2, 32, 20, "center");
+  }
   drawPixelText(`M: sound ${muted ? "off" : "on"}`, 10, canvas.height - 10, 10, "left");
 
   if (state === "paused" || state === "over") {
