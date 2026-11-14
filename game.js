@@ -19,6 +19,7 @@ const ROCK_DURATION = 0.15;
 const POP_DURATION = 0.8;
 const SHAKE_DURATION = 0.3;
 const SHAKE_AMOUNT = 4;
+const RESTART_DELAY_MS = 600;
 
 const SPRITES = {
   background: "assets/background.png",
@@ -61,6 +62,7 @@ function drawSprite(name, x, y) {
 
 let best = Number(localStorage.getItem("starCatcherBest") || 0);
 let state, player, items, pops, lives, score, starsCaught, rocksHit, fallSpeed, spawnTimer;
+let gameOverTime = 0;
 let shake = 0;
 let audioContext = null;
 let muted = false;
@@ -132,6 +134,7 @@ function touchesPlayer(item) {
 
 function gameOver() {
   state = "over";
+  gameOverTime = performance.now();
   if (score > best) {
     best = score;
     localStorage.setItem("starCatcherBest", String(best));
@@ -263,7 +266,7 @@ document.addEventListener("keydown", (e) => {
   }
   if (e.key === " ") {
     e.preventDefault();
-    if (state === "ready" || state === "over") reset();
+    if (state === "ready" || (state === "over" && performance.now() - gameOverTime >= RESTART_DELAY_MS)) reset();
     return;
   }
   if (e.key.startsWith("Arrow")) e.preventDefault();
