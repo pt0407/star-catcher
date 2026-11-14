@@ -33,6 +33,8 @@ const SHOOTING_STAR_Y = 40;
 const STAR_FREQUENCY = 600;
 const STAR_DURATION = 0.08;
 const ROCK_FREQUENCY = 140;
+const PAUSE_FREQUENCY = 220;
+const PAUSE_DURATION = 0.07;
 const ROCK_DURATION = 0.15;
 const POP_DURATION = 0.8;
 const HEART_POPUP_DURATION = 0.8;
@@ -172,6 +174,24 @@ function playCatchSound(type) {
   gain.connect(audioContext.destination);
   oscillator.start(now);
   oscillator.stop(now + duration);
+}
+
+function playPauseSound() {
+  if (muted || !audioContext) return;
+
+  const oscillator = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+  const now = audioContext.currentTime;
+
+  oscillator.type = "square";
+  oscillator.frequency.value = PAUSE_FREQUENCY;
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.08, now + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + PAUSE_DURATION);
+  oscillator.connect(gain);
+  gain.connect(audioContext.destination);
+  oscillator.start(now);
+  oscillator.stop(now + PAUSE_DURATION);
 }
 
 function reset() {
@@ -673,6 +693,7 @@ document.addEventListener("keydown", (e) => {
   if (e.key.toLowerCase() === "p" || e.key === "Escape") {
     if (!e.repeat && (state === "playing" || state === "paused")) {
       state = state === "playing" ? "paused" : "playing";
+      playPauseSound();
     }
     return;
   }
