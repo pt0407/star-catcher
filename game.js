@@ -423,6 +423,7 @@ function checkMilestone() {
   milestoneFlash = `${milestone}!`;
   milestoneFlashRemaining = MILESTONE_FLASH_DURATION;
   shake = Math.max(shake, 0.15);
+  spawnStarSparkles(player.x + SIZE.player / 2, player.y + SIZE.player / 2, "#ffd75e", 16);
 }
 
 function checkNewBest() {
