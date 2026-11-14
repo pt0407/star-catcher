@@ -7,6 +7,7 @@ const MAX_LIVES = 5;
 const PLAYER_SPEED = 300;
 const NEAR_MISS_DISTANCE = 24;
 const GUST_WAIT_MIN = 12;
+const GUST_WARNING_TIME = 2;
 const GUST_WAIT_MAX = 20;
 const GUST_DURATION = 2;
 const GUST_SPEED = 180;
@@ -462,8 +463,12 @@ function update(dt) {
     gustRemaining -= gustPushTime;
   } else {
     gustTimer -= dt;
-    if (gustTimer <= 0) {
+    if (gustTimer > GUST_WARNING_TIME) {
+      gustDirection = 0;
+    } else if (gustDirection === 0) {
       gustDirection = Math.random() < 0.5 ? -1 : 1;
+    }
+    if (gustTimer <= 0) {
       gustRemaining = GUST_DURATION;
       gustTimer = GUST_WAIT_MIN + Math.random() * (GUST_WAIT_MAX - GUST_WAIT_MIN);
       playGustSound();
@@ -764,6 +769,11 @@ function draw() {
   }
   if (gustRemaining > 0) {
     ctx.globalAlpha = 0.6 + 0.4 * Math.sin(now / 100);
+    ctx.fillStyle = "#fff";
+    drawPixelText(gustDirection < 0 ? "<<" : ">>", canvas.width / 2, 48, 14, "center");
+    ctx.globalAlpha = 1;
+  } else if (gustTimer <= GUST_WARNING_TIME && gustDirection !== 0) {
+    ctx.globalAlpha = 0.3;
     ctx.fillStyle = "#fff";
     drawPixelText(gustDirection < 0 ? "<<" : ">>", canvas.width / 2, 48, 14, "center");
     ctx.globalAlpha = 1;
