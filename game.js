@@ -249,8 +249,8 @@ function draw() {
   ctx.fillStyle = "#fff";
   ctx.font = `10px ${FONT}`;
   ctx.fillText(`Score ${score}`, canvas.width - 10, 28);
-  ctx.fillText(`Best ${best}`, canvas.width - 10, 46);
-  if (streak >= 2) ctx.fillText(`Streak ${streak}`, canvas.width - 10, 64);
+  ctx.fillText(`Best ${best}`, canvas.width - 10, 52);
+  if (streak >= 2) ctx.fillText(`Streak ${streak}`, canvas.width - 10, 76);
   ctx.textAlign = "left";
   ctx.font = `10px ${FONT}`;
   ctx.fillText(`M: sound ${muted ? "off" : "on"}`, 10, canvas.height - 10);
