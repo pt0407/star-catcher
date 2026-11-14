@@ -49,6 +49,7 @@ const SPARKLE_POOL_SIZE = SPARKLE_COUNT * 10;
 const SPARKLE_LIFETIME = 0.35;
 const SPARKLE_GRAVITY = 250;
 const SHAKE_DURATION = 0.3;
+const HOP_DURATION = 0.25;
 const SHAKE_AMOUNT = 4;
 const HEART_FLASH_DURATION = 0.2;
 const HEART_BLINK_INTERVAL = 0.25;
@@ -139,6 +140,7 @@ let pauseStartTime = 0;
 let newBest = false;
 let bestAnnounced = false;
 let shake = 0;
+let hopTimer = 0;
 let heartFlash = 0;
 let heartBlinkTimer = 0;
 let heartVisible = true;
@@ -276,6 +278,7 @@ function reset() {
   gustDirection = 0;
   magnetRemaining = 0;
   shake = 0;
+  hopTimer = 0;
   heartFlash = 0;
   heartBlinkTimer = 0;
   heartVisible = true;
@@ -405,6 +408,7 @@ function checkNewBest() {
 
 function update(dt) {
   shake = Math.max(0, shake - dt);
+  hopTimer = Math.max(0, hopTimer - dt);
   heartFlash = Math.max(0, heartFlash - dt);
   heartPopupRemaining = Math.max(0, heartPopupRemaining - dt);
   milestoneFlashRemaining = Math.max(0, milestoneFlashRemaining - dt);
@@ -530,6 +534,7 @@ function update(dt) {
         checkHeartBonus();
         checkMilestone();
         spawnStarSparkles(item.x + SIZE.star / 2, item.y + SIZE.star / 2, item.golden ? "#ffcf40" : "#fff3a0");
+        hopTimer = HOP_DURATION;
         pops.push({ x: item.x + SIZE.star / 2, y: item.y + SIZE.star / 2, age: 0, value });
       } else if (item.type === "magnet") {
         magnetRemaining = MAGNET_DURATION;
@@ -583,6 +588,7 @@ function update(dt) {
       checkHeartBonus();
       checkMilestone();
       spawnStarSparkles(shootingStar.x + SHOOTING_STAR_SIZE / 2, shootingStar.y + SHOOTING_STAR_SIZE / 2, "#ffffff");
+      hopTimer = HOP_DURATION;
       pops.push({
         x: shootingStar.x + SHOOTING_STAR_SIZE / 2,
         y: shootingStar.y + SHOOTING_STAR_SIZE / 2,
@@ -671,7 +677,8 @@ function draw() {
     ctx.globalAlpha = 1;
   }
   const idleBob = state === "playing" && playerSpeed < 1 ? Math.sin(now / 500) * 2 : 0;
-  drawPlayer(state === "ready" ? player.x + Math.sin(now / 400) * 30 : player.x, idleBob);
+  const hop = hopTimer > 0 ? Math.sin((1 - hopTimer / HOP_DURATION) * Math.PI) * 8 : 0;
+  drawPlayer(state === "ready" ? player.x + Math.sin(now / 400) * 30 : player.x, idleBob - hop);
   for (const item of items) {
     if (item.type === "magnet") {
       ctx.fillStyle = "#4fa3ff";
