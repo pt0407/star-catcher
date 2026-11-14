@@ -254,6 +254,11 @@ function draw() {
   ctx.font = `8px ${FONT}`;
   ctx.fillText(`M: sound ${muted ? "off" : "on"}`, canvas.width - 20, 78);
 
+  if (state === "paused" || state === "over") {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.55)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
   if (state === "ready") drawText([["Star Catcher", 28], ["Press Space to start", 14]]);
   if (state === "over") {
     const gameOverLines = [["Game over", 28], [`Score ${score}   Best ${best}`, 14]];
