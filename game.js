@@ -7,6 +7,9 @@ const START_FALL_SPEED = 120;
 const SPEED_UP_EVERY = 10;
 const SPEED_UP_AMOUNT = 20;
 const SPAWN_EVERY = 0.9;
+const SPAWN_INTERVAL_SCORE_STEP = 5;
+const SPAWN_INTERVAL_DECREASE = 0.03;
+const MIN_SPAWN_EVERY = 0.45;
 const STAR_CHANCE = 0.7;
 const STAR_FREQUENCY = 600;
 const STAR_DURATION = 0.08;
@@ -98,6 +101,11 @@ function spawnItem() {
   items.push({ type, x: Math.random() * (canvas.width - SIZE[type]), y: -SIZE[type] });
 }
 
+function getSpawnInterval() {
+  const reductions = Math.floor(score / SPAWN_INTERVAL_SCORE_STEP) * SPAWN_INTERVAL_DECREASE;
+  return Math.max(MIN_SPAWN_EVERY, SPAWN_EVERY - reductions);
+}
+
 function touchesPlayer(item) {
   const s = SIZE[item.type];
   return item.x < player.x + SIZE.player && item.x + s > player.x &&
@@ -122,7 +130,7 @@ function update(dt) {
   spawnTimer -= dt;
   if (spawnTimer <= 0) {
     spawnItem();
-    spawnTimer = SPAWN_EVERY;
+    spawnTimer = getSpawnInterval();
   }
 
   for (const item of items) {
