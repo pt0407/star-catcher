@@ -480,11 +480,9 @@ function draw() {
         ctx.fillRect(item.x, item.y, SIZE.star, SIZE.star);
       }
     } else if (item.type === "rock" && item.speedMultiplier > 1) {
+      ctx.filter = "sepia(1) saturate(4) hue-rotate(-50deg)";
       drawSprite("rock", item.x, item.y);
-      ctx.globalCompositeOperation = "source-atop";
-      ctx.fillStyle = "rgba(229, 57, 53, 0.6)";
-      ctx.fillRect(item.x, item.y, SIZE.rock, SIZE.rock);
-      ctx.globalCompositeOperation = "source-over";
+      ctx.filter = "none";
     } else {
       drawSprite(item.type, item.x, item.y);
     }
