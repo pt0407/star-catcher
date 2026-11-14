@@ -55,6 +55,7 @@ const MILESTONES = [25, 50, 100];
 const MILESTONE_FLASH_DURATION = 1;
 const COMBO_EVERY = 5;
 const COMBO_FLASH_DURATION = 1;
+const PERFECT_FLASH_DURATION = 1;
 const RESTART_DELAY_MS = 600;
 
 const SPRITES = {
@@ -146,6 +147,8 @@ let milestoneFlashRemaining = 0;
 let milestoneFlash = null;
 let comboFlashRemaining = 0;
 let comboFlash = null;
+let perfectFlashRemaining = 0;
+let perfectFlash = null;
 let audioContext = null;
 let muted = localStorage.getItem("starCatcherMuted") === "true";
 let nightMode = localStorage.getItem("starCatcherNight") === "true";
@@ -240,6 +243,8 @@ function reset() {
   milestoneFlash = null;
   comboFlashRemaining = 0;
   comboFlash = null;
+  perfectFlashRemaining = 0;
+  perfectFlash = null;
   newBest = false;
   bestAnnounced = false;
 }
@@ -356,6 +361,7 @@ function update(dt) {
   heartPopupRemaining = Math.max(0, heartPopupRemaining - dt);
   milestoneFlashRemaining = Math.max(0, milestoneFlashRemaining - dt);
   comboFlashRemaining = Math.max(0, comboFlashRemaining - dt);
+  perfectFlashRemaining = Math.max(0, perfectFlashRemaining - dt);
 
   if (lives === 1) {
     heartBlinkTimer += dt;
@@ -458,7 +464,13 @@ function update(dt) {
           comboFlashRemaining = COMBO_FLASH_DURATION;
         }
         runBestStreak = Math.max(runBestStreak, streak);
-        const value = item.golden ? 3 : 1;
+        let value = item.golden ? 3 : 1;
+        const centerDistance = Math.abs((item.x + SIZE.star / 2) - (player.x + SIZE.player / 2));
+        if (centerDistance < SIZE.player / 6) {
+          value += 1;
+          perfectFlash = 'PERFECT!';
+          perfectFlashRemaining = PERFECT_FLASH_DURATION;
+        }
         score += value;
         checkNewBest();
         checkHeartBonus();
@@ -653,6 +665,9 @@ function draw() {
   }
   if (comboFlashRemaining > 0) {
     drawPixelText(comboFlash, canvas.width / 2, 56, 20, "center");
+  }
+  if (perfectFlashRemaining > 0) {
+    drawPixelText(perfectFlash, canvas.width / 2, 84, 14, 'center');
   }
   drawPixelText(`M: sound ${muted ? "off" : "on"}`, 10, canvas.height - 10, 10, "left");
 
