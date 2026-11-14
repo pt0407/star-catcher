@@ -203,9 +203,10 @@ function update(dt) {
 function drawText(lines) {
   ctx.textAlign = "center";
   ctx.fillStyle = "#fff";
+  const firstLineY = canvas.height / 2 - ((lines.length - 1) * 40) / 2;
   lines.forEach(([text, size], i) => {
     ctx.font = `${size}px ${FONT}`;
-    ctx.fillText(text, canvas.width / 2, canvas.height / 2 - 40 + i * 40);
+    ctx.fillText(text, canvas.width / 2, firstLineY + i * 40);
   });
 }
 
@@ -267,7 +268,7 @@ function draw() {
     gameOverLines.push([`Stars ${starsCaught}  Rocks ${rocksHit}`, 14], ["Press Space to play again", 14]);
 
     const panelWidth = 380;
-    const panelHeight = 210;
+    const panelHeight = 240;
     const panelX = (canvas.width - panelWidth) / 2;
     const panelY = (canvas.height - panelHeight) / 2;
     ctx.fillStyle = "rgba(4, 12, 32, 0.9)";
