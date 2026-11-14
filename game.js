@@ -319,8 +319,8 @@ function spawnRockBits(x, y, color = "#888") {
   }
 }
 
-function spawnStarSparkles(x, y, color = "#fff3a0") {
-  for (let i = 0; i < SPARKLE_COUNT; i++) {
+function spawnStarSparkles(x, y, color = "#fff3a0", count = SPARKLE_COUNT) {
+  for (let i = 0; i < count; i++) {
     const sparkle = inactiveSparkles.pop();
     if (!sparkle) break;
 
@@ -535,7 +535,7 @@ function update(dt) {
         checkNewBest();
         checkHeartBonus();
         checkMilestone();
-        spawnStarSparkles(item.x + SIZE.star / 2, item.y + SIZE.star / 2, item.golden ? "#ffcf40" : "#fff3a0");
+        spawnStarSparkles(item.x + SIZE.star / 2, item.y + SIZE.star / 2, item.golden ? "#ffcf40" : "#fff3a0", item.golden ? 14 : SPARKLE_COUNT);
         hopTimer = HOP_DURATION;
         pops.push({ x: item.x + SIZE.star / 2, y: item.y + SIZE.star / 2, age: 0, value, color: item.golden ? "#ffd93b" : "#fff" });
       } else if (item.type === "magnet") {
