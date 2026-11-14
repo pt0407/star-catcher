@@ -534,6 +534,8 @@ function draw() {
   drawPixelText(`Score ${score}`, canvas.width - 10, 28, 10, "right");
   drawPixelText(`Best ${best}`, canvas.width - 10, 52, 10, "right");
   if (streak >= 2) drawPixelText(`Streak ${streak}`, canvas.width - 10, 76, 10, "right");
+  const speedLevel = 1 + Math.floor(score / SPEED_UP_EVERY);
+  if (speedLevel >= 2) drawPixelText(`Speed ${speedLevel}`, canvas.width - 10, 100, 10, "right");
   if (milestoneFlashRemaining > 0) {
     drawPixelText(milestoneFlash, canvas.width / 2, 32, 20, "center");
   }
