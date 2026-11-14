@@ -335,13 +335,13 @@ function update(dt) {
   if (lives <= 0) gameOver();
 }
 
-function drawText(lines) {
+function drawText(lines, offsets = []) {
   ctx.textAlign = "center";
   ctx.fillStyle = "#fff";
   const firstLineY = canvas.height / 2 - ((lines.length - 1) * 40) / 2;
   lines.forEach(([text, size], i) => {
     ctx.font = `${size}px ${FONT}`;
-    ctx.fillText(text, canvas.width / 2, firstLineY + i * 40);
+    ctx.fillText(text, canvas.width / 2, firstLineY + i * 40 + (offsets[i] || 0));
   });
 }
 
@@ -435,7 +435,10 @@ function draw() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  if (state === "ready") drawText([["Star Catcher", 28], ["Press Space to start", 14]]);
+  if (state === "ready") {
+    const titleBob = Math.sin(performance.now() / 300) * 4;
+    drawText([["Star Catcher", 28], ["Press Space to start", 14]], [titleBob]);
+  }
   if (state === "over") {
     const gameOverLines = [["Game over", 28], [`Score ${score}   Best ${best}`, 14]];
     if (newBest) gameOverLines.push(["New best!", 14]);
