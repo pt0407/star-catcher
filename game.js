@@ -791,6 +791,9 @@ function draw() {
     if (best > 0) {
       drawPixelText(`Best ${best}`, canvas.width / 2, canvas.height / 2 + 120, 10, "center");
     }
+    if (totalStars > 0) {
+      drawPixelText(`Stars ${totalStars} all time`, canvas.width / 2, canvas.height / 2 + 142, 8, "center");
+    }
     if (!hasSeenControlsTip) {
       drawPixelText("arrows or a/d to move", canvas.width / 2, canvas.height / 2 + 90, 10, "center");
     }
