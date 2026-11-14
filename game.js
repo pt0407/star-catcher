@@ -278,7 +278,7 @@ function reset() {
   streak = 0;
   runBestStreak = 0;
   fallSpeed = difficulty.fallSpeed;
-  spawnTimer = 0;
+  spawnTimer = getSpawnInterval();
   gustTimer = GUST_WAIT_MIN + Math.random() * (GUST_WAIT_MAX - GUST_WAIT_MIN);
   gustRemaining = 0;
   gustDirection = 0;
