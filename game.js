@@ -769,7 +769,7 @@ function draw() {
     if (now - pauseStartTime < 5000) {
       pauseLines.push(["Press P or Esc to resume", 14]);
     }
-    pauseLines.push([`Score ${score}`, 14]);
+    pauseLines.push([`Score ${score}`, 14], [`Difficulty: ${difficulty.name}`, 10]);
     drawText(pauseLines);
   }
   ctx.restore();
