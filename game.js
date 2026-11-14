@@ -16,6 +16,9 @@ const SPAWN_INTERVAL_SCORE_STEP = 5;
 const SPAWN_INTERVAL_DECREASE = 0.03;
 const MIN_SPAWN_EVERY = 0.45;
 const STAR_CHANCE = 0.7;
+const MAGNET_CHANCE = 1 / 25;
+const MAGNET_DURATION = 4;
+const MAGNET_SPEED = 300;
 const STAR_FREQUENCY = 600;
 const STAR_DURATION = 0.08;
 const ROCK_FREQUENCY = 140;
@@ -33,7 +36,7 @@ const SPRITES = {
   rock: "assets/rock.png",
   heart: "assets/heart.png",
 };
-const SIZE = { player: 64, star: 32, rock: 32, heart: 24 };
+const SIZE = { player: 64, star: 32, rock: 32, magnet: 32, heart: 24 };
 const FALLBACK = { player: "#4fc3f7", star: "#ffd93b", rock: "#8a8a8a", heart: "#ff5577" };
 const FONT = '\"Press Start 2P\", monospace';
 
@@ -67,7 +70,7 @@ function drawSprite(name, x, y) {
 
 let best = Number(localStorage.getItem("starCatcherBest") || 0);
 let state, player, items, pops, lives, score, starsCaught, rocksHit, streak, fallSpeed, spawnTimer;
-let gustTimer, gustRemaining, gustDirection;
+let gustTimer, gustRemaining, gustDirection, magnetRemaining;
 let gameOverTime = 0;
 let newBest = false;
 let shake = 0;
@@ -125,13 +128,19 @@ function reset() {
   gustTimer = GUST_WAIT_MIN + Math.random() * (GUST_WAIT_MAX - GUST_WAIT_MIN);
   gustRemaining = 0;
   gustDirection = 0;
+  magnetRemaining = 0;
   shake = 0;
   heartFlash = 0;
   newBest = false;
 }
 
 function spawnItem() {
-  const type = Math.random() < STAR_CHANCE ? "star" : "rock";
+  let type;
+  if (Math.random() < MAGNET_CHANCE) {
+    type = "magnet";
+  } else {
+    type = Math.random() < STAR_CHANCE ? "star" : "rock";
+  }
   items.push({ type, x: Math.random() * (canvas.width - SIZE[type]), y: -SIZE[type] });
 }
 
@@ -164,6 +173,8 @@ function update(dt) {
   shake = Math.max(0, shake - dt);
   heartFlash = Math.max(0, heartFlash - dt);
   if (state !== "playing") return;
+
+  magnetRemaining = Math.max(0, magnetRemaining - dt);
 
   let gustPushTime = 0;
   if (gustRemaining > 0) {
@@ -198,7 +209,19 @@ function update(dt) {
 
   for (let i = items.length - 1; i >= 0; i--) {
     const item = items[i];
-    item.y += fallSpeed * dt;
+    if (item.type === "star" && magnetRemaining > 0) {
+      const dx = player.x + SIZE.player / 2 - (item.x + SIZE.star / 2);
+      const dy = player.y + SIZE.player / 2 - (item.y + SIZE.star / 2);
+      const distance = Math.hypot(dx, dy);
+      if (distance > 0) {
+        const step = Math.min(MAGNET_SPEED * dt, distance);
+        item.x += dx / distance * step;
+        item.y += dy / distance * step;
+      }
+    } else {
+      item.y += fallSpeed * dt;
+    }
+
     if (touchesPlayer(item)) {
       playCatchSound(item.type);
       if (item.type === "star") {
@@ -206,6 +229,8 @@ function update(dt) {
         streak += 1;
         score += 1;
         pops.push({ x: item.x + SIZE.star / 2, y: item.y + SIZE.star / 2, age: 0 });
+      } else if (item.type === "magnet") {
+        magnetRemaining = MAGNET_DURATION;
       } else {
         rocksHit += 1;
         streak = 0;
@@ -250,7 +275,14 @@ function draw() {
   }
 
   drawSprite("player", player.x, player.y);
-  for (const item of items) drawSprite(item.type, item.x, item.y);
+  for (const item of items) {
+    if (item.type === "magnet") {
+      ctx.fillStyle = "#4fa3ff";
+      ctx.fillRect(item.x, item.y, SIZE.magnet, SIZE.magnet);
+    } else {
+      drawSprite(item.type, item.x, item.y);
+    }
+  }
   for (const pop of pops) {
     const progress = pop.age / POP_DURATION;
     ctx.globalAlpha = 1 - progress;
