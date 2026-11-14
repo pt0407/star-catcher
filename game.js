@@ -13,6 +13,8 @@ const STAR_DURATION = 0.08;
 const ROCK_FREQUENCY = 140;
 const ROCK_DURATION = 0.15;
 const POP_DURATION = 0.8;
+const SHAKE_DURATION = 0.3;
+const SHAKE_AMOUNT = 4;
 
 const SPRITES = {
   background: "assets/background.png",
@@ -45,6 +47,7 @@ function drawSprite(name, x, y) {
 
 let best = Number(localStorage.getItem("starCatcherBest") || 0);
 let state, player, items, pops, lives, score, fallSpeed, spawnTimer;
+let shake = 0;
 let audioContext = null;
 let muted = false;
 const keys = {};
@@ -87,6 +90,7 @@ function reset() {
   score = 0;
   fallSpeed = START_FALL_SPEED;
   spawnTimer = 0;
+  shake = 0;
 }
 
 function spawnItem() {
@@ -109,6 +113,9 @@ function gameOver() {
 }
 
 function update(dt) {
+  shake = Math.max(0, shake - dt);
+  if (state !== "playing") return;
+
   const move = (keys["arrowright"] || keys["d"] ? 1 : 0) - (keys["arrowleft"] || keys["a"] ? 1 : 0);
   player.x = Math.max(0, Math.min(canvas.width - SIZE.player, player.x + move * PLAYER_SPEED * dt));
 
@@ -126,7 +133,10 @@ function update(dt) {
       if (item.type === "star") {
         score += 1;
         pops.push({ x: item.x + SIZE.star / 2, y: item.y + SIZE.star / 2, age: 0 });
-      } else lives -= 1;
+      } else {
+        lives -= 1;
+        shake = SHAKE_DURATION;
+      }
     }
   }
   items = items.filter((item) => !item.caught && item.y < canvas.height);
@@ -148,8 +158,13 @@ function drawText(lines) {
 }
 
 function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  if (shake > 0) {
+    ctx.translate((Math.random() * 2 - 1) * SHAKE_AMOUNT, (Math.random() * 2 - 1) * SHAKE_AMOUNT);
+  }
+
   if (isReady("background")) ctx.drawImage(images.background, 0, 0, canvas.width, canvas.height);
-  else ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   drawSprite("player", player.x, player.y);
   for (const item of items) drawSprite(item.type, item.x, item.y);
@@ -173,6 +188,7 @@ function draw() {
 
   if (state === "ready") drawText([["Star Catcher", 36], ["Press Space to start", 20]]);
   if (state === "over") drawText([["Game over", 36], [`Score ${score}   Best ${best}`, 20], ["Press Space to play again", 20]]);
+  ctx.restore();
 }
 
 document.addEventListener("keydown", (e) => {
@@ -199,7 +215,7 @@ let lastTime = performance.now();
 function frame(time) {
   const dt = Math.min((time - lastTime) / 1000, 0.05);
   lastTime = time;
-  if (state === "playing") update(dt);
+  update(dt);
   draw();
   requestAnimationFrame(frame);
 }
