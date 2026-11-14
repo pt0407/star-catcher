@@ -120,7 +120,7 @@ let runBestStreak = 0;
 let bits = [];
 const inactiveBits = Array.from({ length: BIT_POOL_SIZE }, () => ({ x: 0, y: 0, vx: 0, vy: 0, age: 0 }));
 let sparkles = [];
-const inactiveSparkles = Array.from({ length: SPARKLE_POOL_SIZE }, () => ({ x: 0, y: 0, vx: 0, vy: 0, age: 0 }));
+const inactiveSparkles = Array.from({ length: SPARKLE_POOL_SIZE }, () => ({ x: 0, y: 0, vx: 0, vy: 0, age: 0, color: "#fff3a0" }));
 const STARFIELD_COUNT = 40;
 const starfield = Array.from({ length: STARFIELD_COUNT }, () => ({
   x: Math.random() * canvas.width,
@@ -274,7 +274,7 @@ function spawnRockBits(x, y) {
   }
 }
 
-function spawnStarSparkles(x, y) {
+function spawnStarSparkles(x, y, color = "#fff3a0") {
   for (let i = 0; i < SPARKLE_COUNT; i++) {
     const sparkle = inactiveSparkles.pop();
     if (!sparkle) break;
@@ -284,6 +284,7 @@ function spawnStarSparkles(x, y) {
     sparkle.vx = (Math.random() * 2 - 1) * 220;
     sparkle.vy = (Math.random() * 2 - 1) * 220 - 60;
     sparkle.age = 0;
+    sparkle.color = color;
     sparkles.push(sparkle);
   }
 }
@@ -481,7 +482,7 @@ function update(dt) {
         checkNewBest();
         checkHeartBonus();
         checkMilestone();
-        spawnStarSparkles(item.x + SIZE.star / 2, item.y + SIZE.star / 2);
+        spawnStarSparkles(item.x + SIZE.star / 2, item.y + SIZE.star / 2, item.golden ? "#ffcf40" : "#fff3a0");
         pops.push({ x: item.x + SIZE.star / 2, y: item.y + SIZE.star / 2, age: 0, value });
       } else if (item.type === "magnet") {
         magnetRemaining = MAGNET_DURATION;
@@ -525,6 +526,7 @@ function update(dt) {
       checkNewBest();
       checkHeartBonus();
       checkMilestone();
+      spawnStarSparkles(shootingStar.x + SHOOTING_STAR_SIZE / 2, shootingStar.y + SHOOTING_STAR_SIZE / 2, "#ffffff");
       pops.push({
         x: shootingStar.x + SHOOTING_STAR_SIZE / 2,
         y: shootingStar.y + SHOOTING_STAR_SIZE / 2,
@@ -630,8 +632,10 @@ function draw() {
   }
   ctx.fillStyle = "#888";
   for (const bit of bits) ctx.fillRect(bit.x, bit.y, 3, 3);
-  ctx.fillStyle = "#fff3a0";
-  for (const sparkle of sparkles) ctx.fillRect(sparkle.x, sparkle.y, 2, 2);
+  for (const sparkle of sparkles) {
+    ctx.fillStyle = sparkle.color;
+    ctx.fillRect(sparkle.x, sparkle.y, 2, 2);
+  }
 
   if (shootingStar) {
     const trail = ctx.createLinearGradient(shootingStar.x - 20, 0, shootingStar.x + 2, 0);
