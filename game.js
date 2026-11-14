@@ -864,7 +864,9 @@ function draw() {
     ctx.globalAlpha = 1;
   }
   if (comboFlashRemaining > 0) {
+    ctx.globalAlpha = comboFlashRemaining / COMBO_FLASH_DURATION;
     drawPixelText(comboFlash, canvas.width / 2, 56, reducedMotion ? 20 : Math.round(20 + Math.sin(now / 80) * 2), "center");
+    ctx.globalAlpha = 1;
   }
   if (perfectFlashRemaining > 0) {
     ctx.globalAlpha = perfectFlashRemaining / PERFECT_FLASH_DURATION;
