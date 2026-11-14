@@ -75,16 +75,16 @@ function drawSprite(name, x, y) {
   }
 }
 
-function drawPlayer() {
+function drawPlayer(x = player.x) {
   if (!playerFacingLeft) {
-    drawSprite("player", player.x, player.y);
+    drawSprite("player", x, player.y);
     return;
   }
 
   ctx.save();
-  ctx.translate(player.x * 2 + SIZE.player, 0);
+  ctx.translate(x * 2 + SIZE.player, 0);
   ctx.scale(-1, 1);
-  drawSprite("player", player.x, player.y);
+  drawSprite("player", x, player.y);
   ctx.restore();
 }
 
@@ -93,6 +93,8 @@ let state, player, items, pops, bits, lives, score, starsCaught, rocksHit, strea
 let gustTimer, gustRemaining, gustDirection, magnetRemaining;
 let shootingStar, shootingStarTimer;
 let playerFacingLeft = false;
+let playerTrail = [];
+let playerSpeed = 0;
 let gameOverTime = 0;
 let newBest = false;
 let shake = 0;
@@ -139,6 +141,8 @@ function reset() {
   state = "playing";
   player = { x: canvas.width / 2 - SIZE.player / 2, y: canvas.height - 90 };
   playerFacingLeft = false;
+  playerTrail = [];
+  playerSpeed = 0;
   items = [];
   pops = [];
   bits = [];
@@ -249,6 +253,9 @@ function update(dt) {
   }
   player.x += gustDirection * GUST_SPEED * gustPushTime;
   player.x = Math.max(0, Math.min(canvas.width - SIZE.player, player.x));
+  playerSpeed = dt > 0 ? Math.abs(player.x - previousPlayerX) / dt : 0;
+  playerTrail.push(previousPlayerX);
+  if (playerTrail.length > 3) playerTrail.shift();
   if (player.x < previousPlayerX) playerFacingLeft = true;
   else if (player.x > previousPlayerX) playerFacingLeft = false;
 
@@ -353,6 +360,11 @@ function draw() {
     }
   }
 
+  if (playerSpeed > 200) {
+    ctx.globalAlpha = 0.2;
+    for (const x of playerTrail) drawPlayer(x);
+    ctx.globalAlpha = 1;
+  }
   drawPlayer();
   for (const item of items) {
     if (item.type === "magnet") {
