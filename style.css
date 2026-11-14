@@ -9,6 +9,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  justify-content: safe center;
   background: radial-gradient(ellipse at 50% 20%, #12224d 0%, #07132f 70%) fixed;
   color: #fff;
   font-family: "Press Start 2P", monospace;
