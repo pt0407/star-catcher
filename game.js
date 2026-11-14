@@ -30,13 +30,22 @@ const SIZE = { player: 64, star: 32, rock: 32, heart: 24 };
 const FALLBACK = { player: "#4fc3f7", star: "#ffd93b", rock: "#8a8a8a", heart: "#ff5577" };
 
 const images = {};
+const imageReady = {};
 for (const [name, src] of Object.entries(SPRITES)) {
-  images[name] = new Image();
-  images[name].src = src;
+  const image = new Image();
+  imageReady[name] = false;
+  image.addEventListener("load", () => {
+    imageReady[name] = true;
+  });
+  image.addEventListener("error", () => {
+    imageReady[name] = false;
+  });
+  image.src = src;
+  images[name] = image;
 }
 
 function isReady(name) {
-  return images[name].complete && images[name].naturalWidth > 0;
+  return imageReady[name];
 }
 
 function drawSprite(name, x, y) {
