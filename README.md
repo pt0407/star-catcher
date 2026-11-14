@@ -52,6 +52,7 @@ Put PNG files in the `assets/` folder using these exact names. Until a file exis
 | `star.png` | 32×32 | Good item, +1 point |
 | `rock.png` | 32×32 | Bad item, costs a life |
 | `heart.png` | 24×24 | Life icon |
+| `magnet.png` | 32×32 | Magnet pickup |
 | `background.png` | 400×600 | Optional background |
 
 Use transparent backgrounds for the sprites. If you change a size, also update the `SIZE` table in `game.js`.
@@ -62,7 +63,13 @@ The settings are the constants at the top of `game.js`:
 
 - `START_LIVES`: how many hearts you start with
 - `PLAYER_SPEED`: how fast the player moves
-- `START_FALL_SPEED`: how fast items fall at the start
-- `SPEED_UP_EVERY` and `SPEED_UP_AMOUNT`: how often and how much items speed up
-- `SPAWN_EVERY`: seconds between new items
+- `SPAWN_EVERY`: seconds between new items at the start
+- `SPAWN_INTERVAL_SCORE_STEP` and `SPAWN_INTERVAL_DECREASE`: how often and how much spawns speed up
+- `SPEED_UP_EVERY` and `SPEED_UP_AMOUNT`: how often and how much items fall faster
 - `STAR_CHANCE`: chance that a new item is a star instead of a rock
+- `GOLDEN_STAR_CHANCE`: chance a star is golden (worth 3)
+- `MAGNET_CHANCE` and `MAGNET_DURATION`: how often magnets drop and how long they last
+- `HEART_CHANCE`: how often heart pickups drop
+- `FAST_ROCK_CHANCE`: how often a rock is the fast red kind
+- `GUST_WAIT_MIN`/`GUST_WAIT_MAX`, `GUST_WARNING_TIME`, `GUST_DURATION`, `GUST_SPEED`: the wind gusts
+- `SHOOTING_STAR_INTERVAL` and `SHOOTING_STAR_SPEED`: the bonus stars that cross the top
