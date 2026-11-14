@@ -12,6 +12,7 @@ body {
   color: #fff;
   font-family: "Press Start 2P", monospace;
   text-align: center;
+  -webkit-tap-highlight-color: transparent;
 }
 
 h1 {
