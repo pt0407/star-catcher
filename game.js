@@ -817,7 +817,7 @@ function draw() {
   }
 
   if (state === "ready") {
-    const titleBob = Math.sin(now / 300) * 4;
+    const titleBob = reducedMotion ? 0 : Math.sin(now / 300) * 4;
     drawText([["Star Catcher", 28], ["Press Space to start", 14]], [titleBob]);
     ctx.fillStyle = "#fff";
     const difficultyOptions = DIFFICULTIES.map((option, index) => {
