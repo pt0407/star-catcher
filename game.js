@@ -658,6 +658,9 @@ function draw() {
       return option === difficulty ? `[${label}]` : label;
     }).join("  ");
     drawPixelText(difficultyOptions, canvas.width / 2, canvas.height / 2 + 60, 10, "center");
+    if (best > 0) {
+      drawPixelText(`Best ${best}`, canvas.width / 2, canvas.height / 2 + 120, 10, "center");
+    }
     if (!hasSeenControlsTip) {
       drawPixelText("arrows or a/d to move", canvas.width / 2, canvas.height / 2 + 90, 10, "center");
     }
