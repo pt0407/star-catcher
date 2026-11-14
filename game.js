@@ -801,7 +801,9 @@ function draw() {
   if (state === "over") {
     const gameOverLines = [["Game over", 28], [`Score ${score}   Best ${best}`, 14]];
     if (newBest) gameOverLines.push(["New best!", 14]);
-    gameOverLines.push([`Stars ${starsCaught}  Rocks ${rocksHit}  Total ${totalStars}`, 14]);
+    const attempts = starsCaught + rocksHit;
+    const accuracy = attempts > 0 ? Math.round((starsCaught / attempts) * 100) : 0;
+    gameOverLines.push([`Stars ${starsCaught}  Rocks ${rocksHit}  Total ${totalStars}  Acc ${accuracy}%`, 14]);
 
     const panelWidth = 380;
     const panelHeight = 240;
