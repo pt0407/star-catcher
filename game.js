@@ -224,7 +224,7 @@ function draw() {
   ctx.font = `10px ${FONT}`;
   ctx.fillText(`Score ${score}`, canvas.width - 10, 28);
   ctx.font = `8px ${FONT}`;
-  ctx.fillText(`M: sound ${muted ? "off" : "on"}`, canvas.width - 10, 46);
+  ctx.fillText(`M: sound ${muted ? "off" : "on"}`, canvas.width - 20, 58);
 
   if (state === "ready") drawText([["Star Catcher", 36], ["Press Space to start", 20]]);
   if (state === "over") drawText([["Game over", 36], [`Score ${score}   Best ${best}`, 20], [`Caught ${starsCaught} stars, hit ${rocksHit} rocks`, 16], ["Press Space to play again", 20]]);
