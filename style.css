@@ -43,4 +43,6 @@ p {
   color: #b8c9ed;
   font-size: 8px;
   line-height: 2;
+  user-select: none;
+  -webkit-user-select: none;
 }
