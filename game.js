@@ -404,6 +404,7 @@ function checkNewBest() {
     bestAnnounced = true;
     comboFlash = "NEW BEST!";
     comboFlashRemaining = COMBO_FLASH_DURATION;
+    playNewBestSound();
   }
 }
 
