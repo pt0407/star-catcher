@@ -9,7 +9,9 @@ const ROCK_DURATION = 0.15;
 const GUST_DURATION = 2;
 
 let audioContext = null;
+let masterGain = null;
 let muted = loadItem("starCatcherMuted", "false") === "true";
+let volume = Number(loadItem("starCatcherVolume", "0.8"));
 
 export function isMuted() {
   return muted;
@@ -24,6 +26,16 @@ export function toggleMute() {
   setMuted(!muted);
 }
 
+export function getVolume() {
+  return volume;
+}
+
+export function setVolume(value) {
+  volume = Math.max(0, Math.min(1, value));
+  saveItem("starCatcherVolume", String(volume));
+  if (masterGain) masterGain.gain.value = volume;
+}
+
 export function initializeAudio() {
   if (!audioContext) {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -31,6 +43,11 @@ export function initializeAudio() {
     audioContext = new AudioContextClass();
   }
   if (audioContext.state === "suspended") audioContext.resume();
+  if (!masterGain) {
+    masterGain = audioContext.createGain();
+    masterGain.gain.value = volume;
+    masterGain.connect(audioContext.destination);
+  }
 }
 
 function tone({ type, frequency, duration, volume, slideTo, delay = 0 }) {
@@ -47,7 +64,7 @@ function tone({ type, frequency, duration, volume, slideTo, delay = 0 }) {
   gain.gain.exponentialRampToValueAtTime(volume, now + 0.01);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
   oscillator.connect(gain);
-  gain.connect(audioContext.destination);
+  gain.connect(masterGain || audioContext.destination);
   oscillator.start(now);
   oscillator.stop(now + duration);
 }
