@@ -65,7 +65,7 @@ let state, player, items, pops, lives, score, starsCaught, rocksHit, fallSpeed, 
 let gameOverTime = 0;
 let shake = 0;
 let audioContext = null;
-let muted = false;
+let muted = localStorage.getItem("starCatcherMuted") === "true";
 let touchTargetX = null;
 const keys = {};
 
@@ -255,7 +255,10 @@ canvas.addEventListener("touchcancel", () => {
 document.addEventListener("keydown", (e) => {
   initializeAudio();
   if (e.key.toLowerCase() === "m") {
-    if (!e.repeat) muted = !muted;
+    if (!e.repeat) {
+      muted = !muted;
+      localStorage.setItem("starCatcherMuted", String(muted));
+    }
     return;
   }
   if (e.key.toLowerCase() === "p" || e.key === "Escape") {
