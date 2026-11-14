@@ -665,6 +665,8 @@ function drawText(lines, offsets = []) {
 
 function draw() {
   const now = performance.now();
+  const cursor = state === "ready" || state === "over" ? "pointer" : "default";
+  if (canvas.style.cursor !== cursor) canvas.style.cursor = cursor;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.save();
   if (shake > 0 && !reducedMotion) {
