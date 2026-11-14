@@ -587,6 +587,11 @@ function draw() {
   }
   ctx.globalAlpha = 1;
 
+  if (milestoneFlashRemaining > 0) {
+    ctx.fillStyle = `rgba(255, 255, 255, ${(milestoneFlashRemaining / MILESTONE_FLASH_DURATION) * 0.2})`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
   if (playerSpeed > 200) {
     ctx.globalAlpha = 0.2;
     for (const x of playerTrail) drawPlayer(x);
