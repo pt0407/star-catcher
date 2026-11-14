@@ -57,6 +57,9 @@ p {
 }
 
 @media (max-width: 420px) {
+  body {
+    padding: 14px 8px;
+  }
   h1 {
     margin: 12px 0;
   }
