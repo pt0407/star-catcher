@@ -838,7 +838,7 @@ function draw() {
     drawPixelText(gustDirection < 0 ? "<<" : ">>", canvas.width / 2, 48, 14, "center");
     ctx.globalAlpha = 1;
   } else if (gustTimer <= GUST_WARNING_TIME && gustDirection !== 0) {
-    ctx.globalAlpha = 0.3;
+    ctx.globalAlpha = reducedMotion ? 0.3 : 0.2 + 0.15 * Math.sin(now / 150);
     ctx.fillStyle = "#fff";
     drawPixelText(gustDirection < 0 ? "<<" : ">>", canvas.width / 2, 48, 14, "center");
     ctx.globalAlpha = 1;
