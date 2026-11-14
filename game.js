@@ -623,7 +623,7 @@ function update(dt) {
     if (item.type === "star" && !hit && !item.missed && item.y > player.y + SIZE.player) {
       item.missed = true;
       if (streak >= 2) {
-        pops.push({ x: item.x + SIZE.star / 2, y: item.y, age: 0, text: `miss x${streak}`, color: "#ff9d9d" });
+        pops.push({ x: item.x + SIZE.star / 2, y: item.y, age: 0, text: `miss x${streak}`, color: item.golden ? "#ffd93b" : "#ff9d9d" });
         playMissSound();
       }
       streak = 0;
