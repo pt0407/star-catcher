@@ -461,7 +461,7 @@ function update(dt) {
 
     const hit = touchesPlayer(item);
     if (hit) {
-      playCatchSound(item.type === "heart" ? "star" : item.type, item.type === "star" ? Math.min(streak, 10) * 40 : 0);
+      playCatchSound(item.type === "heart" ? "star" : item.type, item.type === "star" ? Math.min(streak, 10) * 40 + (item.golden ? 160 : 0) : 0);
       if (item.type === "star") {
         starsCaught += 1;
         totalStars += 1;
