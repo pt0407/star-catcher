@@ -10,8 +10,11 @@ const GUST_DURATION = 2;
 
 let audioContext = null;
 let masterGain = null;
+let musicGain = null;
 let muted = loadItem("starCatcherMuted", "false") === "true";
 let volume = Number(loadItem("starCatcherVolume", "0.8"));
+let musicVolume = Number(loadItem("starCatcherMusicVolume", "1"));
+let musicMuted = loadItem("starCatcherMusicMuted", "false") === "true";
 
 export function isMuted() {
   return muted;
@@ -32,6 +35,30 @@ export function getContext() {
 
 export function getOutput() {
   return masterGain || (audioContext ? audioContext.destination : null);
+}
+
+export function getMusicBus() {
+  return musicGain || masterGain;
+}
+
+export function getMusicVolume() {
+  return musicVolume;
+}
+
+export function setMusicVolume(value) {
+  musicVolume = Math.max(0, Math.min(1, value));
+  saveItem("starCatcherMusicVolume", String(musicVolume));
+  if (musicGain) musicGain.gain.value = musicMuted ? 0 : musicVolume;
+}
+
+export function isMusicMuted() {
+  return musicMuted;
+}
+
+export function toggleMusicMute() {
+  musicMuted = !musicMuted;
+  saveItem("starCatcherMusicMuted", String(musicMuted));
+  if (musicGain) musicGain.gain.value = musicMuted ? 0 : musicVolume;
 }
 
 export function getVolume() {
@@ -55,6 +82,9 @@ export function initializeAudio() {
     masterGain = audioContext.createGain();
     masterGain.gain.value = volume;
     masterGain.connect(audioContext.destination);
+    musicGain = audioContext.createGain();
+    musicGain.gain.value = musicMuted ? 0 : musicVolume;
+    musicGain.connect(masterGain);
   }
 }
 

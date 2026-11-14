@@ -1,4 +1,4 @@
-import { getContext, getOutput, isMuted } from "./audio.js";
+import { getContext, getMusicBus, isMuted, isMusicMuted } from "./audio.js";
 
 const TEMPO = { title: 96, game: 132 };
 const STEPS = 16;
@@ -22,13 +22,13 @@ let ducked = false;
 
 function schedule() {
   const ctx = getContext();
-  const out = getOutput();
+  const out = getMusicBus();
   if (!ctx || !out) return;
 
   if (nextTime < ctx.currentTime) nextTime = ctx.currentTime + 0.05;
   const stepDur = 60 / (mode === "game" ? TEMPO.game * (1 + (level - 1) * 0.04) : TEMPO.title) / 2;
   while (nextTime < ctx.currentTime + 0.15) {
-    if (!isMuted() && !ducked) {
+    if (!isMuted() && !isMusicMuted() && !ducked) {
       const lead = LEAD[step % LEAD.length];
       const bass = BASS[step % BASS.length];
       if (lead) note(ctx, out, lead, nextTime, stepDur * 0.9, "square", 0.035);

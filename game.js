@@ -1,6 +1,7 @@
 import { loadItem, saveItem } from "./persist.js";
 import {
-  initializeAudio, isMuted, toggleMute,
+  initializeAudio, isMuted, toggleMute, getVolume, setVolume,
+  getMusicVolume, setMusicVolume, toggleMusicMute,
   playCatchSound, playPauseSound, playNewBestSound, playGustSound, playMissSound,
 } from "./audio.js";
 import { SIZE, FALLBACK, images, isReady, drawSprite } from "./sprites.js";
@@ -775,9 +776,23 @@ function onKeyDown(e) {
     saveItem("starCatcherDifficulty", String(difficultyIndex));
     return;
   }
+  if (e.key === "M" && e.shiftKey) {
+    if (!e.repeat) toggleMusicMute();
+    return;
+  }
   if (e.key.toLowerCase() === "m") {
     if (!e.repeat) {
       toggleMute();
+    }
+    return;
+  }
+  if (e.key === "[" || e.key === "]" || e.key === "," || e.key === ".") {
+    if (!e.repeat) {
+      const music = e.key === "," || e.key === ".";
+      const get = music ? getMusicVolume : getVolume;
+      const set = music ? setMusicVolume : setVolume;
+      set(Math.round((get() + (e.key === "[" || e.key === "," ? -0.1 : 0.1)) * 10) / 10);
+      pops.push({ x: canvas.width / 2, y: 70, age: 0, text: `${music ? "music" : "vol"} ${Math.round(get() * 100)}%`, color: "#9fd0ff" });
     }
     return;
   }
