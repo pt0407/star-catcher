@@ -686,8 +686,9 @@ function draw() {
   }
 
   ctx.fillStyle = "#fff";
+  const twinkleBoost = gustRemaining > 0 ? 1.5 : 1;
   for (const dot of starfield) {
-    ctx.globalAlpha = reducedMotion ? 0.4 : 0.25 + 0.25 * Math.sin(now / 500 * dot.speed + dot.phase);
+    ctx.globalAlpha = reducedMotion ? 0.4 : 0.25 + 0.25 * Math.sin(now / 500 * dot.speed * twinkleBoost + dot.phase);
     ctx.fillRect(dot.x, dot.y, 2, 2);
   }
   ctx.globalAlpha = 1;
