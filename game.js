@@ -933,7 +933,7 @@ function setTouchTarget(event) {
   touchTargetX = Math.max(0, Math.min(canvas.width - SIZE.player, touchX - SIZE.player / 2));
 }
 
-canvas.addEventListener("pointerdown", () => {
+document.addEventListener("pointerdown", () => {
   initializeAudio();
   if (state === "ready" || (state === "over" && performance.now() - gameOverTime >= RESTART_DELAY_MS)) startGame();
 });
