@@ -847,7 +847,8 @@ function draw() {
     if (now - pauseStartTime < 5000) {
       pauseLines.push(["Press P or Esc to resume", 14]);
     }
-    pauseLines.push([`Score ${score}`, 14], [`Difficulty: ${difficulty.name}   R restarts`, 10]);
+    const speedLevel = 1 + Math.floor(score / SPEED_UP_EVERY);
+    pauseLines.push([`Score ${score}`, 14], [`Difficulty: ${difficulty.name}   Speed ${speedLevel}   R restarts`, 10]);
     drawText(pauseLines);
   }
   ctx.restore();
