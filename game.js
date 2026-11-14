@@ -690,7 +690,10 @@ function draw() {
       const goldenOffset = (SIZE.star - goldenSize) / 2;
       if (isReady("star")) {
         ctx.filter = "hue-rotate(-20deg) saturate(1.8) brightness(1.15)";
+        ctx.shadowColor = "#ffd93b";
+        ctx.shadowBlur = 10;
         ctx.drawImage(images.star, item.x + goldenOffset, item.y + goldenOffset, goldenSize, goldenSize);
+        ctx.shadowBlur = 0;
         ctx.filter = "none";
       } else {
         ctx.fillStyle = "#ffb300";
