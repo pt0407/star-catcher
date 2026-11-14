@@ -567,6 +567,7 @@ function drawText(lines, offsets = []) {
 }
 
 function draw() {
+  const now = performance.now();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.save();
   if (shake > 0) {
@@ -586,7 +587,7 @@ function draw() {
 
   ctx.fillStyle = "#fff";
   for (const dot of starfield) {
-    ctx.globalAlpha = 0.25 + 0.25 * Math.sin(performance.now() / 500 * dot.speed + dot.phase);
+    ctx.globalAlpha = 0.25 + 0.25 * Math.sin(now / 500 * dot.speed + dot.phase);
     ctx.fillRect(dot.x, dot.y, 2, 2);
   }
   ctx.globalAlpha = 1;
@@ -659,7 +660,7 @@ function draw() {
   ctx.globalAlpha = 1;
 
   if (lives === 1) {
-    const pulse = 0.2 + 0.15 * Math.sin(performance.now() / 200);
+    const pulse = 0.2 + 0.15 * Math.sin(now / 200);
     ctx.strokeStyle = `rgba(255, 60, 60, ${pulse})`;
     ctx.lineWidth = 8;
     ctx.strokeRect(4, 4, canvas.width - 8, canvas.height - 8);
@@ -710,7 +711,7 @@ function draw() {
   }
 
   if (state === "ready") {
-    const titleBob = Math.sin(performance.now() / 300) * 4;
+    const titleBob = Math.sin(now / 300) * 4;
     drawText([["Star Catcher", 28], ["Press Space to start", 14]], [titleBob]);
     ctx.fillStyle = "#fff";
     const difficultyOptions = DIFFICULTIES.map((option, index) => {
@@ -743,13 +744,13 @@ function draw() {
     drawText(gameOverLines);
     const firstLineY = canvas.height / 2 - ((gameOverLines.length - 1) * 40) / 2;
     const promptY = firstLineY + gameOverLines.length * 40;
-    if (Math.floor(performance.now() / 400) % 2 === 0) {
+    if (Math.floor(now / 400) % 2 === 0) {
       drawPixelText("Press Space to play again", canvas.width / 2, promptY, 14, "center");
     }
   }
   if (state === "paused") {
     const pauseLines = [["Paused", 28]];
-    if (performance.now() - pauseStartTime < 5000) {
+    if (now - pauseStartTime < 5000) {
       pauseLines.push(["Press P or Esc to resume", 14]);
     }
     pauseLines.push([`Score ${score}`, 14]);
