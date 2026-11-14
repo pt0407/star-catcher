@@ -42,6 +42,10 @@ const BIT_COUNT = 6;
 const BIT_POOL_SIZE = BIT_COUNT * 10;
 const BIT_LIFETIME = 0.4;
 const BIT_GRAVITY = 500;
+const SPARKLE_COUNT = 8;
+const SPARKLE_POOL_SIZE = SPARKLE_COUNT * 10;
+const SPARKLE_LIFETIME = 0.35;
+const SPARKLE_GRAVITY = 250;
 const SHAKE_DURATION = 0.3;
 const SHAKE_AMOUNT = 4;
 const HEART_FLASH_DURATION = 0.2;
@@ -111,6 +115,8 @@ let state, player, items, pops, lives, score, starsCaught, rocksHit, streak, fal
 let runBestStreak = 0;
 let bits = [];
 const inactiveBits = Array.from({ length: BIT_POOL_SIZE }, () => ({ x: 0, y: 0, vx: 0, vy: 0, age: 0 }));
+let sparkles = [];
+const inactiveSparkles = Array.from({ length: SPARKLE_POOL_SIZE }, () => ({ x: 0, y: 0, vx: 0, vy: 0, age: 0 }));
 const STARFIELD_COUNT = 40;
 const starfield = Array.from({ length: STARFIELD_COUNT }, () => ({
   x: Math.random() * canvas.width,
@@ -198,6 +204,8 @@ function playPauseSound() {
 function reset() {
   for (const bit of bits) inactiveBits.push(bit);
   bits.length = 0;
+  for (const sparkle of sparkles) inactiveSparkles.push(sparkle);
+  sparkles.length = 0;
   state = "playing";
   player = { x: canvas.width / 2 - SIZE.player / 2, y: canvas.height - 90 };
   playerFacingLeft = false;
@@ -252,6 +260,20 @@ function spawnRockBits(x, y) {
     bit.vy = (Math.random() * 2 - 1) * 150;
     bit.age = 0;
     bits.push(bit);
+  }
+}
+
+function spawnStarSparkles(x, y) {
+  for (let i = 0; i < SPARKLE_COUNT; i++) {
+    const sparkle = inactiveSparkles.pop();
+    if (!sparkle) break;
+
+    sparkle.x = x;
+    sparkle.y = y;
+    sparkle.vx = (Math.random() * 2 - 1) * 220;
+    sparkle.vy = (Math.random() * 2 - 1) * 220 - 60;
+    sparkle.age = 0;
+    sparkles.push(sparkle);
   }
 }
 
@@ -345,6 +367,18 @@ function update(dt) {
     }
   }
 
+  for (let i = sparkles.length - 1; i >= 0; i--) {
+    const sparkle = sparkles[i];
+    sparkle.age += dt;
+    sparkle.vy += SPARKLE_GRAVITY * dt;
+    sparkle.x += sparkle.vx * dt;
+    sparkle.y += sparkle.vy * dt;
+    if (sparkle.age >= SPARKLE_LIFETIME) {
+      sparkles.splice(i, 1);
+      inactiveSparkles.push(sparkle);
+    }
+  }
+
   if (state !== "playing") return;
 
   magnetRemaining = Math.max(0, magnetRemaining - dt);
@@ -415,6 +449,7 @@ function update(dt) {
         score += value;
         checkHeartBonus();
         checkMilestone();
+        spawnStarSparkles(item.x + SIZE.star / 2, item.y + SIZE.star / 2);
         pops.push({ x: item.x + SIZE.star / 2, y: item.y + SIZE.star / 2, age: 0, value });
       } else if (item.type === "magnet") {
         magnetRemaining = MAGNET_DURATION;
@@ -535,6 +570,8 @@ function draw() {
   }
   ctx.fillStyle = "#888";
   for (const bit of bits) ctx.fillRect(bit.x, bit.y, 3, 3);
+  ctx.fillStyle = "#fff3a0";
+  for (const sparkle of sparkles) ctx.fillRect(sparkle.x, sparkle.y, 2, 2);
 
   if (shootingStar) {
     const trail = ctx.createLinearGradient(shootingStar.x - 20, 0, shootingStar.x + 2, 0);
