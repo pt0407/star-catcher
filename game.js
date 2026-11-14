@@ -373,6 +373,9 @@ function gameOver() {
     best = score;
     localStorage.setItem("starCatcherBest", String(best));
     playNewBestSound();
+    spawnStarSparkles(canvas.width * 0.3, 150, "#ffd93b");
+    spawnStarSparkles(canvas.width * 0.5, 120, "#ffffff");
+    spawnStarSparkles(canvas.width * 0.7, 150, "#ff8fb3");
   }
   if (runBestStreak > bestStreak) {
     bestStreak = runBestStreak;
