@@ -773,6 +773,9 @@ function draw() {
   if (perfectFlashRemaining > 0) {
     drawPixelText(perfectFlash, canvas.width / 2, 84, 14, 'center');
   }
+  if (magnetRemaining > 0) {
+    drawPixelText(`Magnet ${Math.ceil(magnetRemaining)}s`, canvas.width / 2, 108, 10, "center");
+  }
   drawPixelText(`M: sound ${muted ? "off" : "on"}`, 10, canvas.height - 10, 10, "left");
 
   if (state === "paused" || state === "over") {
