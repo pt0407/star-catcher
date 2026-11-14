@@ -919,7 +919,7 @@ document.addEventListener("keydown", (e) => {
     return;
   }
   if (e.key.toLowerCase() === "r") {
-    if (!e.repeat && (state === "playing" || state === "paused")) reset();
+    if (!e.repeat && (state === "playing" || state === "paused" || (state === "over" && performance.now() - gameOverTime >= RESTART_DELAY_MS))) reset();
     return;
   }
   if (e.key.toLowerCase() === "p" || e.key === "Escape") {
