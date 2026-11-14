@@ -70,6 +70,7 @@ const SPRITES = {
 };
 const SIZE = { player: 64, star: 32, rock: 32, magnet: 32, heart: 24 };
 const FALLBACK = { player: "#4fc3f7", star: "#ffd93b", rock: "#8a8a8a", heart: "#ff5577" };
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const FONT = '\"Press Start 2P\", monospace';
 
 const images = {};
@@ -651,7 +652,7 @@ function draw() {
   const now = performance.now();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.save();
-  if (shake > 0) {
+  if (shake > 0 && !reducedMotion) {
     ctx.translate((Math.random() * 2 - 1) * SHAKE_AMOUNT, (Math.random() * 2 - 1) * SHAKE_AMOUNT);
   }
 
@@ -668,7 +669,7 @@ function draw() {
 
   ctx.fillStyle = "#fff";
   for (const dot of starfield) {
-    ctx.globalAlpha = 0.25 + 0.25 * Math.sin(now / 500 * dot.speed + dot.phase);
+    ctx.globalAlpha = reducedMotion ? 0.4 : 0.25 + 0.25 * Math.sin(now / 500 * dot.speed + dot.phase);
     ctx.fillRect(dot.x, dot.y, 2, 2);
   }
   ctx.globalAlpha = 1;
