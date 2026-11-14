@@ -271,7 +271,7 @@ document.addEventListener("keydown", (e) => {
     }
     return;
   }
-  if (e.key === " ") {
+  if (e.key === " " || e.key === "Enter") {
     e.preventDefault();
     if (state === "ready" || (state === "over" && performance.now() - gameOverTime >= RESTART_DELAY_MS)) reset();
     return;
