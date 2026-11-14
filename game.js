@@ -28,6 +28,9 @@ const STAR_DURATION = 0.08;
 const ROCK_FREQUENCY = 140;
 const ROCK_DURATION = 0.15;
 const POP_DURATION = 0.8;
+const BIT_COUNT = 6;
+const BIT_LIFETIME = 0.4;
+const BIT_GRAVITY = 500;
 const SHAKE_DURATION = 0.3;
 const SHAKE_AMOUNT = 4;
 const HEART_FLASH_DURATION = 0.2;
@@ -73,7 +76,7 @@ function drawSprite(name, x, y) {
 }
 
 let best = Number(localStorage.getItem("starCatcherBest") || 0);
-let state, player, items, pops, lives, score, starsCaught, rocksHit, streak, fallSpeed, spawnTimer;
+let state, player, items, pops, bits, lives, score, starsCaught, rocksHit, streak, fallSpeed, spawnTimer;
 let gustTimer, gustRemaining, gustDirection, magnetRemaining;
 let shootingStar, shootingStarTimer;
 let gameOverTime = 0;
@@ -123,6 +126,7 @@ function reset() {
   player = { x: canvas.width / 2 - SIZE.player / 2, y: canvas.height - 90 };
   items = [];
   pops = [];
+  bits = [];
   shootingStar = null;
   shootingStarTimer = SHOOTING_STAR_INTERVAL;
   lives = START_LIVES;
@@ -139,6 +143,18 @@ function reset() {
   shake = 0;
   heartFlash = 0;
   newBest = false;
+}
+
+function spawnRockBits(x, y) {
+  for (let i = 0; i < BIT_COUNT; i++) {
+    bits.push({
+      x,
+      y,
+      vx: (Math.random() * 2 - 1) * 150,
+      vy: (Math.random() * 2 - 1) * 150,
+      age: 0,
+    });
+  }
 }
 
 function spawnItem() {
@@ -179,6 +195,16 @@ function gameOver() {
 function update(dt) {
   shake = Math.max(0, shake - dt);
   heartFlash = Math.max(0, heartFlash - dt);
+
+  for (let i = bits.length - 1; i >= 0; i--) {
+    const bit = bits[i];
+    bit.age += dt;
+    bit.vy += BIT_GRAVITY * dt;
+    bit.x += bit.vx * dt;
+    bit.y += bit.vy * dt;
+    if (bit.age >= BIT_LIFETIME) bits.splice(i, 1);
+  }
+
   if (state !== "playing") return;
 
   magnetRemaining = Math.max(0, magnetRemaining - dt);
@@ -239,6 +265,7 @@ function update(dt) {
       } else if (item.type === "magnet") {
         magnetRemaining = MAGNET_DURATION;
       } else {
+        spawnRockBits(item.x + SIZE.rock / 2, item.y + SIZE.rock / 2);
         rocksHit += 1;
         streak = 0;
         lives -= 1;
@@ -317,6 +344,9 @@ function draw() {
       drawSprite(item.type, item.x, item.y);
     }
   }
+  ctx.fillStyle = "#888";
+  for (const bit of bits) ctx.fillRect(bit.x, bit.y, 3, 3);
+
   if (shootingStar) {
     const trail = ctx.createLinearGradient(shootingStar.x - 20, 0, shootingStar.x + 2, 0);
     trail.addColorStop(0, "rgba(255, 255, 255, 0)");
