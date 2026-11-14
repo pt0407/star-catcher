@@ -188,6 +188,7 @@ function draw() {
 
   if (state === "ready") drawText([["Star Catcher", 36], ["Press Space to start", 20]]);
   if (state === "over") drawText([["Game over", 36], [`Score ${score}   Best ${best}`, 20], ["Press Space to play again", 20]]);
+  if (state === "paused") drawText([["Paused", 36]]);
   ctx.restore();
 }
 
@@ -197,9 +198,15 @@ document.addEventListener("keydown", (e) => {
     if (!e.repeat) muted = !muted;
     return;
   }
+  if (e.key.toLowerCase() === "p" || e.key === "Escape") {
+    if (!e.repeat && (state === "playing" || state === "paused")) {
+      state = state === "playing" ? "paused" : "playing";
+    }
+    return;
+  }
   if (e.key === " ") {
     e.preventDefault();
-    if (state !== "playing") reset();
+    if (state === "ready" || state === "over") reset();
     return;
   }
   if (e.key.startsWith("Arrow")) e.preventDefault();
@@ -215,7 +222,7 @@ let lastTime = performance.now();
 function frame(time) {
   const dt = Math.min((time - lastTime) / 1000, 0.05);
   lastTime = time;
-  update(dt);
+  if (state !== "paused") update(dt);
   draw();
   requestAnimationFrame(frame);
 }
