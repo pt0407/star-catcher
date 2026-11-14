@@ -3,6 +3,7 @@ body {
   margin: 0;
   overscroll-behavior: none;
   min-height: 100vh;
+  min-height: 100dvh;
   padding: 24px 16px;
   display: flex;
   flex-direction: column;
