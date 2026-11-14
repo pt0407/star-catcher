@@ -662,6 +662,18 @@ function draw() {
     drawPixelText(gustDirection < 0 ? "<<" : ">>", canvas.width / 2, 48, 14, "center");
     ctx.globalAlpha = 1;
   }
+  if (gustRemaining > 0) {
+    ctx.strokeStyle = "rgba(255,255,255,0.15)";
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 3; i++) {
+      const sy = (i * 173 + Math.floor(now / 20) * gustDirection * 30) % canvas.height;
+      const yy = sy < 0 ? sy + canvas.height : sy;
+      ctx.beginPath();
+      ctx.moveTo(0, yy);
+      ctx.lineTo(canvas.width, yy);
+      ctx.stroke();
+    }
+  }
   if (fpsEnabled && fpsText) {
     ctx.fillStyle = fpsValue > 0 && fpsValue < 30 ? "#ff7777" : "#fff";
     drawPixelText(fpsText, 10, 48, 8, "left");
