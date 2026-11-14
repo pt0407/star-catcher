@@ -4,6 +4,10 @@ ctx.imageSmoothingEnabled = false;
 
 const START_LIVES = 3;
 const PLAYER_SPEED = 300;
+const GUST_WAIT_MIN = 12;
+const GUST_WAIT_MAX = 20;
+const GUST_DURATION = 2;
+const GUST_SPEED = 180;
 const START_FALL_SPEED = 120;
 const SPEED_UP_EVERY = 10;
 const SPEED_UP_AMOUNT = 20;
@@ -63,6 +67,7 @@ function drawSprite(name, x, y) {
 
 let best = Number(localStorage.getItem("starCatcherBest") || 0);
 let state, player, items, pops, lives, score, starsCaught, rocksHit, streak, fallSpeed, spawnTimer;
+let gustTimer, gustRemaining, gustDirection;
 let gameOverTime = 0;
 let newBest = false;
 let shake = 0;
@@ -117,6 +122,9 @@ function reset() {
   streak = 0;
   fallSpeed = START_FALL_SPEED;
   spawnTimer = 0;
+  gustTimer = GUST_WAIT_MIN + Math.random() * (GUST_WAIT_MAX - GUST_WAIT_MIN);
+  gustRemaining = 0;
+  gustDirection = 0;
   shake = 0;
   heartFlash = 0;
   newBest = false;
@@ -157,6 +165,21 @@ function update(dt) {
   heartFlash = Math.max(0, heartFlash - dt);
   if (state !== "playing") return;
 
+  let gustPushTime = 0;
+  if (gustRemaining > 0) {
+    gustPushTime = Math.min(dt, gustRemaining);
+    gustRemaining -= gustPushTime;
+  } else {
+    gustTimer -= dt;
+    if (gustTimer <= 0) {
+      gustDirection = Math.random() < 0.5 ? -1 : 1;
+      gustRemaining = GUST_DURATION;
+      gustTimer = GUST_WAIT_MIN + Math.random() * (GUST_WAIT_MAX - GUST_WAIT_MIN);
+      gustPushTime = Math.min(dt, gustRemaining);
+      gustRemaining -= gustPushTime;
+    }
+  }
+
   if (touchTargetX !== null) {
     const distance = touchTargetX - player.x;
     player.x += Math.sign(distance) * Math.min(Math.abs(distance), PLAYER_SPEED * dt);
@@ -164,6 +187,7 @@ function update(dt) {
     const move = (keys["arrowright"] || keys["d"] ? 1 : 0) - (keys["arrowleft"] || keys["a"] ? 1 : 0);
     player.x += move * PLAYER_SPEED * dt;
   }
+  player.x += gustDirection * GUST_SPEED * gustPushTime;
   player.x = Math.max(0, Math.min(canvas.width - SIZE.player, player.x));
 
   spawnTimer -= dt;
@@ -240,6 +264,12 @@ function draw() {
   ctx.globalAlpha = heartFlash > 0 ? 0.3 : 1;
   for (let i = 0; i < lives; i++) drawSprite("heart", 10 + i * 30, 10);
   ctx.globalAlpha = 1;
+  if (gustRemaining > 0) {
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#fff";
+    ctx.font = `14px ${FONT}`;
+    ctx.fillText(gustDirection < 0 ? "<<" : ">>", canvas.width / 2, 48);
+  }
   if (fpsEnabled) {
     ctx.textAlign = "left";
     ctx.fillStyle = "#fff";
