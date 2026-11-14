@@ -795,6 +795,9 @@ function draw() {
   if (magnetRemaining > 0) {
     drawPixelText(`Magnet ${Math.ceil(magnetRemaining)}s`, canvas.width / 2, 108, 10, "center");
   }
+  if (starsCaught > 0) {
+    drawPixelText(`Stars ${starsCaught}`, 10, canvas.height - 26, 8, "left");
+  }
   drawPixelText(`M: sound ${muted ? "off" : "on"}`, 10, canvas.height - 10, 10, "left");
 
   if (state === "paused" || state === "over") {
