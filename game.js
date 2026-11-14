@@ -20,6 +20,7 @@ const SPAWN_INTERVAL_SCORE_STEP = 5;
 const SPAWN_INTERVAL_DECREASE = 0.03;
 const MIN_SPAWN_EVERY = 0.45;
 const STAR_CHANCE = 0.7;
+const GOLDEN_STAR_CHANCE = 1 / 12;
 const MAGNET_CHANCE = 1 / 25;
 const MAGNET_DURATION = 4;
 const MAGNET_SPEED = 300;
@@ -217,7 +218,8 @@ function spawnItem() {
   } else {
     type = Math.random() < STAR_CHANCE ? "star" : "rock";
   }
-  items.push({ type, x: Math.random() * (canvas.width - SIZE[type]), y: -SIZE[type] });
+  const golden = type === "star" && Math.random() < GOLDEN_STAR_CHANCE;
+  items.push({ type, golden, x: Math.random() * (canvas.width - SIZE[type]), y: -SIZE[type] });
 }
 
 function getSpawnInterval() {
@@ -343,9 +345,10 @@ function update(dt) {
       if (item.type === "star") {
         starsCaught += 1;
         streak += 1;
-        score += 1;
+        const value = item.golden ? 3 : 1;
+        score += value;
         checkMilestone();
-        pops.push({ x: item.x + SIZE.star / 2, y: item.y + SIZE.star / 2, age: 0 });
+        pops.push({ x: item.x + SIZE.star / 2, y: item.y + SIZE.star / 2, age: 0, value });
       } else if (item.type === "magnet") {
         magnetRemaining = MAGNET_DURATION;
       } else {
@@ -437,6 +440,15 @@ function draw() {
     if (item.type === "magnet") {
       ctx.fillStyle = "#4fa3ff";
       ctx.fillRect(item.x, item.y, SIZE.magnet, SIZE.magnet);
+    } else if (item.type === "star" && item.golden) {
+      if (isReady("star")) {
+        ctx.filter = "hue-rotate(40deg) brightness(1.3)";
+        ctx.drawImage(images.star, item.x, item.y, SIZE.star, SIZE.star);
+        ctx.filter = "none";
+      } else {
+        ctx.fillStyle = "#ffb300";
+        ctx.fillRect(item.x, item.y, SIZE.star, SIZE.star);
+      }
     } else {
       drawSprite(item.type, item.x, item.y);
     }
