@@ -5,6 +5,7 @@ import {
 } from "./audio.js";
 import { SIZE, FALLBACK, images, isReady, drawSprite } from "./sprites.js";
 import { keys, touch, bindInput } from "./input.js";
+import { SPARKLE_COUNT, clearParticles, spawnRockBits, spawnStarSparkles, updateParticles, drawParticles } from "./particles.js";
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
@@ -43,14 +44,6 @@ const SHOOTING_STAR_SIZE = 24;
 const SHOOTING_STAR_Y = 40;
 const POP_DURATION = 0.8;
 const HEART_POPUP_DURATION = 0.8;
-const BIT_COUNT = 6;
-const BIT_POOL_SIZE = BIT_COUNT * 10;
-const BIT_LIFETIME = 0.4;
-const BIT_GRAVITY = 500;
-const SPARKLE_COUNT = 8;
-const SPARKLE_POOL_SIZE = SPARKLE_COUNT * 10;
-const SPARKLE_LIFETIME = 0.35;
-const SPARKLE_GRAVITY = 250;
 const SHAKE_DURATION = 0.3;
 const HOP_DURATION = 0.25;
 const SHAKE_AMOUNT = 4;
@@ -85,10 +78,6 @@ let totalScore = Number(loadItem("starCatcherTotalScore", "0"));
 let hasSeenControlsTip = loadItem("starCatcherSeen", "false") === "true";
 let state, player, items, pops, lives, score, starsCaught, goldenCaught, rocksHit, streak, fallSpeed, spawnTimer;
 let runBestStreak = 0;
-let bits = [];
-const inactiveBits = Array.from({ length: BIT_POOL_SIZE }, () => ({ x: 0, y: 0, vx: 0, vy: 0, age: 0 }));
-let sparkles = [];
-const inactiveSparkles = Array.from({ length: SPARKLE_POOL_SIZE }, () => ({ x: 0, y: 0, vx: 0, vy: 0, age: 0, color: "#fff3a0" }));
 const STARFIELD_COUNT = 40;
 const starfield = Array.from({ length: STARFIELD_COUNT }, () => ({
   x: Math.random() * canvas.width,
@@ -134,10 +123,7 @@ let bgPattern = null;
 let vignette = null;
 
 function reset() {
-  for (const bit of bits) inactiveBits.push(bit);
-  bits.length = 0;
-  for (const sparkle of sparkles) inactiveSparkles.push(sparkle);
-  sparkles.length = 0;
+  clearParticles();
   state = "playing";
   runStartTime = performance.now();
   player = { x: canvas.width / 2 - SIZE.player / 2, y: canvas.height - 90 };
@@ -187,36 +173,6 @@ function startGame() {
     hasSeenControlsTip = true;
   }
   reset();
-}
-
-function spawnRockBits(x, y, color = "#888") {
-  for (let i = 0; i < BIT_COUNT; i++) {
-    const bit = inactiveBits.pop();
-    if (!bit) break;
-
-    bit.x = x;
-    bit.y = y;
-    bit.vx = (Math.random() * 2 - 1) * 150;
-    bit.vy = (Math.random() * 2 - 1) * 150;
-    bit.age = 0;
-    bit.color = color;
-    bits.push(bit);
-  }
-}
-
-function spawnStarSparkles(x, y, color = "#fff3a0", count = SPARKLE_COUNT) {
-  for (let i = 0; i < count; i++) {
-    const sparkle = inactiveSparkles.pop();
-    if (!sparkle) break;
-
-    sparkle.x = x;
-    sparkle.y = y;
-    sparkle.vx = (Math.random() * 2 - 1) * 220;
-    sparkle.vy = (Math.random() * 2 - 1) * 220 - 60;
-    sparkle.age = 0;
-    sparkle.color = color;
-    sparkles.push(sparkle);
-  }
 }
 
 function spawnItem() {
@@ -326,29 +282,7 @@ function update(dt) {
     heartVisible = true;
   }
 
-  for (let i = bits.length - 1; i >= 0; i--) {
-    const bit = bits[i];
-    bit.age += dt;
-    bit.vy += BIT_GRAVITY * dt;
-    bit.x += bit.vx * dt;
-    bit.y += bit.vy * dt;
-    if (bit.age >= BIT_LIFETIME) {
-      bits.splice(i, 1);
-      inactiveBits.push(bit);
-    }
-  }
-
-  for (let i = sparkles.length - 1; i >= 0; i--) {
-    const sparkle = sparkles[i];
-    sparkle.age += dt;
-    sparkle.vy += SPARKLE_GRAVITY * dt;
-    sparkle.x += sparkle.vx * dt;
-    sparkle.y += sparkle.vy * dt;
-    if (sparkle.age >= SPARKLE_LIFETIME) {
-      sparkles.splice(i, 1);
-      inactiveSparkles.push(sparkle);
-    }
-  }
+  updateParticles(dt);
 
   if (state !== "playing") return;
 
@@ -655,14 +589,7 @@ function draw() {
       drawSprite(ctx, item.type, item.x, item.y);
     }
   }
-  for (const bit of bits) {
-    ctx.fillStyle = bit.color;
-    ctx.fillRect(bit.x, bit.y, 3, 3);
-  }
-  for (const sparkle of sparkles) {
-    ctx.fillStyle = sparkle.color;
-    ctx.fillRect(sparkle.x, sparkle.y, 2, 2);
-  }
+  drawParticles(ctx);
 
   if (shootingStar) {
     const dir = shootingStar.dir || 1;
