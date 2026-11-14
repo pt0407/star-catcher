@@ -3,6 +3,7 @@ const ctx = canvas.getContext("2d");
 ctx.imageSmoothingEnabled = false;
 
 const START_LIVES = 3;
+const MAX_LIVES = 5;
 const PLAYER_SPEED = 300;
 const GUST_WAIT_MIN = 12;
 const GUST_WAIT_MAX = 20;
@@ -33,6 +34,7 @@ const STAR_DURATION = 0.08;
 const ROCK_FREQUENCY = 140;
 const ROCK_DURATION = 0.15;
 const POP_DURATION = 0.8;
+const HEART_POPUP_DURATION = 0.8;
 const BIT_COUNT = 6;
 const BIT_POOL_SIZE = BIT_COUNT * 10;
 const BIT_LIFETIME = 0.4;
@@ -114,6 +116,8 @@ let shake = 0;
 let heartFlash = 0;
 let heartBlinkTimer = 0;
 let heartVisible = true;
+let heartPopupRemaining = 0;
+let lastHeartBonusScore = 0;
 let lastMilestoneShown = 0;
 let milestoneFlashRemaining = 0;
 let milestoneFlash = null;
@@ -183,6 +187,8 @@ function reset() {
   heartFlash = 0;
   heartBlinkTimer = 0;
   heartVisible = true;
+  heartPopupRemaining = 0;
+  lastHeartBonusScore = 0;
   lastMilestoneShown = 0;
   milestoneFlashRemaining = 0;
   milestoneFlash = null;
@@ -247,6 +253,16 @@ function gameOver() {
   }
 }
 
+function checkHeartBonus() {
+  while (score >= lastHeartBonusScore + 50) {
+    lastHeartBonusScore += 50;
+    if (lives < MAX_LIVES) {
+      lives += 1;
+      heartPopupRemaining = HEART_POPUP_DURATION;
+    }
+  }
+}
+
 function checkMilestone() {
   const milestone = MILESTONES.find((value) => value > lastMilestoneShown && score >= value);
   if (milestone === undefined) return;
@@ -259,6 +275,7 @@ function checkMilestone() {
 function update(dt) {
   shake = Math.max(0, shake - dt);
   heartFlash = Math.max(0, heartFlash - dt);
+  heartPopupRemaining = Math.max(0, heartPopupRemaining - dt);
   milestoneFlashRemaining = Math.max(0, milestoneFlashRemaining - dt);
 
   if (lives === 1) {
@@ -347,6 +364,7 @@ function update(dt) {
         streak += 1;
         const value = item.golden ? 3 : 1;
         score += value;
+        checkHeartBonus();
         checkMilestone();
         pops.push({ x: item.x + SIZE.star / 2, y: item.y + SIZE.star / 2, age: 0, value });
       } else if (item.type === "magnet") {
@@ -372,6 +390,7 @@ function update(dt) {
       starsCaught += 1;
       streak += 1;
       score += 5;
+      checkHeartBonus();
       checkMilestone();
       pops.push({
         x: shootingStar.x + SHOOTING_STAR_SIZE / 2,
@@ -487,6 +506,10 @@ function draw() {
     for (let i = 0; i < lives; i++) drawSprite("heart", 10 + i * 30, 10);
   }
   ctx.globalAlpha = 1;
+  if (heartPopupRemaining > 0) {
+    ctx.fillStyle = "#fff";
+    drawPixelText("+heart", 10 + lives * 30, 27, 10, "left");
+  }
   if (gustRemaining > 0) {
     ctx.fillStyle = "#fff";
     drawPixelText(gustDirection < 0 ? "<<" : ">>", canvas.width / 2, 48, 14, "center");
