@@ -535,6 +535,7 @@ function update(dt) {
         magnetRemaining = MAGNET_DURATION;
         comboFlash = "MAGNET!";
         comboFlashRemaining = COMBO_FLASH_DURATION;
+        spawnStarSparkles(item.x + SIZE.magnet / 2, item.y + SIZE.magnet / 2, "#8fd0ff");
       } else if (item.type === "heart") {
         if (lives < MAX_LIVES) {
           lives += 1;
