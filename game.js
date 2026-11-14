@@ -590,7 +590,9 @@ function draw() {
 
     drawText(gameOverLines);
   }
-  if (state === "paused") drawText([["Paused", 28], ["Press P or Esc to resume", 14]]);
+  if (state === "paused") {
+    drawText([["Paused", 28], ["Press P or Esc to resume", 14], [`Score ${score}`, 14]]);
+  }
   ctx.restore();
 }
 
