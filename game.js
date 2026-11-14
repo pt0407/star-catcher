@@ -173,6 +173,7 @@ let fpsEnabled = false;
 let fpsWindowStart = 0;
 let fpsFrameCount = 0;
 let fpsText = "FPS 0";
+let fpsValue = 0;
 let bgPattern = null;
 let vignette = null;
 const keys = {};
@@ -822,7 +823,7 @@ function draw() {
     ctx.globalAlpha = 1;
   }
   if (fpsEnabled) {
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = fpsValue > 0 && fpsValue < 30 ? "#ff7777" : "#fff";
     drawPixelText(fpsText, 10, 48, 8, "left");
   }
   ctx.fillStyle = "#fff";
@@ -1020,6 +1021,7 @@ function frame(time) {
   fpsFrameCount += 1;
   if (time - fpsWindowStart >= 1000) {
     fpsText = `FPS ${fpsFrameCount}`;
+    fpsValue = fpsFrameCount;
     fpsFrameCount = 0;
     fpsWindowStart = time;
   }
