@@ -251,8 +251,9 @@ function draw() {
   ctx.fillText(`Score ${score}`, canvas.width - 10, 28);
   ctx.fillText(`Best ${best}`, canvas.width - 10, 46);
   if (streak >= 2) ctx.fillText(`Streak ${streak}`, canvas.width - 10, 64);
-  ctx.font = `8px ${FONT}`;
-  ctx.fillText(`M: sound ${muted ? "off" : "on"}`, canvas.width - 20, 78);
+  ctx.textAlign = "left";
+  ctx.font = `10px ${FONT}`;
+  ctx.fillText(`M: sound ${muted ? "off" : "on"}`, 10, canvas.height - 10);
 
   if (state === "paused" || state === "over") {
     ctx.fillStyle = "rgba(0, 0, 0, 0.55)";
