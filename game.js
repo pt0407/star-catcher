@@ -557,11 +557,13 @@ function update(dt) {
         comboFlash = "MAGNET!";
         comboFlashRemaining = COMBO_FLASH_DURATION;
         spawnStarSparkles(item.x + SIZE.magnet / 2, item.y + SIZE.magnet / 2, "#8fd0ff");
+        hopTimer = HOP_DURATION;
       } else if (item.type === "heart") {
         if (lives < MAX_LIVES) {
           lives += 1;
           heartPopupRemaining = HEART_POPUP_DURATION;
           spawnStarSparkles(item.x + SIZE.heart / 2, item.y + SIZE.heart / 2, "#ff8fb3");
+          hopTimer = HOP_DURATION;
           pops.push({ x: item.x + SIZE.heart / 2, y: item.y + SIZE.heart / 2, age: 0, value: "heart", color: "#ff8fb3" });
         } else {
           pops.push({ x: item.x + SIZE.heart / 2, y: item.y + SIZE.heart / 2, age: 0, text: "full!", color: "#ff8fb3" });
