@@ -209,6 +209,27 @@ function playPauseSound() {
   oscillator.stop(now + PAUSE_DURATION);
 }
 
+function playNewBestSound() {
+  if (muted || !audioContext) return;
+
+  const notes = [523, 659, 784];
+  notes.forEach((frequency, i) => {
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    const start = audioContext.currentTime + i * 0.09;
+
+    oscillator.type = "square";
+    oscillator.frequency.value = frequency;
+    gain.gain.setValueAtTime(0.0001, start);
+    gain.gain.exponentialRampToValueAtTime(0.1, start + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.12);
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+    oscillator.start(start);
+    oscillator.stop(start + 0.12);
+  });
+}
+
 function reset() {
   for (const bit of bits) inactiveBits.push(bit);
   bits.length = 0;
@@ -325,6 +346,7 @@ function gameOver() {
   if (newBest) {
     best = score;
     localStorage.setItem("starCatcherBest", String(best));
+    playNewBestSound();
   }
   if (runBestStreak > bestStreak) {
     bestStreak = runBestStreak;
