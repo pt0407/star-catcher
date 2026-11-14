@@ -778,6 +778,10 @@ function draw() {
     if (now - pauseStartTime < 5000) {
       pauseLines.push(["Press P or Esc to resume", 14]);
     }
+    if (loadItem("starCatcherSeenPauseHint", "false") !== "true") {
+      pauseLines.push(["Arrows move - Space starts - R restarts", 10]);
+      saveItem("starCatcherSeenPauseHint", "true");
+    }
     const speedLevel = 1 + Math.floor(score / SPEED_UP_EVERY);
     pauseLines.push([`Score ${score}   Stars ${starsCaught}`, 14], [`Difficulty: ${difficulty.name}   Speed ${speedLevel}   R restarts`, 10]);
     drawText(pauseLines);
