@@ -198,7 +198,13 @@ function draw() {
     ctx.translate((Math.random() * 2 - 1) * SHAKE_AMOUNT, (Math.random() * 2 - 1) * SHAKE_AMOUNT);
   }
 
-  if (isReady("background")) ctx.drawImage(images.background, 0, 0, canvas.width, canvas.height);
+  if (isReady("background")) {
+    const pattern = ctx.createPattern(images.background, "repeat");
+    if (pattern) {
+      ctx.fillStyle = pattern;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+  }
 
   drawSprite("player", player.x, player.y);
   for (const item of items) drawSprite(item.type, item.x, item.y);
