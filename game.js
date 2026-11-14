@@ -8,7 +8,11 @@ const GUST_WAIT_MIN = 12;
 const GUST_WAIT_MAX = 20;
 const GUST_DURATION = 2;
 const GUST_SPEED = 180;
-const START_FALL_SPEED = 120;
+const DIFFICULTIES = [
+  { name: "easy", fallSpeed: 90 },
+  { name: "normal", fallSpeed: 120 },
+  { name: "hard", fallSpeed: 160 },
+];
 const SPEED_UP_EVERY = 10;
 const SPEED_UP_AMOUNT = 20;
 const SPAWN_EVERY = 0.9;
@@ -93,6 +97,7 @@ let hasSeenControlsTip = localStorage.getItem("starCatcherSeen") === "true";
 let state, player, items, pops, bits, lives, score, starsCaught, rocksHit, streak, fallSpeed, spawnTimer;
 let gustTimer, gustRemaining, gustDirection, magnetRemaining;
 let shootingStar, shootingStarTimer;
+let difficulty = DIFFICULTIES[1];
 let playerFacingLeft = false;
 let playerTrail = [];
 let playerSpeed = 0;
@@ -155,7 +160,7 @@ function reset() {
   starsCaught = 0;
   rocksHit = 0;
   streak = 0;
-  fallSpeed = START_FALL_SPEED;
+  fallSpeed = difficulty.fallSpeed;
   spawnTimer = 0;
   gustTimer = GUST_WAIT_MIN + Math.random() * (GUST_WAIT_MAX - GUST_WAIT_MIN);
   gustRemaining = 0;
@@ -341,7 +346,7 @@ function update(dt) {
   for (const pop of pops) pop.age += dt;
   pops = pops.filter((pop) => pop.age < POP_DURATION);
 
-  fallSpeed = START_FALL_SPEED + Math.floor(score / SPEED_UP_EVERY) * SPEED_UP_AMOUNT;
+  fallSpeed = difficulty.fallSpeed + Math.floor(score / SPEED_UP_EVERY) * SPEED_UP_AMOUNT;
   if (lives <= 0) gameOver();
 }
 
@@ -451,11 +456,16 @@ function draw() {
   if (state === "ready") {
     const titleBob = Math.sin(performance.now() / 300) * 4;
     drawText([["Star Catcher", 28], ["Press Space to start", 14]], [titleBob]);
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#fff";
+    ctx.font = `10px ${FONT}`;
+    const difficultyOptions = DIFFICULTIES.map((option, index) => {
+      const label = `${index + 1} ${option.name}`;
+      return option === difficulty ? `[${label}]` : label;
+    }).join("  ");
+    ctx.fillText(difficultyOptions, canvas.width / 2, canvas.height / 2 + 60);
     if (!hasSeenControlsTip) {
-      ctx.textAlign = "center";
-      ctx.fillStyle = "#fff";
-      ctx.font = `10px ${FONT}`;
-      ctx.fillText("arrows or a/d to move", canvas.width / 2, canvas.height / 2 + 70);
+      ctx.fillText("arrows or a/d to move", canvas.width / 2, canvas.height / 2 + 90);
     }
   }
   if (state === "over") {
@@ -505,6 +515,10 @@ window.addEventListener("blur", () => {
 
 document.addEventListener("keydown", (e) => {
   initializeAudio();
+  if (["ready", "over"].includes(state) && ["1", "2", "3"].includes(e.key)) {
+    difficulty = DIFFICULTIES[Number(e.key) - 1];
+    return;
+  }
   if (e.key.toLowerCase() === "m") {
     if (!e.repeat) {
       muted = !muted;
