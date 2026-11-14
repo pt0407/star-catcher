@@ -33,6 +33,7 @@ const ROCK_FREQUENCY = 140;
 const ROCK_DURATION = 0.15;
 const POP_DURATION = 0.8;
 const BIT_COUNT = 6;
+const BIT_POOL_SIZE = BIT_COUNT * 10;
 const BIT_LIFETIME = 0.4;
 const BIT_GRAVITY = 500;
 const SHAKE_DURATION = 0.3;
@@ -97,7 +98,9 @@ function drawPlayer(x = player.x) {
 
 let best = Number(localStorage.getItem("starCatcherBest") || 0);
 let hasSeenControlsTip = localStorage.getItem("starCatcherSeen") === "true";
-let state, player, items, pops, bits, lives, score, starsCaught, rocksHit, streak, fallSpeed, spawnTimer;
+let state, player, items, pops, lives, score, starsCaught, rocksHit, streak, fallSpeed, spawnTimer;
+let bits = [];
+const inactiveBits = Array.from({ length: BIT_POOL_SIZE }, () => ({ x: 0, y: 0, vx: 0, vy: 0, age: 0 }));
 let gustTimer, gustRemaining, gustDirection, magnetRemaining;
 let shootingStar, shootingStarTimer;
 let difficulty = DIFFICULTIES[1];
@@ -153,6 +156,8 @@ function playCatchSound(type) {
 }
 
 function reset() {
+  for (const bit of bits) inactiveBits.push(bit);
+  bits.length = 0;
   state = "playing";
   player = { x: canvas.width / 2 - SIZE.player / 2, y: canvas.height - 90 };
   playerFacingLeft = false;
@@ -160,7 +165,6 @@ function reset() {
   playerSpeed = 0;
   items = [];
   pops = [];
-  bits = [];
   shootingStar = null;
   shootingStarTimer = SHOOTING_STAR_INTERVAL;
   lives = START_LIVES;
@@ -194,13 +198,15 @@ function startGame() {
 
 function spawnRockBits(x, y) {
   for (let i = 0; i < BIT_COUNT; i++) {
-    bits.push({
-      x,
-      y,
-      vx: (Math.random() * 2 - 1) * 150,
-      vy: (Math.random() * 2 - 1) * 150,
-      age: 0,
-    });
+    const bit = inactiveBits.pop();
+    if (!bit) break;
+
+    bit.x = x;
+    bit.y = y;
+    bit.vx = (Math.random() * 2 - 1) * 150;
+    bit.vy = (Math.random() * 2 - 1) * 150;
+    bit.age = 0;
+    bits.push(bit);
   }
 }
 
@@ -270,7 +276,10 @@ function update(dt) {
     bit.vy += BIT_GRAVITY * dt;
     bit.x += bit.vx * dt;
     bit.y += bit.vy * dt;
-    if (bit.age >= BIT_LIFETIME) bits.splice(i, 1);
+    if (bit.age >= BIT_LIFETIME) {
+      bits.splice(i, 1);
+      inactiveBits.push(bit);
+    }
   }
 
   if (state !== "playing") return;
