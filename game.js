@@ -163,7 +163,7 @@ function initializeAudio() {
   if (audioContext.state === "suspended") audioContext.resume();
 }
 
-function playCatchSound(type) {
+function playCatchSound(type, pitchStep = 0) {
   if (muted || !audioContext) return;
 
   const isStar = type === "star";
@@ -173,7 +173,7 @@ function playCatchSound(type) {
   const duration = isStar ? STAR_DURATION : ROCK_DURATION;
 
   oscillator.type = isStar ? "sine" : "square";
-  oscillator.frequency.value = isStar ? STAR_FREQUENCY : ROCK_FREQUENCY;
+  oscillator.frequency.value = isStar ? STAR_FREQUENCY + pitchStep : ROCK_FREQUENCY;
   gain.gain.setValueAtTime(0.0001, now);
   gain.gain.exponentialRampToValueAtTime(0.15, now + 0.01);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
@@ -436,7 +436,7 @@ function update(dt) {
     }
 
     if (touchesPlayer(item)) {
-      playCatchSound(item.type);
+      playCatchSound(item.type, item.type === 'star' ? Math.min(streak, 10) * 40 : 0);
       if (item.type === "star") {
         starsCaught += 1;
         streak += 1;
@@ -470,7 +470,7 @@ function update(dt) {
     const overlapsPlayerX = shootingStar.x < player.x + SIZE.player &&
       shootingStar.x + SHOOTING_STAR_SIZE > player.x;
     if (overlapsPlayerX) {
-      playCatchSound("star");
+      playCatchSound("star", Math.min(streak, 10) * 40);
       starsCaught += 1;
       streak += 1;
       runBestStreak = Math.max(runBestStreak, streak);
