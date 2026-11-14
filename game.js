@@ -75,10 +75,24 @@ function drawSprite(name, x, y) {
   }
 }
 
+function drawPlayer() {
+  if (!playerFacingLeft) {
+    drawSprite("player", player.x, player.y);
+    return;
+  }
+
+  ctx.save();
+  ctx.translate(player.x * 2 + SIZE.player, 0);
+  ctx.scale(-1, 1);
+  drawSprite("player", player.x, player.y);
+  ctx.restore();
+}
+
 let best = Number(localStorage.getItem("starCatcherBest") || 0);
 let state, player, items, pops, bits, lives, score, starsCaught, rocksHit, streak, fallSpeed, spawnTimer;
 let gustTimer, gustRemaining, gustDirection, magnetRemaining;
 let shootingStar, shootingStarTimer;
+let playerFacingLeft = false;
 let gameOverTime = 0;
 let newBest = false;
 let shake = 0;
@@ -124,6 +138,7 @@ function playCatchSound(type) {
 function reset() {
   state = "playing";
   player = { x: canvas.width / 2 - SIZE.player / 2, y: canvas.height - 90 };
+  playerFacingLeft = false;
   items = [];
   pops = [];
   bits = [];
@@ -224,6 +239,7 @@ function update(dt) {
     }
   }
 
+  const previousPlayerX = player.x;
   if (touchTargetX !== null) {
     const distance = touchTargetX - player.x;
     player.x += Math.sign(distance) * Math.min(Math.abs(distance), PLAYER_SPEED * dt);
@@ -233,6 +249,8 @@ function update(dt) {
   }
   player.x += gustDirection * GUST_SPEED * gustPushTime;
   player.x = Math.max(0, Math.min(canvas.width - SIZE.player, player.x));
+  if (player.x < previousPlayerX) playerFacingLeft = true;
+  else if (player.x > previousPlayerX) playerFacingLeft = false;
 
   spawnTimer -= dt;
   if (spawnTimer <= 0) {
@@ -335,7 +353,7 @@ function draw() {
     }
   }
 
-  drawSprite("player", player.x, player.y);
+  drawPlayer();
   for (const item of items) {
     if (item.type === "magnet") {
       ctx.fillStyle = "#4fa3ff";
