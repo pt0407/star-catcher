@@ -266,7 +266,7 @@ function draw() {
     if (newBest) gameOverLines.push(["New best!", 14]);
     gameOverLines.push([`Stars ${starsCaught}  Rocks ${rocksHit}`, 14], ["Press Space to play again", 14]);
 
-    const panelWidth = 340;
+    const panelWidth = 380;
     const panelHeight = 150;
     const panelX = (canvas.width - panelWidth) / 2;
     const panelY = (canvas.height - panelHeight) / 2;
