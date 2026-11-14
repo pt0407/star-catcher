@@ -49,7 +49,7 @@ function drawSprite(name, x, y) {
 }
 
 let best = Number(localStorage.getItem("starCatcherBest") || 0);
-let state, player, items, pops, lives, score, fallSpeed, spawnTimer;
+let state, player, items, pops, lives, score, starsCaught, rocksHit, fallSpeed, spawnTimer;
 let shake = 0;
 let audioContext = null;
 let muted = false;
@@ -92,6 +92,8 @@ function reset() {
   pops = [];
   lives = START_LIVES;
   score = 0;
+  starsCaught = 0;
+  rocksHit = 0;
   fallSpeed = START_FALL_SPEED;
   spawnTimer = 0;
   shake = 0;
@@ -146,9 +148,11 @@ function update(dt) {
       item.caught = true;
       playCatchSound(item.type);
       if (item.type === "star") {
+        starsCaught += 1;
         score += 1;
         pops.push({ x: item.x + SIZE.star / 2, y: item.y + SIZE.star / 2, age: 0 });
       } else {
+        rocksHit += 1;
         lives -= 1;
         shake = SHAKE_DURATION;
       }
@@ -202,7 +206,7 @@ function draw() {
   ctx.fillText(`M: sound ${muted ? "off" : "on"}`, canvas.width - 10, 46);
 
   if (state === "ready") drawText([["Star Catcher", 36], ["Press Space to start", 20]]);
-  if (state === "over") drawText([["Game over", 36], [`Score ${score}   Best ${best}`, 20], ["Press Space to play again", 20]]);
+  if (state === "over") drawText([["Game over", 36], [`Score ${score}   Best ${best}`, 20], [`Caught ${starsCaught} stars, hit ${rocksHit} rocks`, 16], ["Press Space to play again", 20]]);
   if (state === "paused") drawText([["Paused", 36]]);
   ctx.restore();
 }
