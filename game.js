@@ -618,6 +618,10 @@ function update(dt) {
       totalStars += 1;
       streak += 1;
       runBestStreak = Math.max(runBestStreak, streak);
+      if (streak % COMBO_EVERY === 0) {
+        comboFlash = `COMBO ${streak}!`;
+        comboFlashRemaining = COMBO_FLASH_DURATION;
+      }
       score += 5;
       checkNewBest();
       checkHeartBonus();
