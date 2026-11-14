@@ -28,6 +28,8 @@ Live version: https://star-catcher-virid.vercel.app
 - F: FPS counter
 - 1, 2, 3: difficulty on the menus, arrow keys cycle it too
 
+Catch stars for points, golden stars are worth 3. Rocks cost a heart. Magnet stars pull pickups toward you for a few seconds, hearts put one back. Wind gusts shove everything sideways, so keep an eye on the arrow up top.
+
 ## Built with
 
 Plain HTML, CSS, and JavaScript, no build step. The sprites are placeholders drawn by a small script from hand-defined shapes. The code and this README were written with an AI agent (Devin). Nobody has played a full run yet, so expect rough edges.
