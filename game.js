@@ -46,6 +46,8 @@ const HEART_FLASH_DURATION = 0.2;
 const HEART_BLINK_INTERVAL = 0.25;
 const MILESTONES = [25, 50, 100];
 const MILESTONE_FLASH_DURATION = 1;
+const COMBO_EVERY = 5;
+const COMBO_FLASH_DURATION = 1;
 const RESTART_DELAY_MS = 600;
 
 const SPRITES = {
@@ -124,6 +126,8 @@ let lastHeartBonusScore = 0;
 let lastMilestoneShown = 0;
 let milestoneFlashRemaining = 0;
 let milestoneFlash = null;
+let comboFlashRemaining = 0;
+let comboFlash = null;
 let audioContext = null;
 let muted = localStorage.getItem("starCatcherMuted") === "true";
 let nightMode = localStorage.getItem("starCatcherNight") === "true";
@@ -196,6 +200,8 @@ function reset() {
   lastMilestoneShown = 0;
   milestoneFlashRemaining = 0;
   milestoneFlash = null;
+  comboFlashRemaining = 0;
+  comboFlash = null;
   newBest = false;
 }
 
@@ -286,6 +292,7 @@ function update(dt) {
   heartFlash = Math.max(0, heartFlash - dt);
   heartPopupRemaining = Math.max(0, heartPopupRemaining - dt);
   milestoneFlashRemaining = Math.max(0, milestoneFlashRemaining - dt);
+  comboFlashRemaining = Math.max(0, comboFlashRemaining - dt);
 
   if (lives === 1) {
     heartBlinkTimer += dt;
@@ -371,6 +378,10 @@ function update(dt) {
       if (item.type === "star") {
         starsCaught += 1;
         streak += 1;
+        if (streak % COMBO_EVERY === 0) {
+          comboFlash = `COMBO ${streak}!`;
+          comboFlashRemaining = COMBO_FLASH_DURATION;
+        }
         runBestStreak = Math.max(runBestStreak, streak);
         const value = item.golden ? 3 : 1;
         score += value;
@@ -546,6 +557,9 @@ function draw() {
   if (speedLevel >= 2) drawPixelText(`Speed ${speedLevel}`, canvas.width - 10, hudY + 24, 10, "right");
   if (milestoneFlashRemaining > 0) {
     drawPixelText(milestoneFlash, canvas.width / 2, 32, 20, "center");
+  }
+  if (comboFlashRemaining > 0) {
+    drawPixelText(comboFlash, canvas.width / 2, 56, 20, "center");
   }
   drawPixelText(`M: sound ${muted ? "off" : "on"}`, 10, canvas.height - 10, 10, "left");
 
