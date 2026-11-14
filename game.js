@@ -352,7 +352,7 @@ function spawnItem() {
   }
   const golden = type === "star" && Math.random() < GOLDEN_STAR_CHANCE;
   const speedMultiplier = type === "rock" ? (Math.random() < FAST_ROCK_CHANCE ? 1.5 : 0.9 + Math.random() * 0.2) : type === "heart" ? 0.8 : 1;
-  items.push({ type, golden, speedMultiplier, x: Math.random() * (canvas.width - SIZE[type]), y: -SIZE[type] });
+  items.push({ type, golden, speedMultiplier, drift: (Math.random() * 2 - 1) * 12, x: Math.random() * (canvas.width - SIZE[type]), y: -SIZE[type] });
 }
 
 function getSpawnInterval() {
@@ -526,7 +526,7 @@ function update(dt) {
       }
     } else {
       item.y += fallSpeed * item.speedMultiplier * dt;
-      item.x += gustDirection * GUST_SPEED * 0.25 * gustPushTime;
+      item.x += (item.drift || 0) * dt + gustDirection * GUST_SPEED * 0.25 * gustPushTime;
       item.x = Math.max(0, Math.min(canvas.width - SIZE[item.type], item.x));
     }
 
