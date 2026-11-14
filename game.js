@@ -173,7 +173,7 @@ let touchTargetX = null;
 let fpsEnabled = false;
 let fpsWindowStart = 0;
 let fpsFrameCount = 0;
-let fpsText = "FPS 0";
+let fpsText = "";
 let fpsValue = 0;
 let bgPattern = null;
 let vignette = null;
@@ -850,7 +850,7 @@ function draw() {
     drawPixelText(gustDirection < 0 ? "<<" : ">>", canvas.width / 2, 48, 14, "center");
     ctx.globalAlpha = 1;
   }
-  if (fpsEnabled) {
+  if (fpsEnabled && fpsText) {
     ctx.fillStyle = fpsValue > 0 && fpsValue < 30 ? "#ff7777" : "#fff";
     drawPixelText(fpsText, 10, 48, 8, "left");
   }
