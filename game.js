@@ -734,6 +734,7 @@ function draw() {
       ctx.fillStyle = "#4fa3ff";
       ctx.fillRect(item.x, item.y, SIZE.magnet, SIZE.magnet);
     } else if (item.type === "star" && item.golden) {
+      ctx.globalAlpha = reducedMotion ? 1 : 0.8 + 0.2 * Math.sin(now / 250 + item.x);
       const goldenSize = SIZE.star + 8;
       const goldenOffset = (SIZE.star - goldenSize) / 2;
       if (isReady("star")) {
@@ -747,6 +748,7 @@ function draw() {
         ctx.fillStyle = "#ffb300";
         ctx.fillRect(item.x + goldenOffset, item.y + goldenOffset, goldenSize, goldenSize);
       }
+      ctx.globalAlpha = 1;
     } else if (item.type === "rock" && item.speedMultiplier > 1.4) {
       ctx.filter = "sepia(1) saturate(4) hue-rotate(-50deg)";
       drawSprite("rock", item.x, item.y);
