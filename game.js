@@ -339,7 +339,7 @@ function spawnItem() {
     type = Math.random() < STAR_CHANCE ? "star" : "rock";
   }
   const golden = type === "star" && Math.random() < GOLDEN_STAR_CHANCE;
-  const speedMultiplier = type === "rock" && Math.random() < FAST_ROCK_CHANCE ? 1.5 : 1;
+  const speedMultiplier = type === "rock" && Math.random() < FAST_ROCK_CHANCE ? 1.5 : type === "heart" ? 0.8 : 1;
   items.push({ type, golden, speedMultiplier, x: Math.random() * (canvas.width - SIZE[type]), y: -SIZE[type] });
 }
 
