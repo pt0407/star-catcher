@@ -53,6 +53,7 @@ let state, player, items, pops, lives, score, fallSpeed, spawnTimer;
 let shake = 0;
 let audioContext = null;
 let muted = false;
+let touchTargetX = null;
 const keys = {};
 
 function initializeAudio() {
@@ -124,8 +125,14 @@ function update(dt) {
   shake = Math.max(0, shake - dt);
   if (state !== "playing") return;
 
-  const move = (keys["arrowright"] || keys["d"] ? 1 : 0) - (keys["arrowleft"] || keys["a"] ? 1 : 0);
-  player.x = Math.max(0, Math.min(canvas.width - SIZE.player, player.x + move * PLAYER_SPEED * dt));
+  if (touchTargetX !== null) {
+    const distance = touchTargetX - player.x;
+    player.x += Math.sign(distance) * Math.min(Math.abs(distance), PLAYER_SPEED * dt);
+  } else {
+    const move = (keys["arrowright"] || keys["d"] ? 1 : 0) - (keys["arrowleft"] || keys["a"] ? 1 : 0);
+    player.x += move * PLAYER_SPEED * dt;
+  }
+  player.x = Math.max(0, Math.min(canvas.width - SIZE.player, player.x));
 
   spawnTimer -= dt;
   if (spawnTimer <= 0) {
@@ -199,6 +206,22 @@ function draw() {
   if (state === "paused") drawText([["Paused", 36]]);
   ctx.restore();
 }
+
+function setTouchTarget(event) {
+  event.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  const touchX = (event.touches[0].clientX - rect.left) * canvas.width / rect.width;
+  touchTargetX = Math.max(0, Math.min(canvas.width - SIZE.player, touchX - SIZE.player / 2));
+}
+
+canvas.addEventListener("touchstart", setTouchTarget, { passive: false });
+canvas.addEventListener("touchmove", setTouchTarget, { passive: false });
+canvas.addEventListener("touchend", () => {
+  touchTargetX = null;
+});
+canvas.addEventListener("touchcancel", () => {
+  touchTargetX = null;
+});
 
 document.addEventListener("keydown", (e) => {
   initializeAudio();
