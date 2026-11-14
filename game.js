@@ -859,7 +859,9 @@ function draw() {
   const speedLevel = 1 + Math.floor(score / SPEED_UP_EVERY);
   if (speedLevel >= 2) drawPixelText(`Speed ${speedLevel}`, canvas.width - 10, hudY + 24, 10, "right");
   if (milestoneFlashRemaining > 0) {
+    ctx.globalAlpha = milestoneFlashRemaining / MILESTONE_FLASH_DURATION;
     drawPixelText(milestoneFlash, canvas.width / 2, 32, 20, "center");
+    ctx.globalAlpha = 1;
   }
   if (comboFlashRemaining > 0) {
     drawPixelText(comboFlash, canvas.width / 2, 56, reducedMotion ? 20 : Math.round(20 + Math.sin(now / 80) * 2), "center");
