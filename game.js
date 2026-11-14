@@ -594,7 +594,7 @@ function update(dt) {
   }
 
   if (shootingStar) {
-    shootingStar.x += SHOOTING_STAR_SPEED * dt;
+    shootingStar.x += SHOOTING_STAR_SPEED * dt + gustDirection * GUST_SPEED * 0.25 * gustPushTime;
     const overlapsPlayerX = shootingStar.x < player.x + SIZE.player &&
       shootingStar.x + SHOOTING_STAR_SIZE > player.x;
     if (overlapsPlayerX) {
