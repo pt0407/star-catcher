@@ -67,6 +67,10 @@ let shake = 0;
 let audioContext = null;
 let muted = localStorage.getItem("starCatcherMuted") === "true";
 let touchTargetX = null;
+let fpsEnabled = false;
+let fpsWindowStart = 0;
+let fpsFrameCount = 0;
+let fpsText = "FPS 0";
 const keys = {};
 
 function initializeAudio() {
@@ -225,6 +229,12 @@ function draw() {
   ctx.globalAlpha = 1;
 
   for (let i = 0; i < lives; i++) drawSprite("heart", 10 + i * 30, 10);
+  if (fpsEnabled) {
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#fff";
+    ctx.font = `8px ${FONT}`;
+    ctx.fillText(fpsText, 10, 48);
+  }
   ctx.textAlign = "right";
   ctx.fillStyle = "#fff";
   ctx.font = `10px ${FONT}`;
@@ -269,6 +279,10 @@ document.addEventListener("keydown", (e) => {
     }
     return;
   }
+  if (e.key.toLowerCase() === "f") {
+    if (!e.repeat) fpsEnabled = !fpsEnabled;
+    return;
+  }
   if (e.key.toLowerCase() === "p" || e.key === "Escape") {
     if (!e.repeat && (state === "playing" || state === "paused")) {
       state = state === "playing" ? "paused" : "playing";
@@ -293,6 +307,13 @@ let lastTime = performance.now();
 function frame(time) {
   const dt = Math.min((time - lastTime) / 1000, 0.05);
   lastTime = time;
+  if (fpsWindowStart === 0) fpsWindowStart = time;
+  fpsFrameCount += 1;
+  if (time - fpsWindowStart >= 1000) {
+    fpsText = `FPS ${fpsFrameCount}`;
+    fpsFrameCount = 0;
+    fpsWindowStart = time;
+  }
   if (state !== "paused") update(dt);
   draw();
   requestAnimationFrame(frame);
