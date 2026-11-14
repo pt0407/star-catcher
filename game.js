@@ -109,6 +109,13 @@ let state, player, items, pops, lives, score, starsCaught, rocksHit, streak, fal
 let runBestStreak = 0;
 let bits = [];
 const inactiveBits = Array.from({ length: BIT_POOL_SIZE }, () => ({ x: 0, y: 0, vx: 0, vy: 0, age: 0 }));
+const STARFIELD_COUNT = 40;
+const starfield = Array.from({ length: STARFIELD_COUNT }, () => ({
+  x: Math.random() * canvas.width,
+  y: Math.random() * canvas.height,
+  phase: Math.random() * Math.PI * 2,
+  speed: 1 + Math.random() * 2,
+}));
 let gustTimer, gustRemaining, gustDirection, magnetRemaining;
 let shootingStar, shootingStarTimer;
 let difficulty = DIFFICULTIES[1];
@@ -470,6 +477,13 @@ function draw() {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
   }
+
+  ctx.fillStyle = "#fff";
+  for (const dot of starfield) {
+    ctx.globalAlpha = 0.25 + 0.25 * Math.sin(performance.now() / 500 * dot.speed + dot.phase);
+    ctx.fillRect(dot.x, dot.y, 2, 2);
+  }
+  ctx.globalAlpha = 1;
 
   if (playerSpeed > 200) {
     ctx.globalAlpha = 0.2;
