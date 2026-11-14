@@ -92,6 +92,12 @@ function isReady(name) {
   return imageReady[name];
 }
 
+function saveItem(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch (e) {}
+}
+
 function drawSprite(name, x, y) {
   if (isReady(name)) {
     ctx.drawImage(images[name], x, y, SIZE[name], SIZE[name]);
@@ -305,7 +311,7 @@ function reset() {
 
 function startGame() {
   if (!hasSeenControlsTip) {
-    localStorage.setItem("starCatcherSeen", "true");
+    saveItem("starCatcherSeen", "true");
     hasSeenControlsTip = true;
   }
   reset();
@@ -382,7 +388,7 @@ function gameOver() {
   newBest = score > best;
   if (newBest) {
     best = score;
-    localStorage.setItem("starCatcherBest", String(best));
+    saveItem("starCatcherBest", String(best));
     playNewBestSound();
     spawnStarSparkles(canvas.width * 0.3, 150, "#ffd93b");
     spawnStarSparkles(canvas.width * 0.5, 120, "#ffffff");
@@ -390,11 +396,11 @@ function gameOver() {
   }
   if (runBestStreak > bestStreak) {
     bestStreak = runBestStreak;
-    localStorage.setItem("starCatcherBestStreak", String(bestStreak));
+    saveItem("starCatcherBestStreak", String(bestStreak));
   }
-  localStorage.setItem("starCatcherTotalStars", String(totalStars));
+  saveItem("starCatcherTotalStars", String(totalStars));
   totalScore += score;
-  localStorage.setItem("starCatcherTotalScore", String(totalScore));
+  saveItem("starCatcherTotalScore", String(totalScore));
 }
 
 function checkHeartBonus() {
@@ -947,7 +953,7 @@ document.addEventListener("keydown", (e) => {
   if (["ready", "over"].includes(state) && ["1", "2", "3"].includes(e.key)) {
     difficultyIndex = Number(e.key) - 1;
     difficulty = DIFFICULTIES[difficultyIndex];
-    localStorage.setItem("starCatcherDifficulty", String(difficultyIndex));
+    saveItem("starCatcherDifficulty", String(difficultyIndex));
     return;
   }
   if (["ready", "over"].includes(state) && !e.repeat && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
@@ -955,20 +961,20 @@ document.addEventListener("keydown", (e) => {
     const direction = e.key === "ArrowRight" ? 1 : -1;
     difficultyIndex = (difficultyIndex + direction + DIFFICULTIES.length) % DIFFICULTIES.length;
     difficulty = DIFFICULTIES[difficultyIndex];
-    localStorage.setItem("starCatcherDifficulty", String(difficultyIndex));
+    saveItem("starCatcherDifficulty", String(difficultyIndex));
     return;
   }
   if (e.key.toLowerCase() === "m") {
     if (!e.repeat) {
       muted = !muted;
-      localStorage.setItem("starCatcherMuted", String(muted));
+      saveItem("starCatcherMuted", String(muted));
     }
     return;
   }
   if (e.key.toLowerCase() === "n") {
     if (!e.repeat) {
       nightMode = !nightMode;
-      localStorage.setItem("starCatcherNight", String(nightMode));
+      saveItem("starCatcherNight", String(nightMode));
     }
     return;
   }
