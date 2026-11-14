@@ -850,6 +850,7 @@ canvas.addEventListener("touchmove", setTouchTarget, { passive: false });
 canvas.addEventListener("touchend", () => {
   touchTargetX = null;
 });
+canvas.addEventListener("contextmenu", (e) => e.preventDefault());
 canvas.addEventListener("touchcancel", () => {
   touchTargetX = null;
 });
