@@ -98,16 +98,16 @@ function drawSprite(name, x, y) {
   }
 }
 
-function drawPlayer(x = player.x) {
+function drawPlayer(x = player.x, yOffset = 0) {
   if (!playerFacingLeft) {
-    drawSprite("player", x, player.y);
+    drawSprite("player", x, player.y + yOffset);
     return;
   }
 
   ctx.save();
   ctx.translate(x * 2 + SIZE.player, 0);
   ctx.scale(-1, 1);
-  drawSprite("player", x, player.y);
+  drawSprite("player", x, player.y + yOffset);
   ctx.restore();
 }
 
@@ -644,7 +644,8 @@ function draw() {
     for (const x of playerTrail) drawPlayer(x);
     ctx.globalAlpha = 1;
   }
-  drawPlayer(state === "ready" ? player.x + Math.sin(now / 400) * 30 : player.x);
+  const idleBob = state === "playing" && playerSpeed < 1 ? Math.sin(now / 500) * 2 : 0;
+  drawPlayer(state === "ready" ? player.x + Math.sin(now / 400) * 30 : player.x, idleBob);
   for (const item of items) {
     if (item.type === "magnet") {
       ctx.fillStyle = "#4fa3ff";
