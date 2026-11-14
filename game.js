@@ -19,6 +19,10 @@ const STAR_CHANCE = 0.7;
 const MAGNET_CHANCE = 1 / 25;
 const MAGNET_DURATION = 4;
 const MAGNET_SPEED = 300;
+const SHOOTING_STAR_INTERVAL = 20;
+const SHOOTING_STAR_SPEED = 500;
+const SHOOTING_STAR_SIZE = 24;
+const SHOOTING_STAR_Y = 40;
 const STAR_FREQUENCY = 600;
 const STAR_DURATION = 0.08;
 const ROCK_FREQUENCY = 140;
@@ -71,6 +75,7 @@ function drawSprite(name, x, y) {
 let best = Number(localStorage.getItem("starCatcherBest") || 0);
 let state, player, items, pops, lives, score, starsCaught, rocksHit, streak, fallSpeed, spawnTimer;
 let gustTimer, gustRemaining, gustDirection, magnetRemaining;
+let shootingStar, shootingStarTimer;
 let gameOverTime = 0;
 let newBest = false;
 let shake = 0;
@@ -118,6 +123,8 @@ function reset() {
   player = { x: canvas.width / 2 - SIZE.player / 2, y: canvas.height - 90 };
   items = [];
   pops = [];
+  shootingStar = null;
+  shootingStarTimer = SHOOTING_STAR_INTERVAL;
   lives = START_LIVES;
   score = 0;
   starsCaught = 0;
@@ -242,6 +249,33 @@ function update(dt) {
     if (touchesPlayer(item) || item.y >= canvas.height) items.splice(i, 1);
   }
 
+  if (shootingStar) {
+    shootingStar.x += SHOOTING_STAR_SPEED * dt;
+    const overlapsPlayerX = shootingStar.x < player.x + SIZE.player &&
+      shootingStar.x + SHOOTING_STAR_SIZE > player.x;
+    if (overlapsPlayerX) {
+      playCatchSound("star");
+      starsCaught += 1;
+      streak += 1;
+      score += 5;
+      pops.push({
+        x: shootingStar.x + SHOOTING_STAR_SIZE / 2,
+        y: shootingStar.y + SHOOTING_STAR_SIZE / 2,
+        age: 0,
+        value: 5,
+      });
+      shootingStar = null;
+    } else if (shootingStar.x >= canvas.width) {
+      shootingStar = null;
+    }
+  } else {
+    shootingStarTimer -= dt;
+    if (shootingStarTimer <= 0) {
+      shootingStar = { x: -SHOOTING_STAR_SIZE, y: SHOOTING_STAR_Y };
+      shootingStarTimer = SHOOTING_STAR_INTERVAL;
+    }
+  }
+
   for (const pop of pops) pop.age += dt;
   pops = pops.filter((pop) => pop.age < POP_DURATION);
 
@@ -283,13 +317,31 @@ function draw() {
       drawSprite(item.type, item.x, item.y);
     }
   }
+  if (shootingStar) {
+    const trail = ctx.createLinearGradient(shootingStar.x - 20, 0, shootingStar.x + 2, 0);
+    trail.addColorStop(0, "rgba(255, 255, 255, 0)");
+    trail.addColorStop(1, "rgba(255, 255, 255, 0.9)");
+    ctx.strokeStyle = trail;
+    ctx.lineWidth = 3;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(shootingStar.x - 20, shootingStar.y + SHOOTING_STAR_SIZE / 2);
+    ctx.lineTo(shootingStar.x + 2, shootingStar.y + SHOOTING_STAR_SIZE / 2);
+    ctx.stroke();
+    if (isReady("star")) {
+      ctx.drawImage(images.star, shootingStar.x, shootingStar.y, SHOOTING_STAR_SIZE, SHOOTING_STAR_SIZE);
+    } else {
+      ctx.fillStyle = FALLBACK.star;
+      ctx.fillRect(shootingStar.x, shootingStar.y, SHOOTING_STAR_SIZE, SHOOTING_STAR_SIZE);
+    }
+  }
   for (const pop of pops) {
     const progress = pop.age / POP_DURATION;
     ctx.globalAlpha = 1 - progress;
     ctx.fillStyle = "#fff";
     ctx.font = `20px ${FONT}`;
     ctx.textAlign = "center";
-    ctx.fillText("+1", pop.x, pop.y - progress * 30);
+    ctx.fillText(`+${pop.value || 1}`, pop.x, pop.y - progress * 30);
   }
   ctx.globalAlpha = 1;
 
