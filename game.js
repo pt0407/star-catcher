@@ -37,6 +37,7 @@ const SPAWN_INTERVAL_DECREASE = 0.03;
 const MIN_SPAWN_EVERY = 0.45;
 const STAR_CHANCE = 0.7;
 const GOLDEN_STAR_CHANCE = 1 / 12;
+const GOLDEN_HEART_CHANCE = 0.15;
 const MAGNET_CHANCE = 1 / 25;
 const HEART_CHANCE = 1 / 30;
 const FAST_ROCK_CHANCE = 0.2;
@@ -186,7 +187,7 @@ function spawnItem() {
   } else {
     type = Math.random() < STAR_CHANCE ? "star" : "rock";
   }
-  const golden = type === "star" && Math.random() < GOLDEN_STAR_CHANCE;
+  const golden = (type === "star" && Math.random() < GOLDEN_STAR_CHANCE) || (type === "heart" && Math.random() < GOLDEN_HEART_CHANCE);
   const speedMultiplier = type === "rock" ? (Math.random() < FAST_ROCK_CHANCE ? 1.5 : 0.9 + Math.random() * 0.2) : type === "heart" ? 0.8 : type === "star" ? 0.95 + Math.random() * 0.1 : type === "magnet" ? 0.7 : 1;
   let x = Math.random() * (canvas.width - SIZE[type]);
   for (let tries = 0; tries < 3 && items.some(item => Math.abs(item.x + SIZE[item.type] / 2 - (x + SIZE[type] / 2)) < 40); tries++) {
@@ -391,11 +392,11 @@ function update(dt) {
         hopTimer = HOP_DURATION;
       } else if (item.type === "heart") {
         if (lives < MAX_LIVES) {
-          lives += 1;
+          lives = Math.min(MAX_LIVES, lives + (item.golden ? 2 : 1));
           heartPopupRemaining = HEART_POPUP_DURATION;
-          spawnStarSparkles(item.x + SIZE.heart / 2, item.y + SIZE.heart / 2, "#ff8fb3");
+          spawnStarSparkles(item.x + SIZE.heart / 2, item.y + SIZE.heart / 2, item.golden ? "#ffd93b" : "#ff8fb3");
           hopTimer = HOP_DURATION;
-          pops.push({ x: item.x + SIZE.heart / 2, y: item.y + SIZE.heart / 2, age: 0, value: "heart", color: "#ff8fb3" });
+          pops.push({ x: item.x + SIZE.heart / 2, y: item.y + SIZE.heart / 2, age: 0, value: item.golden ? "+2" : "heart", color: item.golden ? "#ffd93b" : "#ff8fb3" });
         } else {
           pops.push({ x: item.x + SIZE.heart / 2, y: item.y + SIZE.heart / 2, age: 0, text: "full!", color: "#ff8fb3" });
         }
@@ -587,6 +588,10 @@ function draw() {
     } else if (item.type === "star" && magnetRemaining > 0) {
       ctx.filter = "hue-rotate(160deg) saturate(1.4)";
       drawSprite(ctx, "star", item.x, item.y, frame);
+      ctx.filter = "none";
+    } else if (item.type === "heart" && item.golden) {
+      ctx.filter = "hue-rotate(-20deg) saturate(1.8) brightness(1.15)";
+      drawSprite(ctx, "heart", item.x, item.y, frame);
       ctx.filter = "none";
     } else {
       drawSprite(ctx, item.type, item.x, item.y, frame);
