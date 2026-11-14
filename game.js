@@ -537,7 +537,7 @@ function update(dt) {
       }
     } else {
       item.y += fallSpeed * item.speedMultiplier * dt;
-      item.x += (item.drift || 0) * dt + gustDirection * GUST_SPEED * 0.25 * gustPushTime;
+      item.x += ((item.drift || 0) + Math.sin(item.y / 45) * 10) * dt + gustDirection * GUST_SPEED * 0.25 * gustPushTime;
       item.x = Math.max(0, Math.min(canvas.width - SIZE[item.type], item.x));
     }
 
