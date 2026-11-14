@@ -168,6 +168,7 @@ let fpsWindowStart = 0;
 let fpsFrameCount = 0;
 let fpsText = "FPS 0";
 let bgPattern = null;
+let vignette = null;
 const keys = {};
 
 function initializeAudio() {
@@ -768,6 +769,14 @@ function draw() {
     drawPixelText(pop.text || `+${pop.value || 1}`, pop.x, pop.y - progress * 30, 20, "center");
   }
   ctx.globalAlpha = 1;
+
+  if (!vignette) {
+    vignette = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 180, canvas.width / 2, canvas.height / 2, 340);
+    vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
+    vignette.addColorStop(1, "rgba(0, 0, 0, 0.22)");
+  }
+  ctx.fillStyle = vignette;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   if (lives === 1) {
     const pulse = 0.2 + 0.15 * Math.sin(now / 200);
