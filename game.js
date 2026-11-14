@@ -19,6 +19,7 @@ const ROCK_DURATION = 0.15;
 const POP_DURATION = 0.8;
 const SHAKE_DURATION = 0.3;
 const SHAKE_AMOUNT = 4;
+const HEART_FLASH_DURATION = 0.2;
 const RESTART_DELAY_MS = 600;
 
 const SPRITES = {
@@ -65,6 +66,7 @@ let state, player, items, pops, lives, score, starsCaught, rocksHit, streak, fal
 let gameOverTime = 0;
 let newBest = false;
 let shake = 0;
+let heartFlash = 0;
 let audioContext = null;
 let muted = localStorage.getItem("starCatcherMuted") === "true";
 let touchTargetX = null;
@@ -116,6 +118,7 @@ function reset() {
   fallSpeed = START_FALL_SPEED;
   spawnTimer = 0;
   shake = 0;
+  heartFlash = 0;
   newBest = false;
 }
 
@@ -151,6 +154,7 @@ function gameOver() {
 
 function update(dt) {
   shake = Math.max(0, shake - dt);
+  heartFlash = Math.max(0, heartFlash - dt);
   if (state !== "playing") return;
 
   if (touchTargetX !== null) {
@@ -183,6 +187,7 @@ function update(dt) {
         streak = 0;
         lives -= 1;
         shake = SHAKE_DURATION;
+        heartFlash = HEART_FLASH_DURATION;
       }
     }
     if (touchesPlayer(item) || item.y >= canvas.height) items.splice(i, 1);
@@ -231,7 +236,9 @@ function draw() {
   }
   ctx.globalAlpha = 1;
 
+  ctx.globalAlpha = heartFlash > 0 ? 0.3 : 1;
   for (let i = 0; i < lives; i++) drawSprite("heart", 10 + i * 30, 10);
+  ctx.globalAlpha = 1;
   if (fpsEnabled) {
     ctx.textAlign = "left";
     ctx.fillStyle = "#fff";
