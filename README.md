@@ -30,6 +30,8 @@ Live version: https://star-catcher-virid.vercel.app
 
 Catch stars for points, golden stars are worth 3. Rocks cost a heart. Magnet stars pull pickups toward you for a few seconds, hearts put one back. Wind gusts shove everything sideways, so keep an eye on the arrow up top. Difficulty (1/2/3) changes fall speed and spawn rate, and your pick is remembered.
 
+Your best score, streak, and totals are saved in the browser (localStorage), so they survive refreshes.
+
 ## Built with
 
 Plain HTML, CSS, and JavaScript, no build step. The sprites are placeholders drawn by a small script from hand-defined shapes. The code and this README were written with an AI agent (Devin). Nobody has played a full run yet, so expect rough edges.
