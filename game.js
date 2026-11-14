@@ -7,6 +7,7 @@ import { SIZE, FALLBACK, images, isReady, drawSprite } from "./sprites.js";
 import { keys, touch, bindInput } from "./input.js";
 import { createStarfield, drawStarfield } from "./starfield.js";
 import { SPARKLE_COUNT, clearParticles, spawnRockBits, spawnStarSparkles, updateParticles, drawParticles } from "./particles.js";
+import { play as playMusic, stop as stopMusic, setLevel as setMusicLevel, setPaused as setMusicPaused } from "./music.js";
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
@@ -160,6 +161,9 @@ function reset() {
   starsPopRemaining = 0;
   newBest = false;
   bestAnnounced = false;
+  setMusicPaused(false);
+  setMusicLevel(1);
+  playMusic("game");
 }
 
 function startGame() {
@@ -205,6 +209,7 @@ function touchesPlayer(item) {
 
 function gameOver() {
   state = "over";
+  playMusic("title");
   gameOverTime = performance.now();
   const elapsed = Math.floor((gameOverTime - runStartTime) / 1000);
   runTimeText = `${Math.floor(elapsed / 60)}:${String(elapsed % 60).padStart(2, "0")}`;
@@ -471,6 +476,7 @@ function update(dt) {
   if (pops.length > 24) pops.splice(0, pops.length - 24);
 
   fallSpeed = difficulty.fallSpeed + Math.floor(score / SPEED_UP_EVERY) * SPEED_UP_AMOUNT;
+  setMusicLevel(1 + Math.floor(score / SPEED_UP_EVERY));
   if (lives <= 0) gameOver();
 }
 
@@ -795,8 +801,10 @@ function onKeyDown(e) {
       if (state === "playing") {
         state = "paused";
         pauseStartTime = performance.now();
+        setMusicPaused(true);
       } else {
         state = "playing";
+        setMusicPaused(false);
       }
       playPauseSound();
     }
@@ -819,6 +827,7 @@ bindInput({
     if (state === "playing") {
       state = "paused";
       pauseStartTime = performance.now();
+      setMusicPaused(true);
     }
   },
   onKeyDown,
@@ -847,6 +856,7 @@ function frame(time) {
 
 reset();
 state = "ready";
+playMusic("title");
 requestAnimationFrame(frame);
 
 // handy for poking at in the console

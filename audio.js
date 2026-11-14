@@ -26,6 +26,14 @@ export function toggleMute() {
   setMuted(!muted);
 }
 
+export function getContext() {
+  return audioContext;
+}
+
+export function getOutput() {
+  return masterGain || (audioContext ? audioContext.destination : null);
+}
+
 export function getVolume() {
   return volume;
 }
