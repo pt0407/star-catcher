@@ -486,6 +486,8 @@ function update(dt) {
         pops.push({ x: item.x + SIZE.star / 2, y: item.y + SIZE.star / 2, age: 0, value });
       } else if (item.type === "magnet") {
         magnetRemaining = MAGNET_DURATION;
+        comboFlash = "MAGNET!";
+        comboFlashRemaining = COMBO_FLASH_DURATION;
       } else if (item.type === "heart") {
         if (lives < MAX_LIVES) {
           lives += 1;
