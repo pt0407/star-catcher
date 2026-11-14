@@ -252,6 +252,10 @@ canvas.addEventListener("touchcancel", () => {
   touchTargetX = null;
 });
 
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden" && state === "playing") state = "paused";
+});
+
 document.addEventListener("keydown", (e) => {
   initializeAudio();
   if (e.key.toLowerCase() === "m") {
