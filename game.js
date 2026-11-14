@@ -503,6 +503,10 @@ function update(dt) {
         heartFlash = HEART_FLASH_DURATION;
       }
     }
+    if (item.type === "star" && !hit && !item.missed && item.y > player.y + SIZE.player) {
+      item.missed = true;
+      streak = 0;
+    }
     if (item.type === "rock" && !item.nearMiss && !hit) {
       const verticallyClose = item.y < player.y + SIZE.player && item.y + SIZE.rock > player.y;
       const horizontallyClose = Math.abs((item.x + SIZE.rock / 2) - (player.x + SIZE.player / 2)) < (SIZE.rock + SIZE.player) / 2 + NEAR_MISS_DISTANCE;
