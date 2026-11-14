@@ -472,7 +472,7 @@ function draw() {
       ctx.fillRect(item.x, item.y, SIZE.magnet, SIZE.magnet);
     } else if (item.type === "star" && item.golden) {
       if (isReady("star")) {
-        ctx.filter = "hue-rotate(40deg) brightness(1.3)";
+        ctx.filter = "hue-rotate(-20deg) saturate(1.8) brightness(1.15)";
         ctx.drawImage(images.star, item.x, item.y, SIZE.star, SIZE.star);
         ctx.filter = "none";
       } else {
