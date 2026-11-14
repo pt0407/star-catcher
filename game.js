@@ -645,6 +645,13 @@ function draw() {
   }
   ctx.globalAlpha = 1;
 
+  if (lives === 1) {
+    const pulse = 0.2 + 0.15 * Math.sin(performance.now() / 200);
+    ctx.strokeStyle = `rgba(255, 60, 60, ${pulse})`;
+    ctx.lineWidth = 8;
+    ctx.strokeRect(4, 4, canvas.width - 8, canvas.height - 8);
+  }
+
   ctx.globalAlpha = heartFlash > 0 ? 0.3 : 1;
   if (lives !== 1 || heartVisible) {
     for (let i = 0; i < lives; i++) drawSprite("heart", 10 + i * 30, 10);
