@@ -493,6 +493,7 @@ function update(dt) {
       gustDirection = 0;
     } else if (gustDirection === 0) {
       gustDirection = Math.random() < 0.5 ? -1 : 1;
+      playPauseSound();
     }
     if (gustTimer <= 0) {
       gustRemaining = GUST_DURATION;
