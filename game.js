@@ -350,13 +350,17 @@ function update(dt) {
   if (lives <= 0) gameOver();
 }
 
+function drawPixelText(text, x, y, size, align) {
+  ctx.font = `${size}px ${FONT}`;
+  ctx.textAlign = align;
+  ctx.fillText(text, x, y);
+}
+
 function drawText(lines, offsets = []) {
-  ctx.textAlign = "center";
   ctx.fillStyle = "#fff";
   const firstLineY = canvas.height / 2 - ((lines.length - 1) * 40) / 2;
   lines.forEach(([text, size], i) => {
-    ctx.font = `${size}px ${FONT}`;
-    ctx.fillText(text, canvas.width / 2, firstLineY + i * 40 + (offsets[i] || 0));
+    drawPixelText(text, canvas.width / 2, firstLineY + i * 40 + (offsets[i] || 0), size, "center");
   });
 }
 
@@ -417,9 +421,7 @@ function draw() {
     const progress = pop.age / POP_DURATION;
     ctx.globalAlpha = 1 - progress;
     ctx.fillStyle = "#fff";
-    ctx.font = `20px ${FONT}`;
-    ctx.textAlign = "center";
-    ctx.fillText(`+${pop.value || 1}`, pop.x, pop.y - progress * 30);
+    drawPixelText(`+${pop.value || 1}`, pop.x, pop.y - progress * 30, 20, "center");
   }
   ctx.globalAlpha = 1;
 
@@ -427,26 +429,18 @@ function draw() {
   for (let i = 0; i < lives; i++) drawSprite("heart", 10 + i * 30, 10);
   ctx.globalAlpha = 1;
   if (gustRemaining > 0) {
-    ctx.textAlign = "center";
     ctx.fillStyle = "#fff";
-    ctx.font = `14px ${FONT}`;
-    ctx.fillText(gustDirection < 0 ? "<<" : ">>", canvas.width / 2, 48);
+    drawPixelText(gustDirection < 0 ? "<<" : ">>", canvas.width / 2, 48, 14, "center");
   }
   if (fpsEnabled) {
-    ctx.textAlign = "left";
     ctx.fillStyle = "#fff";
-    ctx.font = `8px ${FONT}`;
-    ctx.fillText(fpsText, 10, 48);
+    drawPixelText(fpsText, 10, 48, 8, "left");
   }
-  ctx.textAlign = "right";
   ctx.fillStyle = "#fff";
-  ctx.font = `10px ${FONT}`;
-  ctx.fillText(`Score ${score}`, canvas.width - 10, 28);
-  ctx.fillText(`Best ${best}`, canvas.width - 10, 52);
-  if (streak >= 2) ctx.fillText(`Streak ${streak}`, canvas.width - 10, 76);
-  ctx.textAlign = "left";
-  ctx.font = `10px ${FONT}`;
-  ctx.fillText(`M: sound ${muted ? "off" : "on"}`, 10, canvas.height - 10);
+  drawPixelText(`Score ${score}`, canvas.width - 10, 28, 10, "right");
+  drawPixelText(`Best ${best}`, canvas.width - 10, 52, 10, "right");
+  if (streak >= 2) drawPixelText(`Streak ${streak}`, canvas.width - 10, 76, 10, "right");
+  drawPixelText(`M: sound ${muted ? "off" : "on"}`, 10, canvas.height - 10, 10, "left");
 
   if (state === "paused" || state === "over") {
     ctx.fillStyle = "rgba(0, 0, 0, 0.55)";
@@ -456,16 +450,14 @@ function draw() {
   if (state === "ready") {
     const titleBob = Math.sin(performance.now() / 300) * 4;
     drawText([["Star Catcher", 28], ["Press Space to start", 14]], [titleBob]);
-    ctx.textAlign = "center";
     ctx.fillStyle = "#fff";
-    ctx.font = `10px ${FONT}`;
     const difficultyOptions = DIFFICULTIES.map((option, index) => {
       const label = `${index + 1} ${option.name}`;
       return option === difficulty ? `[${label}]` : label;
     }).join("  ");
-    ctx.fillText(difficultyOptions, canvas.width / 2, canvas.height / 2 + 60);
+    drawPixelText(difficultyOptions, canvas.width / 2, canvas.height / 2 + 60, 10, "center");
     if (!hasSeenControlsTip) {
-      ctx.fillText("arrows or a/d to move", canvas.width / 2, canvas.height / 2 + 90);
+      drawPixelText("arrows or a/d to move", canvas.width / 2, canvas.height / 2 + 90, 10, "center");
     }
   }
   if (state === "over") {
