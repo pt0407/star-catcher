@@ -38,6 +38,7 @@ const BIT_GRAVITY = 500;
 const SHAKE_DURATION = 0.3;
 const SHAKE_AMOUNT = 4;
 const HEART_FLASH_DURATION = 0.2;
+const HEART_BLINK_INTERVAL = 0.25;
 const RESTART_DELAY_MS = 600;
 
 const SPRITES = {
@@ -105,6 +106,8 @@ let gameOverTime = 0;
 let newBest = false;
 let shake = 0;
 let heartFlash = 0;
+let heartBlinkTimer = 0;
+let heartVisible = true;
 let audioContext = null;
 let muted = localStorage.getItem("starCatcherMuted") === "true";
 let nightMode = localStorage.getItem("starCatcherNight") === "true";
@@ -168,6 +171,8 @@ function reset() {
   magnetRemaining = 0;
   shake = 0;
   heartFlash = 0;
+  heartBlinkTimer = 0;
+  heartVisible = true;
   newBest = false;
 }
 
@@ -229,6 +234,17 @@ function gameOver() {
 function update(dt) {
   shake = Math.max(0, shake - dt);
   heartFlash = Math.max(0, heartFlash - dt);
+
+  if (lives === 1) {
+    heartBlinkTimer += dt;
+    if (heartBlinkTimer >= HEART_BLINK_INTERVAL) {
+      heartBlinkTimer %= HEART_BLINK_INTERVAL;
+      heartVisible = !heartVisible;
+    }
+  } else {
+    heartBlinkTimer = 0;
+    heartVisible = true;
+  }
 
   for (let i = bits.length - 1; i >= 0; i--) {
     const bit = bits[i];
@@ -426,7 +442,9 @@ function draw() {
   ctx.globalAlpha = 1;
 
   ctx.globalAlpha = heartFlash > 0 ? 0.3 : 1;
-  for (let i = 0; i < lives; i++) drawSprite("heart", 10 + i * 30, 10);
+  if (lives !== 1 || heartVisible) {
+    for (let i = 0; i < lives; i++) drawSprite("heart", 10 + i * 30, 10);
+  }
   ctx.globalAlpha = 1;
   if (gustRemaining > 0) {
     ctx.fillStyle = "#fff";
