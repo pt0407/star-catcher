@@ -143,6 +143,73 @@ sprites = {
 }
 
 
+def rot90(rows):
+    h, w = len(rows), len(rows[0])
+    return ["".join(rows[h - 1 - x][y] for x in range(h)) for y in range(w)]
+
+
+def pad_cell(rows, size=16, ox=0, oy=0):
+    out = []
+    for y in range(size):
+        line = ""
+        for x in range(size):
+            sy, sx = y - oy, x - ox
+            line += rows[sy][sx] if 0 <= sy < len(rows) and 0 <= sx < len(rows[0]) else "."
+        out.append(line)
+    return out
+
+
+def hstack(frames):
+    return ["".join(f[y] for f in frames) for y in range(len(frames[0]))]
+
+
+def sheet_from(palette, frame_rows_list):
+    frames = [pad_cell(f) for f in frame_rows_list]
+    return hstack(frames), palette
+
+
+def build_sheets():
+    sheets = {}
+
+    star_rows, star_pal = sprites["star.png"]
+    star_frames = [star_rows]
+    for _ in range(3):
+        star_frames.append(rot90(star_frames[-1]))
+    sheets["star_sheet.png"] = sheet_from(star_pal, star_frames)
+
+    rock_rows, rock_pal = sprites["rock.png"]
+    rock_frames = [rock_rows]
+    for _ in range(3):
+        rock_frames.append(rot90(rock_frames[-1]))
+    sheets["rock_sheet.png"] = sheet_from(rock_pal, rock_frames)
+
+    heart_rows, heart_pal = sprites["heart.png"]
+    heart_cell = pad_cell(heart_rows, 16, 2, 2)
+    # beat frame: widen the middle by duplicating two center columns
+    wide = []
+    for row in heart_cell:
+        wide.append(row[:8] + row[7:9] + row[8:])
+    wide = [r[:16] for r in wide]
+    sheets["heart_sheet.png"] = (["".join(f[y] for f in (heart_cell, wide)) for y in range(16)], heart_pal)
+
+    player_rows, player_pal = sprites["player.png"]
+    wobble = []
+    for i, shift in enumerate([0, -1, 0, 1]):
+        frame = [list(r) for r in player_rows]
+        for y in range(12, 16):
+            row = frame[y]
+            for x in range(16):
+                src = x - shift
+                row[x] = row[src] if 0 <= src < 16 else "."
+        wobble.append(["".join(r) for r in frame])
+    # squash frame: drop two leg rows and pad the bottom
+    squash = player_rows[:12] + ["................", "................"]
+    player_frames = wobble + [squash]
+    sheets["player_sheet.png"] = sheet_from(player_pal, player_frames)
+
+    return sheets
+
+
 def make_background():
     grid = [["d" for _ in range(32)] for _ in range(32)]
 
@@ -203,7 +270,7 @@ def main():
     assets_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
     os.makedirs(assets_dir, exist_ok=True)
 
-    for filename, (rows, palette) in sprites.items():
+    for filename, (rows, palette) in {**sprites, **build_sheets()}.items():
         path = os.path.join(assets_dir, filename)
         write_png(path, rows, palette)
         print("Wrote " + path)

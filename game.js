@@ -59,16 +59,16 @@ const RESTART_DELAY_MS = 600;
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const FONT = '"Press Start 2P", monospace';
 
-function drawPlayer(x = player.x, yOffset = 0) {
+function drawPlayer(x = player.x, yOffset = 0, frame = 0) {
   if (!playerFacingLeft) {
-    drawSprite(ctx, "player", x, player.y + yOffset);
+    drawSprite(ctx, "player", x, player.y + yOffset, frame);
     return;
   }
 
   ctx.save();
   ctx.translate(x * 2 + SIZE.player, 0);
   ctx.scale(-1, 1);
-  drawSprite(ctx, "player", x, player.y + yOffset);
+  drawSprite(ctx, "player", x, player.y + yOffset, frame);
   ctx.restore();
 }
 
@@ -185,7 +185,7 @@ function spawnItem() {
   for (let tries = 0; tries < 3 && items.some(item => Math.abs(item.x + SIZE[item.type] / 2 - (x + SIZE[type] / 2)) < 40); tries++) {
     x = Math.random() * (canvas.width - SIZE[type]);
   }
-  items.push({ type, golden, speedMultiplier, drift: (Math.random() * 2 - 1) * 12, x, y: -SIZE[type] });
+  items.push({ type, golden, speedMultiplier, drift: (Math.random() * 2 - 1) * 12, phase: Math.random() * 6.28, x, y: -SIZE[type] });
 }
 
 function getSpawnInterval() {
@@ -534,7 +534,8 @@ function draw() {
   }
   const idleBob = state === "playing" && playerSpeed < 1 ? Math.sin(now / 500) * 2 : 0;
   const hop = hopTimer > 0 ? Math.sin((1 - hopTimer / HOP_DURATION) * Math.PI) * 8 : 0;
-  drawPlayer(state === "ready" ? player.x + Math.sin(now / 400) * 30 : player.x, idleBob - hop);
+  const playerFrame = hopTimer > 0 ? 4 : Math.floor(now / 180) % 4;
+  drawPlayer(state === "ready" ? player.x + Math.sin(now / 400) * 30 : player.x, idleBob - hop, playerFrame);
   if (magnetRemaining > 0 && state === "playing") {
     ctx.strokeStyle = "rgba(79, 163, 255, 0.25)";
     ctx.lineWidth = 2;
@@ -543,17 +544,23 @@ function draw() {
     ctx.stroke();
   }
   for (const item of items) {
+    const frame = item.type === "star" ? Math.floor(now / 140 + (item.phase || 0)) % 4
+      : item.type === "rock" ? Math.floor(now / 200 + (item.phase || 0)) % 4
+      : item.type === "heart" ? Math.floor(now / 300 + (item.phase || 0)) % 2
+      : 0;
     if (item.type === "magnet") {
       drawSprite(ctx, "magnet", item.x, item.y);
     } else if (item.type === "star" && item.golden) {
       ctx.globalAlpha = reducedMotion ? 1 : 0.8 + 0.2 * Math.sin(now / 250 + item.x);
       const goldenSize = SIZE.star + 8;
       const goldenOffset = (SIZE.star - goldenSize) / 2;
-      if (isReady("star")) {
+      const starSheet = images["star_sheet"];
+      if (isReady("star_sheet")) {
         ctx.filter = "hue-rotate(-20deg) saturate(1.8) brightness(1.15)";
         ctx.shadowColor = "#ffd93b";
         ctx.shadowBlur = 10;
-        ctx.drawImage(images.star, item.x + goldenOffset, item.y + goldenOffset, goldenSize, goldenSize);
+        const cellW = starSheet.width / 4;
+        ctx.drawImage(starSheet, frame * cellW, 0, cellW, starSheet.height, item.x + goldenOffset, item.y + goldenOffset, goldenSize, goldenSize);
         ctx.shadowBlur = 0;
         ctx.filter = "none";
       } else {
@@ -563,14 +570,14 @@ function draw() {
       ctx.globalAlpha = 1;
     } else if (item.type === "rock" && item.speedMultiplier > 1.4) {
       ctx.filter = "sepia(1) saturate(4) hue-rotate(-50deg)";
-      drawSprite(ctx, "rock", item.x, item.y);
+      drawSprite(ctx, "rock", item.x, item.y, frame);
       ctx.filter = "none";
     } else if (item.type === "star" && magnetRemaining > 0) {
       ctx.filter = "hue-rotate(160deg) saturate(1.4)";
-      drawSprite(ctx, "star", item.x, item.y);
+      drawSprite(ctx, "star", item.x, item.y, frame);
       ctx.filter = "none";
     } else {
-      drawSprite(ctx, item.type, item.x, item.y);
+      drawSprite(ctx, item.type, item.x, item.y, frame);
     }
   }
   drawParticles(ctx);
@@ -587,7 +594,12 @@ function draw() {
     ctx.moveTo(shootingStar.x - 20 * dir, shootingStar.y + SHOOTING_STAR_SIZE / 2);
     ctx.lineTo(shootingStar.x + 2 * dir, shootingStar.y + SHOOTING_STAR_SIZE / 2);
     ctx.stroke();
-    if (isReady("star")) {
+    const shootFrame = Math.floor(now / 100) % 4;
+    if (isReady("star_sheet")) {
+      const starSheet = images["star_sheet"];
+      const cellW = starSheet.width / 4;
+      ctx.drawImage(starSheet, shootFrame * cellW, 0, cellW, starSheet.height, shootingStar.x, shootingStar.y, SHOOTING_STAR_SIZE, SHOOTING_STAR_SIZE);
+    } else if (isReady("star")) {
       ctx.drawImage(images.star, shootingStar.x, shootingStar.y, SHOOTING_STAR_SIZE, SHOOTING_STAR_SIZE);
     } else {
       ctx.fillStyle = FALLBACK.star;
@@ -619,7 +631,8 @@ function draw() {
 
   ctx.globalAlpha = heartFlash > 0 ? 0.3 : 1;
   if (lives !== 1 || heartVisible) {
-    for (let i = 0; i < lives; i++) drawSprite(ctx, "heart", 10 + i * 30, 10);
+    const heartFrame = Math.floor(now / 300) % 2;
+    for (let i = 0; i < lives; i++) drawSprite(ctx, "heart", 10 + i * 30, 10, heartFrame);
   }
   ctx.globalAlpha = 1;
   if (heartPopupRemaining > 0) {
@@ -848,4 +861,6 @@ window.__game = {
   get magnetRemaining() { return magnetRemaining; },
   get gustRemaining() { return gustRemaining; },
   get difficulty() { return difficulty.name; },
+  spriteReady: (name) => isReady(name),
+  spriteReadySheet: (name) => isReady(name + "_sheet"),
 };
