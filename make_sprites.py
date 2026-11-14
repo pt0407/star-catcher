@@ -114,6 +114,32 @@ sprites = {
             "w": (255, 224, 229, 255),
         },
     ),
+    "magnet.png": (
+        make_grid([
+            "................",
+            "..www......www..",
+            "..wsb..bb..bsw..",
+            "..wsb.bbbb.bsw..",
+            "..wsb.bbbb.bsw..",
+            "..wsb.bbbb.bsw..",
+            "..wsb.bbbb.bsw..",
+            "..wsb.bbbb.bsw..",
+            "..wsb.bbbb.bsw..",
+            "..wsb.bbbb.bsw..",
+            "..wsb.bbbb.bsw..",
+            "..wsb.bbbb.bsw..",
+            "..wssbbbbbbssw..",
+            "..wssbbbbbbssw..",
+            "...wssssssssw...",
+            "................",
+        ], 16, 16),
+        {
+            ".": (0, 0, 0, 0),
+            "w": (230, 240, 255, 255),
+            "s": (170, 185, 205, 255),
+            "b": (79, 163, 255, 255),
+        },
+    ),
 }
 
 

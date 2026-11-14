@@ -67,9 +67,10 @@ const SPRITES = {
   star: "assets/star.png",
   rock: "assets/rock.png",
   heart: "assets/heart.png",
+  magnet: "assets/magnet.png",
 };
 const SIZE = { player: 64, star: 32, rock: 32, magnet: 32, heart: 24 };
-const FALLBACK = { player: "#4fc3f7", star: "#ffd93b", rock: "#8a8a8a", heart: "#ff5577" };
+const FALLBACK = { player: "#4fc3f7", star: "#ffd93b", rock: "#8a8a8a", heart: "#ff5577", magnet: "#4fa3ff" };
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const FONT = '\"Press Start 2P\", monospace';
 
@@ -778,8 +779,7 @@ function draw() {
   }
   for (const item of items) {
     if (item.type === "magnet") {
-      ctx.fillStyle = "#4fa3ff";
-      ctx.fillRect(item.x, item.y, SIZE.magnet, SIZE.magnet);
+      drawSprite("magnet", item.x, item.y);
     } else if (item.type === "star" && item.golden) {
       ctx.globalAlpha = reducedMotion ? 1 : 0.8 + 0.2 * Math.sin(now / 250 + item.x);
       const goldenSize = SIZE.star + 8;
