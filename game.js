@@ -31,6 +31,7 @@ const DIFFICULTIES = [
 const SPEED_UP_EVERY = 10;
 const SPEED_UP_AMOUNT = 20;
 const SPAWN_EVERY = 0.9;
+const MAX_ITEMS = 14;
 const SPAWN_INTERVAL_SCORE_STEP = 5;
 const SPAWN_INTERVAL_DECREASE = 0.03;
 const MIN_SPAWN_EVERY = 0.45;
@@ -176,6 +177,7 @@ function startGame() {
 }
 
 function spawnItem() {
+  if (items.length >= MAX_ITEMS) return;
   let type;
   if (lives < MAX_LIVES && Math.random() < HEART_CHANCE && !items.some(item => item.type === "heart")) {
     type = "heart";
