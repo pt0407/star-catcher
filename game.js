@@ -867,7 +867,9 @@ function draw() {
     drawPixelText(comboFlash, canvas.width / 2, 56, reducedMotion ? 20 : Math.round(20 + Math.sin(now / 80) * 2), "center");
   }
   if (perfectFlashRemaining > 0) {
+    ctx.globalAlpha = perfectFlashRemaining / PERFECT_FLASH_DURATION;
     drawPixelText(perfectFlash, canvas.width / 2, 84, reducedMotion ? 14 : Math.round(14 + Math.sin(now / 80) * 1.5), 'center');
+    ctx.globalAlpha = 1;
   }
   if (magnetRemaining > 0) {
     drawPixelText(`Magnet ${Math.ceil(magnetRemaining)}s`, canvas.width / 2, 108, 10, "center");
