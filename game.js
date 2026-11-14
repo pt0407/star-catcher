@@ -391,6 +391,7 @@ function checkMilestone() {
   lastMilestoneShown = milestone;
   milestoneFlash = `${milestone}!`;
   milestoneFlashRemaining = MILESTONE_FLASH_DURATION;
+  shake = Math.max(shake, 0.15);
 }
 
 function checkNewBest() {
