@@ -536,7 +536,7 @@ function update(dt) {
         checkMilestone();
         spawnStarSparkles(item.x + SIZE.star / 2, item.y + SIZE.star / 2, item.golden ? "#ffcf40" : "#fff3a0");
         hopTimer = HOP_DURATION;
-        pops.push({ x: item.x + SIZE.star / 2, y: item.y + SIZE.star / 2, age: 0, value });
+        pops.push({ x: item.x + SIZE.star / 2, y: item.y + SIZE.star / 2, age: 0, value, color: item.golden ? "#ffd93b" : "#fff" });
       } else if (item.type === "magnet") {
         magnetRemaining = MAGNET_DURATION;
         comboFlash = "MAGNET!";
@@ -547,7 +547,7 @@ function update(dt) {
           lives += 1;
           heartPopupRemaining = HEART_POPUP_DURATION;
           spawnStarSparkles(item.x + SIZE.heart / 2, item.y + SIZE.heart / 2, "#ff8fb3");
-          pops.push({ x: item.x + SIZE.heart / 2, y: item.y + SIZE.heart / 2, age: 0, value: "heart" });
+          pops.push({ x: item.x + SIZE.heart / 2, y: item.y + SIZE.heart / 2, age: 0, value: "heart", color: "#ff8fb3" });
         }
       } else {
         spawnRockBits(item.x + SIZE.rock / 2, item.y + SIZE.rock / 2, item.speedMultiplier > 1.4 ? "#ff7777" : "#888");
@@ -561,14 +561,14 @@ function update(dt) {
     if (item.type === "star" && !hit && !item.missed && item.y > player.y + SIZE.player) {
       item.missed = true;
       streak = 0;
-      pops.push({ x: item.x + SIZE.star / 2, y: item.y, age: 0, text: "miss" });
+      pops.push({ x: item.x + SIZE.star / 2, y: item.y, age: 0, text: "miss", color: "#ff9d9d" });
     }
     if (item.type === "rock" && !item.nearMiss && !hit) {
       const verticallyClose = item.y < player.y + SIZE.player && item.y + SIZE.rock > player.y;
       const horizontallyClose = Math.abs((item.x + SIZE.rock / 2) - (player.x + SIZE.player / 2)) < (SIZE.rock + SIZE.player) / 2 + NEAR_MISS_DISTANCE;
       if (verticallyClose && horizontallyClose) {
         item.nearMiss = true;
-        pops.push({ x: item.x + SIZE.rock / 2, y: item.y + SIZE.rock / 2, age: 0, text: 'close!' });
+        pops.push({ x: item.x + SIZE.rock / 2, y: item.y + SIZE.rock / 2, age: 0, text: 'close!', color: "#9fd0ff" });
       }
     }
     if (hit || item.y >= canvas.height) items.splice(i, 1);
@@ -737,7 +737,7 @@ function draw() {
   for (const pop of pops) {
     const progress = pop.age / POP_DURATION;
     ctx.globalAlpha = 1 - progress;
-    ctx.fillStyle = pop.text ? "#9fd0ff" : "#fff";
+    ctx.fillStyle = pop.color || "#fff";
     drawPixelText(pop.text || `+${pop.value || 1}`, pop.x, pop.y - progress * 30, 20, "center");
   }
   ctx.globalAlpha = 1;
