@@ -339,7 +339,7 @@ function spawnItem() {
     type = Math.random() < STAR_CHANCE ? "star" : "rock";
   }
   const golden = type === "star" && Math.random() < GOLDEN_STAR_CHANCE;
-  const speedMultiplier = type === "rock" && Math.random() < FAST_ROCK_CHANCE ? 1.5 : type === "heart" ? 0.8 : 1;
+  const speedMultiplier = type === "rock" ? (Math.random() < FAST_ROCK_CHANCE ? 1.5 : 0.9 + Math.random() * 0.2) : type === "heart" ? 0.8 : 1;
   items.push({ type, golden, speedMultiplier, x: Math.random() * (canvas.width - SIZE[type]), y: -SIZE[type] });
 }
 
@@ -684,7 +684,7 @@ function draw() {
         ctx.fillStyle = "#ffb300";
         ctx.fillRect(item.x + goldenOffset, item.y + goldenOffset, goldenSize, goldenSize);
       }
-    } else if (item.type === "rock" && item.speedMultiplier > 1) {
+    } else if (item.type === "rock" && item.speedMultiplier > 1.4) {
       ctx.filter = "sepia(1) saturate(4) hue-rotate(-50deg)";
       drawSprite("rock", item.x, item.y);
       ctx.filter = "none";
