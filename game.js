@@ -873,4 +873,13 @@ window.__game = {
   get difficulty() { return difficulty.name; },
   spriteReady: (name) => isReady(name),
   spriteReadySheet: (name) => isReady(name + "_sheet"),
+  set(name, value) {
+    if (name === "lives") lives = value;
+    else if (name === "score") score = value;
+    else if (name === "shootingStar") shootingStar = value;
+    else if (name === "gustRemaining") gustRemaining = value;
+    else if (name === "gustDirection") gustDirection = value;
+    else if (name === "magnetRemaining") magnetRemaining = value;
+    else if (name === "state") state = value;
+  },
 };
