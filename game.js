@@ -264,6 +264,17 @@ function draw() {
     const gameOverLines = [["Game over", 28], [`Score ${score}   Best ${best}`, 14]];
     if (newBest) gameOverLines.push(["New best!", 14]);
     gameOverLines.push([`Stars ${starsCaught}  Rocks ${rocksHit}`, 14], ["Press Space to play again", 14]);
+
+    const panelWidth = 340;
+    const panelHeight = 150;
+    const panelX = (canvas.width - panelWidth) / 2;
+    const panelY = (canvas.height - panelHeight) / 2;
+    ctx.fillStyle = "rgba(4, 12, 32, 0.9)";
+    ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
+    ctx.strokeStyle = "#b8c9ed";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(panelX, panelY, panelWidth, panelHeight);
+
     drawText(gameOverLines);
   }
   if (state === "paused") drawText([["Paused", 28], ["Press P or Esc to resume", 14]]);
