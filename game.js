@@ -758,8 +758,10 @@ function draw() {
     drawPixelText("+heart", 10 + lives * 30, 27, 10, "left");
   }
   if (gustRemaining > 0) {
+    ctx.globalAlpha = 0.6 + 0.4 * Math.sin(now / 100);
     ctx.fillStyle = "#fff";
     drawPixelText(gustDirection < 0 ? "<<" : ">>", canvas.width / 2, 48, 14, "center");
+    ctx.globalAlpha = 1;
   }
   if (fpsEnabled) {
     ctx.fillStyle = "#fff";
