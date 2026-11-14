@@ -270,6 +270,10 @@ document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden" && state === "playing") state = "paused";
 });
 
+window.addEventListener("blur", () => {
+  for (const key of Object.keys(keys)) keys[key] = false;
+});
+
 document.addEventListener("keydown", (e) => {
   initializeAudio();
   if (e.key.toLowerCase() === "m") {
