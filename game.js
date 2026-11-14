@@ -193,7 +193,7 @@ function spawnItem() {
   for (let tries = 0; tries < 3 && items.some(item => Math.abs(item.x + SIZE[item.type] / 2 - (x + SIZE[type] / 2)) < 40); tries++) {
     x = Math.random() * (canvas.width - SIZE[type]);
   }
-  items.push({ type, golden, speedMultiplier, drift: (Math.random() * 2 - 1) * 12, phase: Math.random() * 6.28, x, y: -SIZE[type] });
+  items.push({ type, golden, speedMultiplier, drift: (Math.random() * 2 - 1) * 12, phase: Math.random() * 6.28, rot: type === "rock" ? Math.random() * 6.28 : 0, x, y: -SIZE[type] });
   if (type === "star" && !golden && items.length < MAX_ITEMS && Math.random() < 0.04) {
     items.push({ type: "star", golden: false, speedMultiplier: 0.95 + Math.random() * 0.1, drift: (Math.random() * 2 - 1) * 12, phase: Math.random() * 6.28, x: Math.min(canvas.width - SIZE.star, Math.max(0, x + SIZE.star + 4)), y: -SIZE.star });
   }
@@ -352,6 +352,7 @@ function update(dt) {
       }
     } else {
       item.y += fallSpeed * item.speedMultiplier * dt;
+      if (item.type === "rock") item.rot = (item.rot || 0) + dt * 2;
       item.x += ((item.drift || 0) + Math.sin(item.y / 45) * 10) * dt + gustDirection * GUST_SPEED * 0.25 * gustPushTime;
       item.x = Math.max(0, Math.min(canvas.width - SIZE[item.type], item.x));
     }
@@ -583,7 +584,7 @@ function draw() {
       ctx.globalAlpha = 1;
     } else if (item.type === "rock" && item.speedMultiplier > 1.4) {
       ctx.filter = "sepia(1) saturate(4) hue-rotate(-50deg)";
-      drawSprite(ctx, "rock", item.x, item.y, frame);
+      drawSprite(ctx, "rock", item.x, item.y, frame, item.rot || 0);
       ctx.filter = "none";
     } else if (item.type === "star" && magnetRemaining > 0) {
       ctx.filter = "hue-rotate(160deg) saturate(1.4)";
@@ -594,7 +595,7 @@ function draw() {
       drawSprite(ctx, "heart", item.x, item.y, frame);
       ctx.filter = "none";
     } else {
-      drawSprite(ctx, item.type, item.x, item.y, frame);
+      drawSprite(ctx, item.type, item.x, item.y, frame, item.type === "rock" ? item.rot || 0 : 0);
     }
   }
   drawParticles(ctx);

@@ -57,7 +57,19 @@ function drawFallback(ctx, name, x, y) {
   ctx.fillRect(x, y, SIZE[name], SIZE[name]);
 }
 
-export function drawSprite(ctx, name, x, y, frame = 0) {
+export function drawSprite(ctx, name, x, y, frame = 0, rotation = 0) {
+  const size = SIZE[name];
+  const blit = (image, sx, sy, sw, sh) => {
+    if (rotation) {
+      ctx.save();
+      ctx.translate(x + size / 2, y + size / 2);
+      ctx.rotate(rotation);
+      ctx.drawImage(image, sx, sy, sw, sh, -size / 2, -size / 2, size, size);
+      ctx.restore();
+    } else {
+      ctx.drawImage(image, sx, sy, sw, sh, x, y, size, size);
+    }
+  };
   const sheet = SHEETS[name];
   if (sheet) {
     const key = name + "_sheet";
@@ -65,7 +77,7 @@ export function drawSprite(ctx, name, x, y, frame = 0) {
     if (imageReady[key]) {
       const cellW = image.width / sheet.frames;
       const cellH = image.height;
-      ctx.drawImage(image, frame * cellW, 0, cellW, cellH, x, y, SIZE[name], SIZE[name]);
+      blit(image, frame * cellW, 0, cellW, cellH);
     } else {
       drawFallback(ctx, name, x, y);
     }
@@ -73,7 +85,7 @@ export function drawSprite(ctx, name, x, y, frame = 0) {
   }
 
   if (isReady(name)) {
-    ctx.drawImage(images[name], x, y, SIZE[name], SIZE[name]);
+    blit(images[name], 0, 0, images[name].width, images[name].height);
   } else {
     drawFallback(ctx, name, x, y);
   }
