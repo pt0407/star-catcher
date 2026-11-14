@@ -704,8 +704,9 @@ function draw() {
   const cursor = state === "ready" || state === "over" ? "pointer" : "default";
   if (canvas.style.cursor !== cursor) canvas.style.cursor = cursor;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.save();
-  if (shake > 0 && !reducedMotion) {
+  const shaking = shake > 0 && !reducedMotion;
+  if (shaking) {
+    ctx.save();
     ctx.translate((Math.random() * 2 - 1) * SHAKE_AMOUNT, (Math.random() * 2 - 1) * SHAKE_AMOUNT);
   }
 
@@ -952,7 +953,7 @@ function draw() {
     pauseLines.push([`Score ${score}   Stars ${starsCaught}`, 14], [`Difficulty: ${difficulty.name}   Speed ${speedLevel}   R restarts`, 10]);
     drawText(pauseLines);
   }
-  ctx.restore();
+  if (shaking) ctx.restore();
 }
 
 function setTouchTarget(event) {
