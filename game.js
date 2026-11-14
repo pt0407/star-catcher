@@ -752,7 +752,7 @@ function draw() {
     if (newBest) gameOverLines.push(["New best!", 14]);
     const attempts = starsCaught + rocksHit;
     const accuracy = attempts > 0 ? Math.round((starsCaught / attempts) * 100) : 0;
-    gameOverLines.push([`Stars ${starsCaught}  Rocks ${rocksHit}  Acc ${accuracy}%`, 14]);
+    gameOverLines.push([`Stars ${starsCaught}  Rocks ${rocksHit}  Acc ${accuracy}%  ${difficulty.name}`, 14]);
     gameOverLines.push([`All time ${totalStars}${goldenCaught > 0 ? `   Gold ${goldenCaught}` : ""}`, 14]);
 
     const panelWidth = 380;
