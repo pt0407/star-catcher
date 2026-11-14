@@ -458,7 +458,8 @@ function update(dt) {
       item.y += fallSpeed * item.speedMultiplier * dt;
     }
 
-    if (touchesPlayer(item)) {
+    const hit = touchesPlayer(item);
+    if (hit) {
       playCatchSound(item.type === "heart" ? "star" : item.type, item.type === "star" ? Math.min(streak, 10) * 40 : 0);
       if (item.type === "star") {
         starsCaught += 1;
@@ -499,7 +500,7 @@ function update(dt) {
         heartFlash = HEART_FLASH_DURATION;
       }
     }
-    if (item.type === "rock" && !item.nearMiss && !touchesPlayer(item)) {
+    if (item.type === "rock" && !item.nearMiss && !hit) {
       const verticallyClose = item.y < player.y + SIZE.player && item.y + SIZE.rock > player.y;
       const horizontallyClose = Math.abs((item.x + SIZE.rock / 2) - (player.x + SIZE.player / 2)) < (SIZE.rock + SIZE.player) / 2 + NEAR_MISS_DISTANCE;
       if (verticallyClose && horizontallyClose) {
@@ -507,7 +508,7 @@ function update(dt) {
         pops.push({ x: item.x + SIZE.rock / 2, y: item.y + SIZE.rock / 2, age: 0, text: 'close!' });
       }
     }
-    if (touchesPlayer(item) || item.y >= canvas.height) items.splice(i, 1);
+    if (hit || item.y >= canvas.height) items.splice(i, 1);
   }
 
   if (shootingStar) {
