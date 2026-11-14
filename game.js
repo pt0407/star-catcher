@@ -637,6 +637,8 @@ function update(dt) {
 
   for (let i = pops.length - 1; i >= 0; i--) {
     pops[i].age += dt;
+    pops[i].x += gustDirection * GUST_SPEED * 0.25 * gustPushTime;
+    pops[i].x = Math.max(0, Math.min(canvas.width, pops[i].x));
     if (pops[i].age >= POP_DURATION) pops.splice(i, 1);
   }
   if (pops.length > 24) pops.splice(0, pops.length - 24);
