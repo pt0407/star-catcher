@@ -142,6 +142,7 @@ let pauseIndex = 0;
 let gamepadDir = 0;
 let particleScale = 1;
 let konami = [];
+let runUnlocks = [];
 let trailTimer = 0;
 let padA = false;
 let padStart = false;
@@ -198,6 +199,7 @@ function reset() {
   lastStage = -1;
   stageFlash = 0;
   trailTimer = 0;
+  runUnlocks = [];
   feverTimer = 0;
   nextFeverAt = FEVER_EVERY;
   nextShowerAt = SHOWER_EVERY;
@@ -717,6 +719,7 @@ function checkAchievements() {
       unlocked.add(a.id);
       saveItem("starCatcherAchievements", JSON.stringify([...unlocked]));
       pops.push({ x: canvas.width / 2, y: 140, age: 0, text: `achievement: ${a.label}`, color: "#ffd93b" });
+      runUnlocks.push(a.label);
       playNewBestSound();
     }
   }
@@ -1080,6 +1083,7 @@ function draw() {
     gameOverLines.push([`Stage ${stageIndex() + 1} (${stageName()})`, 12]);
     gameOverLines.push([`All time ${totalStars}${goldenCaught > 0 ? `   Gold ${goldenCaught}` : ""}`, 14]);
     gameOverLines.push([`Runs ${totalRuns}`, 10]);
+    if (runUnlocks.length > 0) gameOverLines.push([`unlocked: ${runUnlocks.slice(0, 3).join(", ")}${runUnlocks.length > 3 ? "..." : ""}`, 10]);
     if (highScores.length > 0) {
       gameOverLines.push(["top scores", 12]);
       highScores.slice(0, 5).forEach((entry, i) => {
