@@ -766,7 +766,7 @@ function draw() {
 
   const stageSky = nightMode ? null : STAGES[stageIndex()].sky;
   const stageStars = nightMode ? "#fff" : STAGES[stageIndex()].stars;
-  drawStarfield(ctx, starfield, now, gustRemaining > 0, reducedMotion, stageStars);
+  drawStarfield(ctx, starfield, now, gustRemaining > 0, reducedMotion, stageStars, canvas.height);
   if (stageSky) {
     ctx.fillStyle = stageSky;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
