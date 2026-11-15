@@ -48,6 +48,8 @@ const GOLDEN_STAR_CHANCE = 1 / 12;
 const GOLDEN_HEART_CHANCE = 0.15;
 const COMET_CHANCE = 0.04;
 const SUPER_STAR_CHANCE = 0.015;
+const FEVER_EVERY = 100;
+const FEVER_DURATION = 6;
 const MAGNET_CHANCE = 1 / 25;
 const HEART_CHANCE = 1 / 30;
 const FAST_ROCK_CHANCE = 0.2;
@@ -126,6 +128,8 @@ let perfectFlash = null;
 let starsPopRemaining = 0;
 let lastStage = -1;
 let stageFlash = 0;
+let feverTimer = 0;
+let nextFeverAt = FEVER_EVERY;
 let menuIndex = 0;
 let pauseIndex = 0;
 let nightMode = loadItem("starCatcherNight", "false") === "true";
@@ -180,6 +184,8 @@ function reset() {
   starsPopRemaining = 0;
   lastStage = -1;
   stageFlash = 0;
+  feverTimer = 0;
+  nextFeverAt = FEVER_EVERY;
   newBest = false;
   bestAnnounced = false;
   setMusicPaused(false);
@@ -317,6 +323,7 @@ function update(dt) {
   comboFlashRemaining = Math.max(0, comboFlashRemaining - dt);
   perfectFlashRemaining = Math.max(0, perfectFlashRemaining - dt);
   stageFlash = Math.max(0, stageFlash - dt);
+  feverTimer = Math.max(0, feverTimer - dt);
   starsPopRemaining = Math.max(0, starsPopRemaining - dt);
 
   if (lives === 1) {
@@ -420,7 +427,7 @@ function update(dt) {
           perfectFlash = 'PERFECT!';
           perfectFlashRemaining = PERFECT_FLASH_DURATION;
         }
-        score += value;
+        score += value * feverMult();
         if ((item.comet || item.super) && items.length < MAX_ITEMS) {
           const pieces = item.super ? 5 : 3;
           for (let s = 0; s < pieces; s++) {
@@ -433,7 +440,7 @@ function update(dt) {
         checkMilestone();
         spawnStarSparkles(item.x + SIZE.star / 2, item.y + SIZE.star / 2, item.golden ? "#ffcf40" : "#fff3a0", item.golden ? 14 : SPARKLE_COUNT);
         hopTimer = HOP_DURATION;
-        pops.push({ x: item.x + SIZE.star / 2, y: item.y + SIZE.star / 2, age: 0, value, color: item.golden ? "#ffd93b" : "#fff" });
+        pops.push({ x: item.x + SIZE.star / 2, y: item.y + SIZE.star / 2, age: 0, value: value * feverMult(), color: item.golden ? "#ffd93b" : "#fff" });
       } else if (item.type === "magnet") {
         magnetRemaining = MAGNET_DURATION;
         comboFlash = "MAGNET!";
@@ -498,7 +505,7 @@ function update(dt) {
         comboFlash = `COMBO ${streak}!`;
         comboFlashRemaining = streak % 50 === 0 ? COMBO_FLASH_DURATION * 2 : COMBO_FLASH_DURATION;
       }
-      score += 5;
+      score += 5 * feverMult();
       checkNewBest();
       checkHeartBonus();
       checkMilestone();
@@ -508,7 +515,7 @@ function update(dt) {
         x: shootingStar.x + SHOOTING_STAR_SIZE / 2,
         y: shootingStar.y + SHOOTING_STAR_SIZE / 2,
         age: 0,
-        value: 5,
+        value: 5 * feverMult(),
       });
       shootingStar = null;
     } else if (shootingStar.dir === 1 ? shootingStar.x >= canvas.width : shootingStar.x <= -SHOOTING_STAR_SIZE) {
@@ -540,6 +547,12 @@ function update(dt) {
       pops.push({ x: canvas.width / 2, y: 120, age: 0, text: `stage ${stage + 1}: ${STAGES[stage].name}`, color: "#9fd0ff" });
       stageFlash = 0.4;
     }
+  }
+  if (score >= nextFeverAt) {
+    nextFeverAt += FEVER_EVERY;
+    feverTimer = FEVER_DURATION;
+    pops.push({ x: canvas.width / 2, y: 100, age: 0, text: "FEVER x2!", color: "#ffd93b" });
+    playNewBestSound();
   }
   setMusicLevel(1 + Math.floor(score / SPEED_UP_EVERY));
   if (lives <= 0) gameOver();
@@ -647,6 +660,8 @@ try {
   unlocked = new Set();
 }
 
+const feverMult = () => (feverTimer > 0 ? 2 : 1);
+
 function checkAchievements() {
   for (const a of ACHIEVEMENTS) {
     if (!unlocked.has(a.id) && a.test()) {
@@ -703,6 +718,14 @@ function draw() {
   if (stageFlash > 0) {
     ctx.fillStyle = `rgba(255, 255, 255, ${stageFlash * 0.5})`;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  if (feverTimer > 0) {
+    const pulse = 0.5 + 0.5 * Math.sin(now / 120);
+    ctx.strokeStyle = `rgba(255, 217, 59, ${0.4 + pulse * 0.4})`;
+    ctx.lineWidth = 10;
+    ctx.strokeRect(5, 5, canvas.width - 10, canvas.height - 10);
+    drawPixelText("FEVER x2", canvas.width / 2, 96, 14, "center");
   }
 
   const speedLevelNow = 1 + Math.floor(score / SPEED_UP_EVERY);
