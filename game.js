@@ -333,6 +333,7 @@ function update(dt) {
   updateParticles(dt);
 
   if (state !== "playing") return;
+  checkAchievements();
 
   magnetRemaining = Math.max(0, magnetRemaining - dt);
 
@@ -631,6 +632,32 @@ function saveScoreEntry(name, value) {
   saveItem("starCatcherScores", JSON.stringify(highScores));
 }
 
+const ACHIEVEMENTS = [
+  { id: "first-star", label: "first star", test: () => starsCaught >= 1 },
+  { id: "combo-10", label: "combo x10", test: () => streak >= 10 },
+  { id: "century", label: "100 points", test: () => score >= 100 },
+  { id: "stage-3", label: "reach stage 3", test: () => stageIndex() >= 2 },
+  { id: "stargazer", label: "100 stars total", test: () => totalStars >= 100 },
+  { id: "high-roller", label: "score 250", test: () => score >= 250 },
+];
+let unlocked = new Set();
+try {
+  unlocked = new Set(JSON.parse(loadItem("starCatcherAchievements", "[]")));
+} catch {
+  unlocked = new Set();
+}
+
+function checkAchievements() {
+  for (const a of ACHIEVEMENTS) {
+    if (!unlocked.has(a.id) && a.test()) {
+      unlocked.add(a.id);
+      saveItem("starCatcherAchievements", JSON.stringify([...unlocked]));
+      pops.push({ x: canvas.width / 2, y: 140, age: 0, text: `achievement: ${a.label}`, color: "#ffd93b" });
+      playNewBestSound();
+    }
+  }
+}
+
 let entryLetters = ["A", "A", "A"];
 let entryIndex = 0;
 let entryScore = 0;
@@ -902,6 +929,9 @@ function draw() {
     }
     if (totalScore > 0) {
       drawPixelText(`Points ${totalScore} all time`, canvas.width / 2, canvas.height - 76, 8, "center");
+    }
+    if (unlocked.size > 0) {
+      drawPixelText(`achievements ${unlocked.size}/${ACHIEVEMENTS.length}`, canvas.width / 2, canvas.height - 60, 8, "center");
     }
     drawPixelText("up/down pick, enter select", canvas.width / 2, canvas.height - 40, 8, "center");
     drawPixelText("v0.4", canvas.width - 10, canvas.height - 40, 8, "right");
