@@ -53,6 +53,7 @@ const PRISM_STAR_CHANCE = 1 / 60;
 const WILD_STAR_CHANCE = 1 / 40;
 const FEVER_EVERY = 100;
 const SHOWER_EVERY = 200;
+const STORM_EVERY = 500;
 const FEVER_DURATION = 6;
 const MAGNET_CHANCE = 1 / 25;
 const HEART_CHANCE = 1 / 30;
@@ -135,6 +136,7 @@ let stageFlash = 0;
 let feverTimer = 0;
 let nextFeverAt = FEVER_EVERY;
 let nextShowerAt = SHOWER_EVERY;
+let nextStormAt = STORM_EVERY;
 let menuIndex = 0;
 let pauseIndex = 0;
 let gamepadDir = 0;
@@ -199,6 +201,7 @@ function reset() {
   feverTimer = 0;
   nextFeverAt = FEVER_EVERY;
   nextShowerAt = SHOWER_EVERY;
+  nextStormAt = STORM_EVERY;
   newBest = false;
   bestAnnounced = false;
   setMusicPaused(false);
@@ -581,6 +584,14 @@ function update(dt) {
     }
     pops.push({ x: canvas.width / 2, y: 84, age: 0, text: "STAR SHOWER!", color: "#9fd0ff" });
     playGustSound();
+  }
+  if (score >= nextStormAt) {
+    nextStormAt += STORM_EVERY;
+    for (let i = 0; i < 8 && items.length < MAX_ITEMS; i++) {
+      items.push({ type: "rock", golden: false, comet: false, super: false, prism: false, wild: false, speedMultiplier: 1.3 + Math.random() * 0.3, drift: (Math.random() * 2 - 1) * 20, phase: Math.random() * 6.28, rot: Math.random() * 6.28, x: Math.random() * (canvas.width - SIZE.rock), y: -SIZE.rock - i * 25 });
+    }
+    pops.push({ x: canvas.width / 2, y: 84, age: 0, text: "ROCK STORM!", color: "#ff9d9d" });
+    playMissSound();
   }
   setMusicLevel(1 + Math.floor(score / SPEED_UP_EVERY));
   if (lives <= 0) gameOver();
