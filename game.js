@@ -132,6 +132,9 @@ let feverTimer = 0;
 let nextFeverAt = FEVER_EVERY;
 let menuIndex = 0;
 let pauseIndex = 0;
+let gamepadDir = 0;
+let padA = false;
+let padStart = false;
 let nightMode = loadItem("starCatcherNight", "false") === "true";
 let fpsEnabled = false;
 let fpsWindowStart = 0;
@@ -370,7 +373,7 @@ function update(dt) {
     const distance = touch.targetX - player.x;
     player.x += Math.sign(distance) * Math.min(Math.abs(distance), PLAYER_SPEED * dt);
   } else {
-    const move = touch.dir !== 0 ? touch.dir : (keys["arrowright"] || keys["d"] ? 1 : 0) - (keys["arrowleft"] || keys["a"] ? 1 : 0);
+    const move = touch.dir !== 0 ? touch.dir : gamepadDir !== 0 ? gamepadDir : (keys["arrowright"] || keys["d"] ? 1 : 0) - (keys["arrowleft"] || keys["a"] ? 1 : 0);
     player.x += move * PLAYER_SPEED * dt;
   }
   player.x += gustDirection * GUST_SPEED * gustPushTime;
@@ -984,7 +987,7 @@ function draw() {
     const helpLines = [
       ["How to play", 24],
       ["", 10],
-      ["arrows or a/d - move", 14],
+      ["arrows, a/d or gamepad - move", 14],
       ["space - start / restart", 14],
       ["p or esc - pause", 14],
       ["catch stars, dodge rocks", 14],
@@ -1183,6 +1186,39 @@ bindInput({
 
 let lastTime = performance.now();
 
+function pollGamepad() {
+  const pads = typeof navigator !== "undefined" && navigator.getGamepads ? navigator.getGamepads() : [];
+  const pad = pads && pads[0];
+  gamepadDir = 0;
+  if (!pad) {
+    padA = false;
+    padStart = false;
+    return;
+  }
+  const axis = pad.axes[0] || 0;
+  const left = !!(pad.buttons[14] && pad.buttons[14].pressed);
+  const right = !!(pad.buttons[15] && pad.buttons[15].pressed);
+  if (axis < -0.4 || left) gamepadDir = -1;
+  else if (axis > 0.4 || right) gamepadDir = 1;
+  const a = !!(pad.buttons[0] && pad.buttons[0].pressed);
+  if (a && !padA && (state === "ready" || (state === "over" && performance.now() - gameOverTime >= RESTART_DELAY_MS))) startGame();
+  padA = a;
+  const start = !!(pad.buttons[9] && pad.buttons[9].pressed);
+  if (start && !padStart && (state === "playing" || state === "paused")) {
+    if (state === "playing") {
+      state = "paused";
+      pauseStartTime = performance.now();
+      pauseIndex = 0;
+      setMusicPaused(true);
+    } else {
+      state = "playing";
+      setMusicPaused(false);
+    }
+    playPauseSound();
+  }
+  padStart = start;
+}
+
 function frame(time) {
   const dt = Math.min((time - lastTime) / 1000, 0.05);
   lastTime = time;
@@ -1194,6 +1230,7 @@ function frame(time) {
     fpsFrameCount = 0;
     fpsWindowStart = time;
   }
+  pollGamepad();
   if (state !== "paused") update(dt);
   draw();
   requestAnimationFrame(frame);
