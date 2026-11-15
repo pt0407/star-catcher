@@ -998,6 +998,9 @@ function draw() {
       [`points ${totalScore} all time`, 14],
       [`best ${best}   best streak ${bestStreak}`, 14],
       ["", 10],
+      [`achievements ${unlocked.size}/${ACHIEVEMENTS.length}`, 12],
+      ...ACHIEVEMENTS.filter(a => unlocked.has(a.id)).map(a => [`* ${a.label}`, 10]),
+      ["", 10],
     ];
     if (highScores.length > 0) {
       statLines.push(["top scores", 12]);
