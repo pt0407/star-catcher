@@ -236,7 +236,14 @@ function touchesPlayer(item) {
 }
 
 function gameOver() {
-  state = "over";
+  if (qualifiesForBoard(score)) {
+    state = "entry";
+    entryLetters = ["A", "A", "A"];
+    entryIndex = 0;
+    entryScore = score;
+  } else {
+    state = "over";
+  }
   playMusic("title");
   gameOverTime = performance.now();
   const elapsed = Math.floor((gameOverTime - runStartTime) / 1000);
@@ -564,6 +571,28 @@ function activateMenuItem() {
   else cycleMenuValue(item.id, 1);
 }
 
+let highScores = [];
+try {
+  highScores = JSON.parse(loadItem("starCatcherScores", "[]")) || [];
+} catch {
+  highScores = [];
+}
+
+function qualifiesForBoard(value) {
+  return value > 0 && (highScores.length < 10 || value > highScores[highScores.length - 1].score);
+}
+
+function saveScoreEntry(name, value) {
+  highScores.push({ name, score: value });
+  highScores.sort((a, b) => b.score - a.score);
+  highScores = highScores.slice(0, 10);
+  saveItem("starCatcherScores", JSON.stringify(highScores));
+}
+
+let entryLetters = ["A", "A", "A"];
+let entryIndex = 0;
+let entryScore = 0;
+
 function drawText(lines, offsets = []) {
   ctx.fillStyle = "#fff";
   const firstLineY = canvas.height / 2 - ((lines.length - 1) * 40) / 2;
@@ -829,6 +858,9 @@ function draw() {
     ];
     drawText(helpLines);
   }
+  if (state === "entry") {
+    drawText([["New high score!", 24], [`Score ${entryScore}`, 16], ["", 8], ["enter initials:", 14], [entryLetters.join(" "), 28], ["", 8], ["arrows pick letter, up/down change", 10], ["enter to save", 10]]);
+  }
   if (state === "over") {
     const gameOverLines = [["Game over", 28], [`Score ${score}   Best ${best}   ${runTimeText}`, 14]];
     if (newBest) gameOverLines.push(["New best!", 14]);
@@ -837,6 +869,12 @@ function draw() {
     gameOverLines.push([`Stars ${starsCaught}  Rocks ${rocksHit}  Acc ${accuracy}%  ${difficulty.name}`, 14]);
     gameOverLines.push([`Stage ${stageIndex() + 1} (${stageName()})`, 12]);
     gameOverLines.push([`All time ${totalStars}${goldenCaught > 0 ? `   Gold ${goldenCaught}` : ""}`, 14]);
+    if (highScores.length > 0) {
+      gameOverLines.push(["top scores", 12]);
+      highScores.slice(0, 5).forEach((entry, i) => {
+        gameOverLines.push([`${i + 1}. ${entry.name}  ${entry.score}`, 10]);
+      });
+    }
 
     const panelWidth = 380;
     const panelHeight = 240 + Math.max(0, gameOverLines.length - 4) * 40;
@@ -874,6 +912,21 @@ function draw() {
 function onKeyDown(e) {
   if (state === "help") {
     state = "ready";
+    return;
+  }
+  if (state === "entry") {
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      entryIndex = (entryIndex + (e.key === "ArrowRight" ? 1 : -1) + 3) % 3;
+    } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+      const delta = e.key === "ArrowUp" ? -1 : 1;
+      const cur = entryLetters[entryIndex].charCodeAt(0);
+      entryLetters[entryIndex] = String.fromCharCode(((cur - 65 + delta + 26) % 26) + 65);
+    } else if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      saveScoreEntry(entryLetters.join(""), entryScore);
+      state = "over";
+      gameOverTime = performance.now();
+    }
     return;
   }
   if (state === "ready" && !e.repeat && (e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "w" || e.key === "s")) {
