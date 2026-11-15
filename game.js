@@ -124,6 +124,7 @@ let perfectFlashRemaining = 0;
 let perfectFlash = null;
 let starsPopRemaining = 0;
 let lastStage = -1;
+let stageFlash = 0;
 let menuIndex = 0;
 let nightMode = loadItem("starCatcherNight", "false") === "true";
 let fpsEnabled = false;
@@ -176,6 +177,7 @@ function reset() {
   perfectFlash = null;
   starsPopRemaining = 0;
   lastStage = -1;
+  stageFlash = 0;
   newBest = false;
   bestAnnounced = false;
   setMusicPaused(false);
@@ -310,6 +312,7 @@ function update(dt) {
   milestoneFlashRemaining = Math.max(0, milestoneFlashRemaining - dt);
   comboFlashRemaining = Math.max(0, comboFlashRemaining - dt);
   perfectFlashRemaining = Math.max(0, perfectFlashRemaining - dt);
+  stageFlash = Math.max(0, stageFlash - dt);
   starsPopRemaining = Math.max(0, starsPopRemaining - dt);
 
   if (lives === 1) {
@@ -528,7 +531,10 @@ function update(dt) {
   const stage = stageIndex();
   if (stage !== lastStage) {
     lastStage = stage;
-    if (stage > 0) pops.push({ x: canvas.width / 2, y: 120, age: 0, text: `stage ${stage + 1}: ${STAGES[stage].name}`, color: "#9fd0ff" });
+    if (stage > 0) {
+      pops.push({ x: canvas.width / 2, y: 120, age: 0, text: `stage ${stage + 1}: ${STAGES[stage].name}`, color: "#9fd0ff" });
+      stageFlash = 0.4;
+    }
   }
   setMusicLevel(1 + Math.floor(score / SPEED_UP_EVERY));
   if (lives <= 0) gameOver();
@@ -636,6 +642,11 @@ function draw() {
   drawStarfield(ctx, starfield, now, gustRemaining > 0, reducedMotion, stageStars);
   if (stageSky) {
     ctx.fillStyle = stageSky;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  if (stageFlash > 0) {
+    ctx.fillStyle = `rgba(255, 255, 255, ${stageFlash * 0.5})`;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
