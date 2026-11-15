@@ -512,7 +512,7 @@ function update(dt) {
   const stage = stageIndex();
   if (stage !== lastStage) {
     lastStage = stage;
-    pops.push({ x: canvas.width / 2, y: 120, age: 0, text: `stage ${stage + 1}: ${STAGES[stage].name}`, color: "#9fd0ff" });
+    if (stage > 0) pops.push({ x: canvas.width / 2, y: 120, age: 0, text: `stage ${stage + 1}: ${STAGES[stage].name}`, color: "#9fd0ff" });
   }
   setMusicLevel(1 + Math.floor(score / SPEED_UP_EVERY));
   if (lives <= 0) gameOver();
