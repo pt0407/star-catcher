@@ -1,0 +1,10 @@
+{
+  "name": "Star Catcher",
+  "short_name": "Star Catcher",
+  "start_url": ".",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#07132f",
+  "theme_color": "#07132f",
+  "icons": []
+}

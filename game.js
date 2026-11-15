@@ -1229,6 +1229,10 @@ function onKeyDown(e) {
   keys[e.key.toLowerCase()] = true;
 }
 
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  navigator.serviceWorker.register("sw.js");
+}
+
 bindInput({
   onPointerStart() {
     if (state === "ready" || (state === "over" && performance.now() - gameOverTime >= RESTART_DELAY_MS)) startGame();
