@@ -240,6 +240,26 @@ sprites["background.png"] = (
 )
 
 
+# Logo: the star sprite scaled up 2x with a couple of sparkles around it
+_star_rows, _star_pal = sprites["star.png"]
+_logo = [["." for _ in range(32)] for _ in range(32)]
+for _y in range(16):
+    for _x in range(16):
+        _ch = _star_rows[_y][_x]
+        for _dy in range(2):
+            for _dx in range(2):
+                _logo[_y * 2 + _dy][_x * 2 + _dx] = _ch
+for _sx, _sy in [(1, 1), (28, 3), (2, 28)]:
+    _logo[_sy][_sx] = "w"
+    _logo[_sy][_sx + 1] = "s"
+    _logo[_sy + 1][_sx] = "s"
+    _logo[_sy + 1][_sx + 1] = "d"
+sprites["logo.png"] = (
+    ["".join(row) for row in _logo],
+    dict(_star_pal, w=(255, 255, 255, 255), s=(120, 160, 220, 255), d=(20, 39, 79, 255)),
+)
+
+
 def png_chunk(kind, data):
     chunk = kind + data
     return struct.pack(">I", len(data)) + chunk + struct.pack(">I", zlib.crc32(chunk) & 0xFFFFFFFF)

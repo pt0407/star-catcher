@@ -5,6 +5,7 @@ export const SPRITES = {
   rock: "assets/rock.png",
   heart: "assets/heart.png",
   magnet: "assets/magnet.png",
+  logo: "assets/logo.png",
 };
 
 // animated sprites: sheet file + how many frames sit side by side
@@ -15,8 +16,8 @@ export const SHEETS = {
   heart: { src: "assets/heart_sheet.png", frames: 2 },
 };
 
-export const SIZE = { player: 64, star: 32, rock: 32, magnet: 32, heart: 24 };
-export const FALLBACK = { player: "#4fc3f7", star: "#ffd93b", rock: "#8a8a8a", heart: "#ff5577", magnet: "#4fa3ff" };
+export const SIZE = { player: 64, star: 32, rock: 32, magnet: 32, heart: 24, logo: 96 };
+export const FALLBACK = { player: "#4fc3f7", star: "#ffd93b", rock: "#8a8a8a", heart: "#ff5577", magnet: "#4fa3ff", logo: "#ffd93b" };
 
 export const images = {};
 const imageReady = {};

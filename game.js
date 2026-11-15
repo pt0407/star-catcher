@@ -1031,6 +1031,7 @@ function draw() {
 
   if (state === "ready") {
     const titleBob = reducedMotion ? 0 : Math.sin(now / 300) * 4;
+    drawSprite(ctx, "logo", canvas.width / 2 - 48, canvas.height / 2 - 160 + titleBob);
     drawText([["Star Catcher", 28]], [titleBob]);
     const items = menuItems();
     const startY = canvas.height / 2 - 30;
