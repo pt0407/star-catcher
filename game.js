@@ -138,6 +138,7 @@ let menuIndex = 0;
 let pauseIndex = 0;
 let gamepadDir = 0;
 let particleScale = 1;
+let konami = [];
 let padA = false;
 let padStart = false;
 let nightMode = loadItem("starCatcherNight", "false") === "true";
@@ -1087,6 +1088,17 @@ function draw() {
 }
 
 function onKeyDown(e) {
+  const konamiSeq = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright", "b", "a"];
+  konami.push(e.key.toLowerCase());
+  if (konami.length > konamiSeq.length) konami.shift();
+  if (konami.join(",") === konamiSeq.join(",")) {
+    konami = [];
+    for (let i = 0; i < 20 && items.length < MAX_ITEMS; i++) {
+      items.push({ type: "star", golden: true, comet: false, super: false, prism: false, speedMultiplier: 0.9 + Math.random() * 0.2, drift: (Math.random() * 2 - 1) * 20, phase: Math.random() * 6.28, rot: 0, x: Math.random() * (canvas.width - SIZE.star), y: -SIZE.star - i * 20 });
+    }
+    pops.push({ x: canvas.width / 2, y: 70, age: 0, text: "GOLDEN STORM!", color: "#ffd93b" });
+    playNewBestSound();
+  }
   if (state === "help" || state === "stats") {
     state = "ready";
     return;
