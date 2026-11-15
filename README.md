@@ -33,6 +33,16 @@ Catch stars for points, golden stars are worth 3. Rocks cost a heart. Magnet sta
 
 Your best score, streak, and totals are saved in the browser (localStorage), so they survive refreshes.
 
+## Features
+
+- 5 stages that cycle every 50 points: day, dusk, night, deep space, aurora, each with its own sky and star colors
+- Star types: normal, golden (3), prism (4), wild (random 1-5), comets (5, split into 3), super stars (10, split into 5)
+- Fever mode doubles points for 6 seconds every 100 points, star showers and rock storms keep it spicy
+- 10 achievements, a local top 10 with initials entry, pause menu, stats screen
+- Chiptune music with separate volume, Web Audio sound effects
+- Keyboard, mouse/touch, gamepad, tilt and on-screen buttons
+- Installable as a PWA, plays offline
+
 ## Built with
 
 Plain HTML, CSS, and JavaScript, no build step. The sprites are placeholders drawn by a small script from hand-defined shapes. The code and this README were written with an AI agent (Devin). Nobody has played a full run yet, so expect rough edges.
