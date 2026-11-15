@@ -794,6 +794,7 @@ function draw() {
     ctx.lineWidth = 10;
     ctx.strokeRect(5, 5, canvas.width - 10, canvas.height - 10);
     drawPixelText("FEVER x2", canvas.width / 2, 96, 14, "center");
+    drawPixelText(`${Math.ceil(feverTimer)}s`, canvas.width / 2, 114, 12, "center");
   }
 
   const speedLevelNow = 1 + Math.floor(score / SPEED_UP_EVERY);
