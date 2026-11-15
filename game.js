@@ -635,6 +635,22 @@ function draw() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
+  const speedLevelNow = 1 + Math.floor(score / SPEED_UP_EVERY);
+  if (speedLevelNow >= 3 && state === "playing") {
+    ctx.globalAlpha = Math.min(0.22, (speedLevelNow - 2) * 0.07);
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 2;
+    for (let i = 0; i < speedLevelNow * 3; i++) {
+      const x = (i * 97 + now * 6) % canvas.width;
+      const y = (i * 173 + now * (8 + speedLevelNow * 4)) % canvas.height;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x, y + 18 + speedLevelNow * 4);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
   if (milestoneFlashRemaining > 0) {
     ctx.fillStyle = `rgba(255, 255, 255, ${(milestoneFlashRemaining / MILESTONE_FLASH_DURATION) * 0.2})`;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
