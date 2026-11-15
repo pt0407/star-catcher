@@ -27,6 +27,7 @@ const DIFFICULTIES = [
   { name: "easy", fallSpeed: 90, spawnEvery: 1.15 },
   { name: "normal", fallSpeed: 120, spawnEvery: 1 },
   { name: "hard", fallSpeed: 160, spawnEvery: 0.85 },
+  { name: "expert", fallSpeed: 200, spawnEvery: 0.75 },
 ];
 const SPEED_UP_EVERY = 10;
 const STAGE_EVERY = 50;
