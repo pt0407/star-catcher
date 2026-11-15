@@ -580,6 +580,7 @@ function menuItems() {
     { id: "difficulty", label: `difficulty: ${difficulty.name}` },
     { id: "sound", label: `sound: ${isMuted() ? "off" : "on"}` },
     { id: "music", label: `music: ${isMusicMuted() ? "off" : "on"}` },
+    { id: "stats", label: "stats" },
     { id: "howto", label: "how to play" },
   ];
 }
@@ -959,6 +960,26 @@ function draw() {
     drawPixelText("up/down pick, enter select", canvas.width / 2, canvas.height - 40, 8, "center");
     drawPixelText("v0.4", canvas.width - 10, canvas.height - 40, 8, "right");
   }
+  if (state === "stats") {
+    const statLines = [
+      ["Stats", 24],
+      ["", 10],
+      [`runs ${totalRuns}`, 14],
+      [`stars ${totalStars} all time`, 14],
+      [`points ${totalScore} all time`, 14],
+      [`best ${best}   best streak ${bestStreak}`, 14],
+      ["", 10],
+    ];
+    if (highScores.length > 0) {
+      statLines.push(["top scores", 12]);
+      highScores.slice(0, 3).forEach((entry, i) => {
+        statLines.push([`${i + 1}. ${entry.name}  ${entry.score}`, 10]);
+      });
+      statLines.push(["", 10]);
+    }
+    statLines.push(["any key - back", 14]);
+    drawText(statLines);
+  }
   if (state === "help") {
     const helpLines = [
       ["How to play", 24],
@@ -1028,7 +1049,7 @@ function draw() {
 }
 
 function onKeyDown(e) {
-  if (state === "help") {
+  if (state === "help" || state === "stats") {
     state = "ready";
     return;
   }
