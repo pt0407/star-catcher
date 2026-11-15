@@ -100,7 +100,7 @@ let totalStars = Number(loadItem("starCatcherTotalStars", "0"));
 let totalScore = Number(loadItem("starCatcherTotalScore", "0"));
 let totalRuns = Number(loadItem("starCatcherRuns", "0"));
 let hasSeenControlsTip = loadItem("starCatcherSeen", "false") === "true";
-let state, player, items, pops, lives, score, starsCaught, goldenCaught, rocksHit, streak, fallSpeed, spawnTimer;
+let state, player, items, pops, lives, score, starsCaught, goldenCaught, rocksHit, missedStars, streak, fallSpeed, spawnTimer;
 let runBestStreak = 0;
 const starfield = createStarfield(canvas.width, canvas.height);
 let gustTimer, gustRemaining, gustDirection, magnetRemaining;
@@ -166,12 +166,14 @@ function reset() {
   playerSpeed = 0;
   items = [];
   pops = [];
+  starTrails = [];
   shootingStar = null;
   shootingStarTimer = SHOOTING_STAR_INTERVAL;
   shootingStarTrailTimer = 0;
   lives = START_LIVES;
   score = 0;
   starsCaught = 0;
+  missedStars = 0;
   goldenCaught = 0;
   rocksHit = 0;
   streak = 0;
@@ -430,6 +432,7 @@ function update(dt) {
       if (item.type === "rock") item.rot = (item.rot || 0) + dt * 2;
       item.x += ((item.drift || 0) + Math.sin(item.y / 45) * 10) * dt + gustDirection * GUST_SPEED * 0.25 * gustPushTime;
       item.x = Math.max(0, Math.min(canvas.width - SIZE[item.type], item.x));
+      if (item.type === "star" && Math.random() < dt * 24) starTrails.push({ x: item.x + SIZE.star / 2, y: item.y + SIZE.star / 2, age: 0 });
     }
 
     const hit = touchesPlayer(item);
@@ -494,6 +497,7 @@ function update(dt) {
     }
     if (item.type === "star" && !hit && !item.missed && item.y > player.y + SIZE.player) {
       item.missed = true;
+      missedStars += 1;
       if (streak >= 2) {
         pops.push({ x: item.x + SIZE.star / 2, y: item.y, age: 0, text: `miss x${streak}`, color: item.golden ? "#ffd93b" : "#ff9d9d" });
         playMissSound();
@@ -565,6 +569,11 @@ function update(dt) {
     if (pops[i].age >= POP_DURATION) pops.splice(i, 1);
   }
   if (pops.length > 24) pops.splice(0, pops.length - 24);
+  for (let i = starTrails.length - 1; i >= 0; i--) {
+    starTrails[i].age += dt;
+    if (starTrails[i].age >= 0.45) starTrails.splice(i, 1);
+  }
+  if (starTrails.length > 240) starTrails.splice(0, starTrails.length - 240);
 
   fallSpeed = difficulty.fallSpeed + Math.floor(score / SPEED_UP_EVERY) * SPEED_UP_AMOUNT;
   const stage = stageIndex();
@@ -875,6 +884,12 @@ function draw() {
       drawSprite(ctx, item.type, item.x, item.y, frame, item.type === "rock" ? item.rot || 0 : 0);
     }
   }
+  for (const t of starTrails) {
+    ctx.globalAlpha = Math.max(0, 0.5 * (1 - t.age / 0.45));
+    ctx.fillStyle = "#ffe98a";
+    ctx.fillRect(t.x - 1.5, t.y - 1.5, 3, 3);
+  }
+  ctx.globalAlpha = 1;
   drawParticles(ctx);
 
   if (shootingStar) {
@@ -1094,6 +1109,7 @@ function draw() {
     gameOverLines.push([`All time ${totalStars}${goldenCaught > 0 ? `   Gold ${goldenCaught}` : ""}`, 14]);
     gameOverLines.push([`Runs ${totalRuns}`, 10]);
     if (runUnlocks.length > 0) gameOverLines.push([`unlocked: ${runUnlocks.slice(0, 3).join(", ")}${runUnlocks.length > 3 ? "..." : ""}`, 10]);
+    gameOverLines.push([`caught ${starsCaught} - missed ${missedStars}`, 10]);
     if (highScores.length > 0) {
       gameOverLines.push(["top scores", 12]);
       highScores.slice(0, 5).forEach((entry, i) => {
