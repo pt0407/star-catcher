@@ -9,8 +9,8 @@ export function createStarfield(width, height) {
   }));
 }
 
-export function drawStarfield(ctx, starfield, now, gustActive, reducedMotion) {
-  ctx.fillStyle = "#fff";
+export function drawStarfield(ctx, starfield, now, gustActive, reducedMotion, color = "#fff") {
+  ctx.fillStyle = color;
   const twinkleBoost = gustActive ? 1.5 : 1;
   if (reducedMotion) {
     ctx.globalAlpha = 0.4;

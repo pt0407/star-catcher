@@ -29,6 +29,14 @@ const DIFFICULTIES = [
   { name: "hard", fallSpeed: 160 },
 ];
 const SPEED_UP_EVERY = 10;
+const STAGE_EVERY = 50;
+const STAGES = [
+  { name: "day", sky: null, stars: "#fff" },
+  { name: "dusk", sky: "rgba(255, 140, 60, 0.16)", stars: "#ffd9a0" },
+  { name: "night", sky: "rgba(10, 10, 50, 0.4)", stars: "#aab4ff" },
+  { name: "deep space", sky: "rgba(70, 0, 110, 0.35)", stars: "#d0c0ff" },
+  { name: "aurora", sky: "rgba(0, 140, 90, 0.22)", stars: "#9fffd0" },
+];
 const SPEED_UP_AMOUNT = 20;
 const SPAWN_EVERY = 0.9;
 const MAX_ITEMS = 14;
@@ -112,6 +120,7 @@ let comboFlash = null;
 let perfectFlashRemaining = 0;
 let perfectFlash = null;
 let starsPopRemaining = 0;
+let lastStage = -1;
 let nightMode = loadItem("starCatcherNight", "false") === "true";
 let fpsEnabled = false;
 let fpsWindowStart = 0;
@@ -162,6 +171,7 @@ function reset() {
   perfectFlashRemaining = 0;
   perfectFlash = null;
   starsPopRemaining = 0;
+  lastStage = -1;
   newBest = false;
   bestAnnounced = false;
   setMusicPaused(false);
@@ -175,6 +185,14 @@ function startGame() {
     hasSeenControlsTip = true;
   }
   reset();
+}
+
+function stageIndex() {
+  return Math.floor(score / STAGE_EVERY) % STAGES.length;
+}
+
+function stageName() {
+  return STAGES[stageIndex()].name;
 }
 
 function spawnItem() {
@@ -484,6 +502,11 @@ function update(dt) {
   if (pops.length > 24) pops.splice(0, pops.length - 24);
 
   fallSpeed = difficulty.fallSpeed + Math.floor(score / SPEED_UP_EVERY) * SPEED_UP_AMOUNT;
+  const stage = stageIndex();
+  if (stage !== lastStage) {
+    lastStage = stage;
+    pops.push({ x: canvas.width / 2, y: 120, age: 0, text: `stage ${stage + 1}: ${STAGES[stage].name}`, color: "#9fd0ff" });
+  }
   setMusicLevel(1 + Math.floor(score / SPEED_UP_EVERY));
   if (lives <= 0) gameOver();
 }
@@ -534,7 +557,13 @@ function draw() {
     }
   }
 
-  drawStarfield(ctx, starfield, now, gustRemaining > 0, reducedMotion);
+  const stageSky = nightMode ? null : STAGES[stageIndex()].sky;
+  const stageStars = nightMode ? "#fff" : STAGES[stageIndex()].stars;
+  drawStarfield(ctx, starfield, now, gustRemaining > 0, reducedMotion, stageStars);
+  if (stageSky) {
+    ctx.fillStyle = stageSky;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
 
   if (milestoneFlashRemaining > 0) {
     ctx.fillStyle = `rgba(255, 255, 255, ${(milestoneFlashRemaining / MILESTONE_FLASH_DURATION) * 0.2})`;
@@ -754,6 +783,7 @@ function draw() {
     const attempts = starsCaught + rocksHit;
     const accuracy = attempts > 0 ? Math.round((starsCaught / attempts) * 100) : 0;
     gameOverLines.push([`Stars ${starsCaught}  Rocks ${rocksHit}  Acc ${accuracy}%  ${difficulty.name}`, 14]);
+    gameOverLines.push([`Stage ${stageIndex() + 1} (${stageName()})`, 12]);
     gameOverLines.push([`All time ${totalStars}${goldenCaught > 0 ? `   Gold ${goldenCaught}` : ""}`, 14]);
 
     const panelWidth = 380;
