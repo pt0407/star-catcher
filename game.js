@@ -147,6 +147,7 @@ let trailTimer = 0;
 let padA = false;
 let padStart = false;
 let nightMode = loadItem("starCatcherNight", "false") === "true";
+let screenShake = loadItem("starCatcherShake", "true") !== "false";
 let fpsEnabled = false;
 let fpsWindowStart = 0;
 let fpsFrameCount = 0;
@@ -623,6 +624,7 @@ function menuItems() {
     { id: "sound", label: `sound: ${isMuted() ? "off" : "on"}` },
     { id: "music", label: `music: ${isMusicMuted() ? "off" : "on"}` },
     { id: "stats", label: "stats" },
+    { id: "shake", label: `shake: ${screenShake ? "on" : "off"}` },
     { id: "howto", label: "how to play" },
   ];
 }
@@ -636,6 +638,9 @@ function cycleMenuValue(id, direction) {
     toggleMute();
   } else if (id === "music") {
     toggleMusicMute();
+  } else if (id === "shake") {
+    screenShake = !screenShake;
+    saveItem("starCatcherShake", String(screenShake));
   }
 }
 
@@ -742,7 +747,7 @@ function draw() {
   const cursor = state === "ready" || state === "over" ? "pointer" : "default";
   if (canvas.style.cursor !== cursor) canvas.style.cursor = cursor;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const shaking = shake > 0 && !reducedMotion;
+  const shaking = shake > 0 && !reducedMotion && screenShake;
   if (shaking) {
     ctx.save();
     ctx.translate((Math.random() * 2 - 1) * SHAKE_AMOUNT, (Math.random() * 2 - 1) * SHAKE_AMOUNT);
