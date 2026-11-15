@@ -220,6 +220,9 @@ function spawnItem() {
   if (type === "star" && !golden && items.length < MAX_ITEMS && Math.random() < 0.04) {
     items.push({ type: "star", golden: false, speedMultiplier: 0.95 + Math.random() * 0.1, drift: (Math.random() * 2 - 1) * 12, phase: Math.random() * 6.28, x: Math.min(canvas.width - SIZE.star, Math.max(0, x + SIZE.star + 4)), y: -SIZE.star });
   }
+  if (type === "rock" && items.length < MAX_ITEMS && Math.random() < 0.12) {
+    items.push({ type: "rock", golden: false, comet: false, speedMultiplier, drift: (Math.random() * 2 - 1) * 12, phase: Math.random() * 6.28, rot: Math.random() * 6.28, x: Math.min(canvas.width - SIZE.rock, Math.max(0, x + SIZE.rock + 6)), y: -SIZE.rock });
+  }
 }
 
 function getSpawnInterval() {
