@@ -24,5 +24,19 @@ for (const m of sprites.matchAll(/assets\/([\w.]+)/g)) {
 
 JSON.parse(readFileSync(join(root, "manifest.json"), "utf8"));
 
+import { execFileSync } from "node:child_process";
+import { writeFileSync, unlinkSync } from "node:fs";
+for (const f of readdirSync(root).filter((f) => f.endsWith(".js"))) {
+  const tmp = join("/tmp", "check_" + f + ".mjs");
+  writeFileSync(tmp, readFileSync(join(root, f), "utf8"));
+  try {
+    execFileSync("node", ["--check", tmp], { stdio: "pipe" });
+  } catch (e) {
+    check(false, `${f} has a syntax error`);
+  } finally {
+    try { unlinkSync(tmp); } catch {}
+  }
+}
+
 if (failed === 0) console.log("all checks passed");
 else { console.log(`${failed} check(s) failed`); process.exit(1); }
