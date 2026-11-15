@@ -140,6 +140,7 @@ let pauseIndex = 0;
 let gamepadDir = 0;
 let particleScale = 1;
 let konami = [];
+let trailTimer = 0;
 let padA = false;
 let padStart = false;
 let nightMode = loadItem("starCatcherNight", "false") === "true";
@@ -194,6 +195,7 @@ function reset() {
   starsPopRemaining = 0;
   lastStage = -1;
   stageFlash = 0;
+  trailTimer = 0;
   feverTimer = 0;
   nextFeverAt = FEVER_EVERY;
   nextShowerAt = SHOWER_EVERY;
@@ -390,6 +392,11 @@ function update(dt) {
   player.x = Math.max(0, Math.min(canvas.width - SIZE.player, player.x));
   playerSpeed = dt > 0 ? Math.abs(player.x - previousPlayerX) / dt : 0;
   playerTrail.push(previousPlayerX);
+  trailTimer -= dt;
+  if (playerSpeed > 300 && trailTimer <= 0) {
+    trailTimer = 0.08;
+    spawnSparkles(player.x + SIZE.player / 2, player.y + SIZE.player / 2, "#9fd0ff", 2);
+  }
   if (playerTrail.length > 3) playerTrail.shift();
   if (player.x < previousPlayerX) playerFacingLeft = true;
   else if (player.x > previousPlayerX) playerFacingLeft = false;
