@@ -448,6 +448,7 @@ function update(dt) {
           comboFlash = `COMBO ${streak}!`;
           comboFlashRemaining = streak % 50 === 0 ? COMBO_FLASH_DURATION * 2 : COMBO_FLASH_DURATION;
         }
+        if (streak % 25 === 0) pops.push({ x: player.x + SIZE.player / 2, y: player.y - 30, age: 0, text: `streak x${streak}`, color: "#7cfc9a" });
         runBestStreak = Math.max(runBestStreak, streak);
         let value = item.super ? 10 : item.comet ? 5 : item.prism ? 4 : item.wild ? item.wildValue : item.golden ? 3 : 1;
         const centerDistance = Math.abs((item.x + SIZE.star / 2) - (player.x + SIZE.player / 2));
@@ -536,6 +537,7 @@ function update(dt) {
         comboFlash = `COMBO ${streak}!`;
         comboFlashRemaining = streak % 50 === 0 ? COMBO_FLASH_DURATION * 2 : COMBO_FLASH_DURATION;
       }
+      if (streak % 25 === 0) pops.push({ x: player.x + SIZE.player / 2, y: player.y - 30, age: 0, text: `streak x${streak}`, color: "#7cfc9a" });
       score += 5 * feverMult();
       checkNewBest();
       checkHeartBonus();
