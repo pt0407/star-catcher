@@ -51,6 +51,7 @@ const COMET_CHANCE = 0.04;
 const SUPER_STAR_CHANCE = 0.015;
 const PRISM_STAR_CHANCE = 1 / 60;
 const FEVER_EVERY = 100;
+const SHOWER_EVERY = 200;
 const FEVER_DURATION = 6;
 const MAGNET_CHANCE = 1 / 25;
 const HEART_CHANCE = 1 / 30;
@@ -132,6 +133,7 @@ let lastStage = -1;
 let stageFlash = 0;
 let feverTimer = 0;
 let nextFeverAt = FEVER_EVERY;
+let nextShowerAt = SHOWER_EVERY;
 let menuIndex = 0;
 let pauseIndex = 0;
 let gamepadDir = 0;
@@ -191,6 +193,7 @@ function reset() {
   stageFlash = 0;
   feverTimer = 0;
   nextFeverAt = FEVER_EVERY;
+  nextShowerAt = SHOWER_EVERY;
   newBest = false;
   bestAnnounced = false;
   setMusicPaused(false);
@@ -559,6 +562,14 @@ function update(dt) {
     feverTimer = FEVER_DURATION;
     pops.push({ x: canvas.width / 2, y: 100, age: 0, text: "FEVER x2!", color: "#ffd93b" });
     playNewBestSound();
+  }
+  if (score >= nextShowerAt) {
+    nextShowerAt += SHOWER_EVERY;
+    for (let i = 0; i < 14 && items.length < MAX_ITEMS; i++) {
+      items.push({ type: "star", golden: Math.random() < GOLDEN_STAR_CHANCE, comet: false, super: false, prism: false, speedMultiplier: 0.9 + Math.random() * 0.25, drift: (Math.random() * 2 - 1) * 20, phase: Math.random() * 6.28, rot: 0, x: Math.random() * (canvas.width - SIZE.star), y: -SIZE.star - i * 30 });
+    }
+    pops.push({ x: canvas.width / 2, y: 84, age: 0, text: "STAR SHOWER!", color: "#9fd0ff" });
+    playGustSound();
   }
   setMusicLevel(1 + Math.floor(score / SPEED_UP_EVERY));
   if (lives <= 0) gameOver();
