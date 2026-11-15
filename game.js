@@ -100,7 +100,7 @@ let totalStars = Number(loadItem("starCatcherTotalStars", "0"));
 let totalScore = Number(loadItem("starCatcherTotalScore", "0"));
 let totalRuns = Number(loadItem("starCatcherRuns", "0"));
 let hasSeenControlsTip = loadItem("starCatcherSeen", "false") === "true";
-let state, player, items, pops, lives, score, starsCaught, goldenCaught, rocksHit, missedStars, streak, fallSpeed, spawnTimer;
+let state, player, items, pops, starTrails, lives, score, starsCaught, goldenCaught, rocksHit, missedStars, streak, fallSpeed, spawnTimer;
 let runBestStreak = 0;
 const starfield = createStarfield(canvas.width, canvas.height);
 let gustTimer, gustRemaining, gustDirection, magnetRemaining;
