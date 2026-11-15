@@ -50,6 +50,7 @@ const GOLDEN_HEART_CHANCE = 0.15;
 const COMET_CHANCE = 0.04;
 const SUPER_STAR_CHANCE = 0.015;
 const PRISM_STAR_CHANCE = 1 / 60;
+const WILD_STAR_CHANCE = 1 / 40;
 const FEVER_EVERY = 100;
 const SHOWER_EVERY = 200;
 const FEVER_DURATION = 6;
@@ -232,13 +233,14 @@ function spawnItem() {
   const comet = type === "star" && stageIndex() >= 2 && Math.random() < COMET_CHANCE;
   const superStar = type === "star" && stageIndex() >= 4 && Math.random() < SUPER_STAR_CHANCE;
   const prism = type === "star" && Math.random() < PRISM_STAR_CHANCE;
-  const golden = comet || superStar || prism || (type === "star" && Math.random() < GOLDEN_STAR_CHANCE) || (type === "heart" && Math.random() < GOLDEN_HEART_CHANCE);
+  const wild = type === "star" && Math.random() < WILD_STAR_CHANCE;
+  const golden = comet || superStar || prism || wild || (type === "star" && Math.random() < GOLDEN_STAR_CHANCE) || (type === "heart" && Math.random() < GOLDEN_HEART_CHANCE);
   const speedMultiplier = (type === "rock" ? (Math.random() < FAST_ROCK_CHANCE ? 1.5 : 0.9 + Math.random() * 0.2) : type === "heart" ? 0.8 : type === "star" ? 0.95 + Math.random() * 0.1 : type === "magnet" ? 0.7 : 1) * (comet ? 1.9 : superStar ? 0.75 : 1);
   let x = Math.random() * (canvas.width - SIZE[type]);
   for (let tries = 0; tries < 3 && items.some(item => Math.abs(item.x + SIZE[item.type] / 2 - (x + SIZE[type] / 2)) < 40); tries++) {
     x = Math.random() * (canvas.width - SIZE[type]);
   }
-  items.push({ type, golden, comet, super: superStar, prism, speedMultiplier, drift: (Math.random() * 2 - 1) * 12, phase: Math.random() * 6.28, rot: type === "rock" ? Math.random() * 6.28 : 0, x, y: -SIZE[type] });
+  items.push({ type, golden, comet, super: superStar, prism, wild, wildValue: 1 + Math.floor(Math.random() * 5), speedMultiplier, drift: (Math.random() * 2 - 1) * 12, phase: Math.random() * 6.28, rot: type === "rock" ? Math.random() * 6.28 : 0, x, y: -SIZE[type] });
   if (type === "star" && !golden && items.length < MAX_ITEMS && Math.random() < 0.04) {
     items.push({ type: "star", golden: false, speedMultiplier: 0.95 + Math.random() * 0.1, drift: (Math.random() * 2 - 1) * 12, phase: Math.random() * 6.28, x: Math.min(canvas.width - SIZE.star, Math.max(0, x + SIZE.star + 4)), y: -SIZE.star });
   }
@@ -431,7 +433,7 @@ function update(dt) {
           comboFlashRemaining = streak % 50 === 0 ? COMBO_FLASH_DURATION * 2 : COMBO_FLASH_DURATION;
         }
         runBestStreak = Math.max(runBestStreak, streak);
-        let value = item.super ? 10 : item.comet ? 5 : item.prism ? 4 : item.golden ? 3 : 1;
+        let value = item.super ? 10 : item.comet ? 5 : item.prism ? 4 : item.wild ? item.wildValue : item.golden ? 3 : 1;
         const centerDistance = Math.abs((item.x + SIZE.star / 2) - (player.x + SIZE.player / 2));
         if (centerDistance < SIZE.player / 6) {
           value += 1;
