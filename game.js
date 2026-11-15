@@ -1063,6 +1063,7 @@ function draw() {
     if (Math.floor(now / 400) % 2 === 0) {
       drawPixelText("Press Space to play again", canvas.width / 2, promptY, 14, "center");
     }
+    drawPixelText("c - copy score", canvas.width / 2, promptY + 22, 8, "center");
   }
   if (state === "paused") {
     drawText([["Paused", 28]]);
@@ -1105,6 +1106,12 @@ function onKeyDown(e) {
     const down = e.key === "ArrowDown" || e.key === "s" || e.key === "ArrowRight";
     pauseIndex = (pauseIndex + (down ? 1 : -1) + pauseItems().length) % pauseItems().length;
     playPauseSound();
+    return;
+  }
+  if (state === "over" && e.key.toLowerCase() === "c") {
+    const text = `Star Catcher score: ${score} (best ${best})`;
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text);
+    pops.push({ x: canvas.width / 2, y: canvas.height / 2 + 120, age: 0, text: "score copied!", color: "#9fd0ff" });
     return;
   }
   if (state === "ready" && !e.repeat && (e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "w" || e.key === "s")) {
