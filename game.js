@@ -593,7 +593,7 @@ function update(dt) {
     pops.push({ x: canvas.width / 2, y: 84, age: 0, text: "ROCK STORM!", color: "#ff9d9d" });
     playMissSound();
   }
-  setMusicLevel(1 + Math.floor(score / SPEED_UP_EVERY));
+  setMusicLevel(1 + Math.floor(score / SPEED_UP_EVERY) + (feverTimer > 0 ? 1 : 0));
   if (lives <= 0) gameOver();
 }
 
