@@ -704,6 +704,9 @@ const ACHIEVEMENTS = [
   { id: "aurora", label: "reach the aurora", test: () => stageIndex() >= 4 },
   { id: "gold-rush", label: "5 golden stars", test: () => goldenCaught >= 5 },
   { id: "century-club", label: "1000 points all time", test: () => totalScore >= 1000 },
+  { id: "half-K", label: "score 500", test: () => score >= 500 },
+  { id: "star-machine", label: "500 stars all time", test: () => totalStars >= 500 },
+  { id: "deep-run", label: "30 stars in one run", test: () => starsCaught >= 30 },
 ];
 let unlocked = new Set();
 try {
