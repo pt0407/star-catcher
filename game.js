@@ -1262,6 +1262,10 @@ function onKeyDown(e) {
     else if (state === "over" && performance.now() - gameOverTime >= RESTART_DELAY_MS) startGame();
     return;
   }
+  if ((e.key === "r" || e.key === "R") && !e.repeat && state === "over" && performance.now() - gameOverTime >= RESTART_DELAY_MS) {
+    startGame();
+    return;
+  }
   if (e.key.startsWith("Arrow")) e.preventDefault();
   keys[e.key.toLowerCase()] = true;
 }
