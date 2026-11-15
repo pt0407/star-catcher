@@ -91,6 +91,7 @@ let best = Number(loadItem("starCatcherBest", "0"));
 let bestStreak = Number(loadItem("starCatcherBestStreak", "0"));
 let totalStars = Number(loadItem("starCatcherTotalStars", "0"));
 let totalScore = Number(loadItem("starCatcherTotalScore", "0"));
+let totalRuns = Number(loadItem("starCatcherRuns", "0"));
 let hasSeenControlsTip = loadItem("starCatcherSeen", "false") === "true";
 let state, player, items, pops, lives, score, starsCaught, goldenCaught, rocksHit, streak, fallSpeed, spawnTimer;
 let runBestStreak = 0;
@@ -272,6 +273,8 @@ function gameOver() {
   saveItem("starCatcherTotalStars", String(totalStars));
   totalScore += score;
   saveItem("starCatcherTotalScore", String(totalScore));
+  totalRuns += 1;
+  saveItem("starCatcherRuns", String(totalRuns));
 }
 
 function checkHeartBonus() {
@@ -905,6 +908,7 @@ function draw() {
     gameOverLines.push([`Stars ${starsCaught}  Rocks ${rocksHit}  Acc ${accuracy}%  ${difficulty.name}`, 14]);
     gameOverLines.push([`Stage ${stageIndex() + 1} (${stageName()})`, 12]);
     gameOverLines.push([`All time ${totalStars}${goldenCaught > 0 ? `   Gold ${goldenCaught}` : ""}`, 14]);
+    gameOverLines.push([`Runs ${totalRuns}`, 10]);
     if (highScores.length > 0) {
       gameOverLines.push(["top scores", 12]);
       highScores.slice(0, 5).forEach((entry, i) => {
