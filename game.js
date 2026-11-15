@@ -46,6 +46,7 @@ const MIN_SPAWN_EVERY = 0.45;
 const STAR_CHANCE = 0.7;
 const GOLDEN_STAR_CHANCE = 1 / 12;
 const GOLDEN_HEART_CHANCE = 0.15;
+const COMET_CHANCE = 0.04;
 const MAGNET_CHANCE = 1 / 25;
 const HEART_CHANCE = 1 / 30;
 const FAST_ROCK_CHANCE = 0.2;
@@ -205,13 +206,14 @@ function spawnItem() {
   } else {
     type = Math.random() < STAR_CHANCE ? "star" : "rock";
   }
-  const golden = (type === "star" && Math.random() < GOLDEN_STAR_CHANCE) || (type === "heart" && Math.random() < GOLDEN_HEART_CHANCE);
-  const speedMultiplier = type === "rock" ? (Math.random() < FAST_ROCK_CHANCE ? 1.5 : 0.9 + Math.random() * 0.2) : type === "heart" ? 0.8 : type === "star" ? 0.95 + Math.random() * 0.1 : type === "magnet" ? 0.7 : 1;
+  const comet = type === "star" && stageIndex() >= 2 && Math.random() < COMET_CHANCE;
+  const golden = comet || (type === "star" && Math.random() < GOLDEN_STAR_CHANCE) || (type === "heart" && Math.random() < GOLDEN_HEART_CHANCE);
+  const speedMultiplier = (type === "rock" ? (Math.random() < FAST_ROCK_CHANCE ? 1.5 : 0.9 + Math.random() * 0.2) : type === "heart" ? 0.8 : type === "star" ? 0.95 + Math.random() * 0.1 : type === "magnet" ? 0.7 : 1) * (comet ? 1.9 : 1);
   let x = Math.random() * (canvas.width - SIZE[type]);
   for (let tries = 0; tries < 3 && items.some(item => Math.abs(item.x + SIZE[item.type] / 2 - (x + SIZE[type] / 2)) < 40); tries++) {
     x = Math.random() * (canvas.width - SIZE[type]);
   }
-  items.push({ type, golden, speedMultiplier, drift: (Math.random() * 2 - 1) * 12, phase: Math.random() * 6.28, rot: type === "rock" ? Math.random() * 6.28 : 0, x, y: -SIZE[type] });
+  items.push({ type, golden, comet, speedMultiplier, drift: (Math.random() * 2 - 1) * 12, phase: Math.random() * 6.28, rot: type === "rock" ? Math.random() * 6.28 : 0, x, y: -SIZE[type] });
   if (type === "star" && !golden && items.length < MAX_ITEMS && Math.random() < 0.04) {
     items.push({ type: "star", golden: false, speedMultiplier: 0.95 + Math.random() * 0.1, drift: (Math.random() * 2 - 1) * 12, phase: Math.random() * 6.28, x: Math.min(canvas.width - SIZE.star, Math.max(0, x + SIZE.star + 4)), y: -SIZE.star });
   }
@@ -389,7 +391,7 @@ function update(dt) {
           comboFlashRemaining = COMBO_FLASH_DURATION;
         }
         runBestStreak = Math.max(runBestStreak, streak);
-        let value = item.golden ? 3 : 1;
+        let value = item.comet ? 5 : item.golden ? 3 : 1;
         const centerDistance = Math.abs((item.x + SIZE.star / 2) - (player.x + SIZE.player / 2));
         if (centerDistance < SIZE.player / 6) {
           value += 1;
@@ -397,6 +399,11 @@ function update(dt) {
           perfectFlashRemaining = PERFECT_FLASH_DURATION;
         }
         score += value;
+        if (item.comet && items.length < MAX_ITEMS) {
+          for (const dir of [-1, 0, 1]) {
+            items.push({ type: "star", golden: false, comet: false, speedMultiplier: 0.95 + Math.random() * 0.1, drift: dir * 30, phase: Math.random() * 6.28, rot: 0, x: Math.max(0, Math.min(canvas.width - SIZE.star, player.x + SIZE.player / 2 - SIZE.star / 2 + dir * 50)), y: player.y + SIZE.player });
+          }
+        }
         checkNewBest();
         checkHeartBonus();
         checkMilestone();
