@@ -661,7 +661,7 @@ function qualifiesForBoard(value) {
 }
 
 function saveScoreEntry(name, value) {
-  highScores.push({ name, score: value });
+  highScores.push({ name, score: value, date: new Date().toISOString().slice(0, 10) });
   highScores.sort((a, b) => b.score - a.score);
   highScores = highScores.slice(0, 10);
   saveItem("starCatcherScores", JSON.stringify(highScores));
@@ -1013,7 +1013,7 @@ function draw() {
     if (highScores.length > 0) {
       statLines.push(["top scores", 12]);
       highScores.slice(0, 3).forEach((entry, i) => {
-        statLines.push([`${i + 1}. ${entry.name}  ${entry.score}`, 10]);
+        statLines.push([`${i + 1}. ${entry.name}  ${entry.score}${entry.date ? `  ${entry.date.slice(5)}` : ""}`, 10]);
       });
       statLines.push(["", 10]);
     }
@@ -1051,7 +1051,7 @@ function draw() {
     if (highScores.length > 0) {
       gameOverLines.push(["top scores", 12]);
       highScores.slice(0, 5).forEach((entry, i) => {
-        gameOverLines.push([`${i + 1}. ${entry.name}  ${entry.score}`, 10]);
+        gameOverLines.push([`${i + 1}. ${entry.name}  ${entry.score}${entry.date ? `  ${entry.date.slice(5)}` : ""}`, 10]);
       });
     }
 
