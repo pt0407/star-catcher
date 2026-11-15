@@ -127,6 +127,12 @@ export function playNewBestSound() {
   });
 }
 
+export function playUnlockSound() {
+  [660, 880, 1108].forEach((frequency, i) => {
+    tone({ type: "triangle", frequency, duration: 0.14, volume: 0.09, delay: i * 0.07 });
+  });
+}
+
 export function playGustSound() {
   tone({ type: "sawtooth", frequency: 180, slideTo: 420, duration: GUST_DURATION, volume: 0.06 });
 }

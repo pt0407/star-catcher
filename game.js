@@ -2,7 +2,7 @@ import { loadItem, saveItem } from "./persist.js";
 import {
   initializeAudio, isMuted, toggleMute, getVolume, setVolume,
   getMusicVolume, setMusicVolume, isMusicMuted, toggleMusicMute,
-  playCatchSound, playPauseSound, playNewBestSound, playGustSound, playMissSound,
+  playCatchSound, playPauseSound, playNewBestSound, playGustSound, playMissSound, playUnlockSound,
 } from "./audio.js";
 import { SIZE, FALLBACK, images, isReady, drawSprite } from "./sprites.js";
 import { keys, touch, bindInput } from "./input.js";
@@ -725,7 +725,7 @@ function checkAchievements() {
       saveItem("starCatcherAchievements", JSON.stringify([...unlocked]));
       pops.push({ x: canvas.width / 2, y: 140, age: 0, text: `achievement: ${a.label}`, color: "#ffd93b" });
       runUnlocks.push(a.label);
-      playNewBestSound();
+      playUnlockSound();
     }
   }
 }
