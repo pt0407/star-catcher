@@ -405,7 +405,7 @@ function update(dt) {
         streak += 1;
         if (streak % COMBO_EVERY === 0) {
           comboFlash = `COMBO ${streak}!`;
-          comboFlashRemaining = COMBO_FLASH_DURATION;
+          comboFlashRemaining = streak % 50 === 0 ? COMBO_FLASH_DURATION * 2 : COMBO_FLASH_DURATION;
         }
         runBestStreak = Math.max(runBestStreak, streak);
         let value = item.super ? 10 : item.comet ? 5 : item.golden ? 3 : 1;
@@ -491,7 +491,7 @@ function update(dt) {
       runBestStreak = Math.max(runBestStreak, streak);
       if (streak % COMBO_EVERY === 0) {
         comboFlash = `COMBO ${streak}!`;
-        comboFlashRemaining = COMBO_FLASH_DURATION;
+        comboFlashRemaining = streak % 50 === 0 ? COMBO_FLASH_DURATION * 2 : COMBO_FLASH_DURATION;
       }
       score += 5;
       checkNewBest();
