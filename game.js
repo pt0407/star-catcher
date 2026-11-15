@@ -926,6 +926,14 @@ function draw() {
   if (streak >= 2) drawPixelText(`Streak ${streak}`, canvas.width - 10, hudY, 10, "right");
   const speedLevel = 1 + Math.floor(score / SPEED_UP_EVERY);
   if (speedLevel >= 2) drawPixelText(`Speed ${speedLevel}`, canvas.width - 10, hudY + 24, 10, "right");
+  if (streak >= 2) {
+    const barW = 80;
+    const prog = (streak % COMBO_EVERY) / COMBO_EVERY;
+    ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
+    ctx.fillRect(canvas.width / 2 - barW / 2, canvas.height - 12, barW, 5);
+    ctx.fillStyle = "#ffd93b";
+    ctx.fillRect(canvas.width / 2 - barW / 2, canvas.height - 12, barW * prog, 5);
+  }
   if (milestoneFlashRemaining > 0) {
     ctx.globalAlpha = milestoneFlashRemaining / MILESTONE_FLASH_DURATION;
     drawPixelText(milestoneFlash, canvas.width / 2, 32, 20, "center");
