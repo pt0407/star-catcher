@@ -24,9 +24,9 @@ const GUST_WAIT_MAX = 20;
 const GUST_DURATION = 2;
 const GUST_SPEED = 180;
 const DIFFICULTIES = [
-  { name: "easy", fallSpeed: 90 },
-  { name: "normal", fallSpeed: 120 },
-  { name: "hard", fallSpeed: 160 },
+  { name: "easy", fallSpeed: 90, spawnEvery: 1.15 },
+  { name: "normal", fallSpeed: 120, spawnEvery: 1 },
+  { name: "hard", fallSpeed: 160, spawnEvery: 0.85 },
 ];
 const SPEED_UP_EVERY = 10;
 const STAGE_EVERY = 50;
@@ -222,7 +222,7 @@ function spawnItem() {
 
 function getSpawnInterval() {
   const reductions = Math.floor(score / SPAWN_INTERVAL_SCORE_STEP) * SPAWN_INTERVAL_DECREASE;
-  return Math.max(MIN_SPAWN_EVERY, SPAWN_EVERY - reductions);
+  return Math.max(MIN_SPAWN_EVERY, (SPAWN_EVERY - reductions) * difficulty.spawnEvery);
 }
 
 function touchesPlayer(item) {
