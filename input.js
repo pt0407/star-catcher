@@ -2,7 +2,7 @@ import { initializeAudio } from "./audio.js";
 import { SIZE } from "./sprites.js";
 
 export const keys = {};
-export const touch = { targetX: null, dir: 0 };
+export const touch = { targetX: null, dir: 0, tilt: 0 };
 
 const canvas = document.getElementById("game");
 
@@ -41,9 +41,16 @@ export function bindInput(handlers) {
     if (document.visibilityState === "hidden") handlers.onHidden();
   });
 
+  const onTilt = (event) => {
+    if (event.gamma === null || event.gamma === undefined) return;
+    touch.tilt = Math.max(-1, Math.min(1, event.gamma / 25));
+  };
+  window.addEventListener("deviceorientation", onTilt);
+
   window.addEventListener("blur", () => {
     for (const key of Object.keys(keys)) keys[key] = false;
     touch.dir = 0;
+    touch.tilt = 0;
   });
 
   document.addEventListener("keydown", (e) => {
