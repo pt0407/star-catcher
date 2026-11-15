@@ -1267,7 +1267,19 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
 }
 
 bindInput({
-  onPointerStart() {
+  onPointerStart(event) {
+    if (state === "ready" && event) {
+      const rect = canvas.getBoundingClientRect();
+      const nx = (event.clientX - rect.left) * canvas.width / rect.width;
+      const ny = (event.clientY - rect.top) * canvas.height / rect.height;
+      const startY = canvas.height / 2 - 30;
+      const hit = menuItems().findIndex((item, i) => Math.abs(ny - (startY + i * 34 + 8)) < 17 && Math.abs(nx - canvas.width / 2) < 110);
+      if (hit >= 0) {
+        menuIndex = hit;
+        activateMenuItem();
+        return;
+      }
+    }
     if (state === "ready" || (state === "over" && performance.now() - gameOverTime >= RESTART_DELAY_MS)) startGame();
   },
   onHidden() {

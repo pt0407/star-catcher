@@ -9,7 +9,7 @@ const canvas = document.getElementById("game");
 export function bindInput(handlers) {
   document.addEventListener("pointerdown", () => {
     initializeAudio();
-    handlers.onPointerStart();
+    handlers.onPointerStart(event);
   });
 
   const setTouchTarget = (event) => {
