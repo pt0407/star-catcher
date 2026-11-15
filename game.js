@@ -1055,10 +1055,15 @@ function draw() {
       ["p or esc - pause", 14],
       ["catch stars, dodge rocks", 14],
       ["golden stars = 3, comets = 5", 14],
+      ["prism 4, wild is random, super 10", 12],
+      ["fever doubles points for 6s", 12],
+      ["star shower every 200, rock storm 500", 12],
+      ["achievements unlock as you play", 12],
       ["m sound, shift+m music", 14],
       ["[ ] volume, , . music vol", 14],
       ["", 10],
       ["enter - back", 14],
+      ["c on game over copies score", 12],
     ];
     drawText(helpLines);
   }
