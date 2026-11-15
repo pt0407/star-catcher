@@ -502,7 +502,8 @@ function update(dt) {
       const horizontallyClose = Math.abs((item.x + SIZE.rock / 2) - (player.x + SIZE.player / 2)) < (SIZE.rock + SIZE.player) / 2 + NEAR_MISS_DISTANCE;
       if (verticallyClose && horizontallyClose) {
         item.nearMiss = true;
-        pops.push({ x: item.x + SIZE.rock / 2, y: item.y + SIZE.rock / 2, age: 0, text: 'close!', color: item.speedMultiplier > 1.4 ? "#ff9d9d" : "#9fd0ff" });
+        score += 1;
+        pops.push({ x: item.x + SIZE.rock / 2, y: item.y + SIZE.rock / 2, age: 0, text: 'close! +1', color: item.speedMultiplier > 1.4 ? "#ff9d9d" : "#9fd0ff" });
       }
     }
     if (hit || item.y >= canvas.height) items.splice(i, 1);
