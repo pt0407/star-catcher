@@ -2,7 +2,7 @@ import { initializeAudio } from "./audio.js";
 import { SIZE } from "./sprites.js";
 
 export const keys = {};
-export const touch = { targetX: null };
+export const touch = { targetX: null, dir: 0 };
 
 const canvas = document.getElementById("game");
 
@@ -22,6 +22,19 @@ export function bindInput(handlers) {
   canvas.addEventListener("touchmove", setTouchTarget, { passive: false });
   canvas.addEventListener("touchend", () => { touch.targetX = null; });
   canvas.addEventListener("touchcancel", () => { touch.targetX = null; });
+
+  const bindPad = (id, dir) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const press = (event) => { event.preventDefault(); touch.dir = dir; };
+    const release = () => { touch.dir = 0; };
+    el.addEventListener("pointerdown", press);
+    el.addEventListener("pointerup", release);
+    el.addEventListener("pointercancel", release);
+    el.addEventListener("pointerleave", release);
+  };
+  bindPad("touch-left", -1);
+  bindPad("touch-right", 1);
   canvas.addEventListener("contextmenu", (e) => e.preventDefault());
 
   document.addEventListener("visibilitychange", () => {
@@ -30,6 +43,7 @@ export function bindInput(handlers) {
 
   window.addEventListener("blur", () => {
     for (const key of Object.keys(keys)) keys[key] = false;
+    touch.dir = 0;
   });
 
   document.addEventListener("keydown", (e) => {

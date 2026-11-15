@@ -349,7 +349,7 @@ function update(dt) {
     const distance = touch.targetX - player.x;
     player.x += Math.sign(distance) * Math.min(Math.abs(distance), PLAYER_SPEED * dt);
   } else {
-    const move = (keys["arrowright"] || keys["d"] ? 1 : 0) - (keys["arrowleft"] || keys["a"] ? 1 : 0);
+    const move = touch.dir !== 0 ? touch.dir : (keys["arrowright"] || keys["d"] ? 1 : 0) - (keys["arrowleft"] || keys["a"] ? 1 : 0);
     player.x += move * PLAYER_SPEED * dt;
   }
   player.x += gustDirection * GUST_SPEED * gustPushTime;
