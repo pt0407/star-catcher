@@ -27,6 +27,7 @@ Live version: https://star-catcher-virid.vercel.app
 - N: night mode
 - F: FPS counter
 - 1, 2, 3: difficulty on the menus, arrow keys cycle it too
+- Gamepad: left stick or d-pad to move, A to start, start button pauses
 
 Catch stars for points, golden stars are worth 3. Rocks cost a heart. Magnet stars pull pickups toward you for a few seconds, hearts put one back. Wind gusts shove everything sideways, so keep an eye on the arrow up top. Difficulty (1/2/3) changes fall speed and spawn rate, and your pick is remembered.
 
