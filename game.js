@@ -33,10 +33,10 @@ const SPEED_UP_EVERY = 10;
 const STAGE_EVERY = 50;
 const STAGES = [
   { name: "day", sky: null, stars: "#fff" },
-  { name: "dusk", sky: "rgba(255, 140, 60, 0.16)", stars: "#ffd9a0" },
-  { name: "night", sky: "rgba(10, 10, 50, 0.4)", stars: "#aab4ff" },
-  { name: "deep space", sky: "rgba(70, 0, 110, 0.35)", stars: "#d0c0ff" },
-  { name: "aurora", sky: "rgba(0, 140, 90, 0.22)", stars: "#9fffd0" },
+  { name: "dusk", sky: "rgba(255, 140, 60, 0.16)", stars: "#ffd9a0", glow: "rgba(255, 120, 40, 0.22)" },
+  { name: "night", sky: "rgba(10, 10, 50, 0.4)", stars: "#aab4ff", glow: "rgba(80, 80, 200, 0.18)" },
+  { name: "deep space", sky: "rgba(70, 0, 110, 0.35)", stars: "#d0c0ff", glow: "rgba(150, 0, 220, 0.22)" },
+  { name: "aurora", sky: "rgba(0, 140, 90, 0.22)", stars: "#9fffd0", glow: "rgba(0, 255, 160, 0.16)" },
 ];
 const SPEED_UP_AMOUNT = 20;
 const SPAWN_EVERY = 0.9;
@@ -743,6 +743,14 @@ function draw() {
   if (stageSky) {
     ctx.fillStyle = stageSky;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+  const stageGlow = nightMode ? null : STAGES[stageIndex()].glow;
+  if (stageGlow) {
+    const grad = ctx.createLinearGradient(0, canvas.height * 0.55, 0, canvas.height);
+    grad.addColorStop(0, "rgba(0, 0, 0, 0)");
+    grad.addColorStop(1, stageGlow);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, canvas.height * 0.55, canvas.width, canvas.height * 0.45);
   }
 
   if (stageFlash > 0) {
