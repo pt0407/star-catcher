@@ -240,7 +240,7 @@ function spawnItem() {
   const prism = type === "star" && Math.random() < PRISM_STAR_CHANCE;
   const wild = type === "star" && Math.random() < WILD_STAR_CHANCE;
   const golden = comet || superStar || prism || wild || (type === "star" && Math.random() < GOLDEN_STAR_CHANCE) || (type === "heart" && Math.random() < GOLDEN_HEART_CHANCE);
-  const speedMultiplier = (type === "rock" ? (Math.random() < FAST_ROCK_CHANCE ? 1.5 : 0.9 + Math.random() * 0.2) : type === "heart" ? 0.8 : type === "star" ? 0.95 + Math.random() * 0.1 : type === "magnet" ? 0.7 : 1) * (comet ? 1.9 : superStar ? 0.75 : 1);
+  const speedMultiplier = (type === "rock" ? (Math.random() < FAST_ROCK_CHANCE ? 1.5 : 0.9 + Math.random() * 0.2) : type === "heart" ? 0.8 : type === "star" ? 0.95 + Math.random() * 0.1 : type === "magnet" ? 0.7 : 1) * (comet ? 1.9 : superStar ? 0.75 : 1) * (1 + stageIndex() * 0.05);
   let x = Math.random() * (canvas.width - SIZE[type]);
   for (let tries = 0; tries < 3 && items.some(item => Math.abs(item.x + SIZE[item.type] / 2 - (x + SIZE[type] / 2)) < 40); tries++) {
     x = Math.random() * (canvas.width - SIZE[type]);
