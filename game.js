@@ -127,6 +127,7 @@ let starsPopRemaining = 0;
 let lastStage = -1;
 let stageFlash = 0;
 let menuIndex = 0;
+let pauseIndex = 0;
 let nightMode = loadItem("starCatcherNight", "false") === "true";
 let fpsEnabled = false;
 let fpsWindowStart = 0;
@@ -585,7 +586,31 @@ function activateMenuItem() {
   const item = menuItems()[menuIndex];
   if (item.id === "play") startGame();
   else if (item.id === "howto") state = "help";
+  else if (item.id === "stats") state = "stats";
   else cycleMenuValue(item.id, 1);
+}
+
+function pauseItems() {
+  return [
+    { id: "resume", label: "resume" },
+    { id: "restart", label: "restart" },
+    { id: "quit", label: "quit to title" },
+  ];
+}
+
+function activatePauseItem() {
+  const item = pauseItems()[pauseIndex];
+  if (item.id === "resume") {
+    state = "playing";
+    setMusicPaused(false);
+  } else if (item.id === "restart") {
+    reset();
+  } else {
+    state = "ready";
+    setMusicPaused(false);
+    playMusic("title");
+  }
+  playPauseSound();
 }
 
 let highScores = [];
@@ -934,17 +959,17 @@ function draw() {
     }
   }
   if (state === "paused") {
-    const pauseLines = [["Paused", 28]];
-    if (now - pauseStartTime < 5000) {
-      pauseLines.push(["Press P or Esc to resume", 14]);
-    }
-    if (loadItem("starCatcherSeenPauseHint", "false") !== "true") {
-      pauseLines.push(["Arrows move - Space starts - R restarts", 10]);
-      saveItem("starCatcherSeenPauseHint", "true");
-    }
+    drawText([["Paused", 28]]);
+    const items = pauseItems();
+    const startY = canvas.height / 2 + 10;
+    items.forEach((item, i) => {
+      const selected = i === pauseIndex;
+      drawPixelText(selected ? `> ${item.label} <` : item.label, canvas.width / 2, startY + i * 34, selected ? 16 : 14, "center");
+    });
     const speedLevel = 1 + Math.floor(score / SPEED_UP_EVERY);
-    pauseLines.push([`Score ${score}   Stars ${starsCaught}`, 14], [`Difficulty: ${difficulty.name}   Speed ${speedLevel}   R restarts`, 10]);
-    drawText(pauseLines);
+    drawPixelText(`Score ${score}   Stars ${starsCaught}`, canvas.width / 2, canvas.height - 90, 10, "center");
+    drawPixelText(`Difficulty: ${difficulty.name}   Speed ${speedLevel}`, canvas.width / 2, canvas.height - 70, 8, "center");
+    drawPixelText("p or esc resume - r restart", canvas.width / 2, canvas.height - 40, 8, "center");
   }
   if (shaking) ctx.restore();
 }
@@ -967,6 +992,13 @@ function onKeyDown(e) {
       state = "over";
       gameOverTime = performance.now();
     }
+    return;
+  }
+  if (state === "paused" && !e.repeat && (e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "w" || e.key === "s" || e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+    e.preventDefault();
+    const down = e.key === "ArrowDown" || e.key === "s" || e.key === "ArrowRight";
+    pauseIndex = (pauseIndex + (down ? 1 : -1) + pauseItems().length) % pauseItems().length;
+    playPauseSound();
     return;
   }
   if (state === "ready" && !e.repeat && (e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "w" || e.key === "s")) {
@@ -1036,6 +1068,7 @@ function onKeyDown(e) {
       if (state === "playing") {
         state = "paused";
         pauseStartTime = performance.now();
+        pauseIndex = 0;
         setMusicPaused(true);
       } else {
         state = "playing";
@@ -1048,6 +1081,7 @@ function onKeyDown(e) {
   if (e.key === " " || e.key === "Enter") {
     e.preventDefault();
     if (state === "ready") activateMenuItem();
+    else if (state === "paused") activatePauseItem();
     else if (state === "over" && performance.now() - gameOverTime >= RESTART_DELAY_MS) startGame();
     return;
   }
@@ -1063,6 +1097,7 @@ bindInput({
     if (state === "playing") {
       state = "paused";
       pauseStartTime = performance.now();
+      pauseIndex = 0;
       setMusicPaused(true);
     }
   },
