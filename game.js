@@ -1083,7 +1083,7 @@ function draw() {
     });
     const speedLevel = 1 + Math.floor(score / SPEED_UP_EVERY);
     drawPixelText(`Score ${score}   Stars ${starsCaught}`, canvas.width / 2, canvas.height - 90, 10, "center");
-    drawPixelText(`Difficulty: ${difficulty.name}   Speed ${speedLevel}`, canvas.width / 2, canvas.height - 70, 8, "center");
+    drawPixelText(`Difficulty: ${difficulty.name}   Speed ${speedLevel}   Stage ${stageIndex() + 1}`, canvas.width / 2, canvas.height - 70, 8, "center");
     drawPixelText("p or esc resume - r restart", canvas.width / 2, canvas.height - 40, 8, "center");
   }
   if (shaking) ctx.restore();
