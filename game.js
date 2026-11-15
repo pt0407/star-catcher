@@ -137,6 +137,7 @@ let nextShowerAt = SHOWER_EVERY;
 let menuIndex = 0;
 let pauseIndex = 0;
 let gamepadDir = 0;
+let particleScale = 1;
 let padA = false;
 let padStart = false;
 let nightMode = loadItem("starCatcherNight", "false") === "true";
@@ -278,9 +279,9 @@ function gameOver() {
     best = score;
     saveItem("starCatcherBest", String(best));
     playNewBestSound();
-    spawnStarSparkles(canvas.width * 0.3, 150, "#ffd93b");
-    spawnStarSparkles(canvas.width * 0.5, 120, "#ffffff");
-    spawnStarSparkles(canvas.width * 0.7, 150, "#ff8fb3");
+    spawnSparkles(canvas.width * 0.3, 150, "#ffd93b");
+    spawnSparkles(canvas.width * 0.5, 120, "#ffffff");
+    spawnSparkles(canvas.width * 0.7, 150, "#ff8fb3");
   }
   if (runBestStreak > bestStreak) {
     bestStreak = runBestStreak;
@@ -311,7 +312,7 @@ function checkMilestone() {
   milestoneFlash = `${milestone}!`;
   milestoneFlashRemaining = MILESTONE_FLASH_DURATION;
   shake = Math.max(shake, 0.15);
-  spawnStarSparkles(player.x + SIZE.player / 2, player.y + SIZE.player / 2, "#ffd75e", 16);
+  spawnSparkles(player.x + SIZE.player / 2, player.y + SIZE.player / 2, "#ffd75e", 16);
 }
 
 function checkNewBest() {
@@ -447,20 +448,20 @@ function update(dt) {
         checkNewBest();
         checkHeartBonus();
         checkMilestone();
-        spawnStarSparkles(item.x + SIZE.star / 2, item.y + SIZE.star / 2, item.prism ? "#7ef0ff" : item.golden ? "#ffcf40" : "#fff3a0", item.golden || item.prism ? 14 : SPARKLE_COUNT);
+        spawnSparkles(item.x + SIZE.star / 2, item.y + SIZE.star / 2, item.prism ? "#7ef0ff" : item.golden ? "#ffcf40" : "#fff3a0", item.golden || item.prism ? 14 : SPARKLE_COUNT);
         hopTimer = HOP_DURATION;
         pops.push({ x: item.x + SIZE.star / 2, y: item.y + SIZE.star / 2, age: 0, value: value * feverMult(), color: item.prism ? "#7ef0ff" : item.golden ? "#ffd93b" : "#fff" });
       } else if (item.type === "magnet") {
         magnetRemaining = MAGNET_DURATION;
         comboFlash = "MAGNET!";
         comboFlashRemaining = COMBO_FLASH_DURATION;
-        spawnStarSparkles(item.x + SIZE.magnet / 2, item.y + SIZE.magnet / 2, "#8fd0ff");
+        spawnSparkles(item.x + SIZE.magnet / 2, item.y + SIZE.magnet / 2, "#8fd0ff");
         hopTimer = HOP_DURATION;
       } else if (item.type === "heart") {
         if (lives < MAX_LIVES) {
           lives = Math.min(MAX_LIVES, lives + (item.golden ? 2 : 1));
           heartPopupRemaining = HEART_POPUP_DURATION;
-          spawnStarSparkles(item.x + SIZE.heart / 2, item.y + SIZE.heart / 2, item.golden ? "#ffd93b" : "#ff8fb3");
+          spawnSparkles(item.x + SIZE.heart / 2, item.y + SIZE.heart / 2, item.golden ? "#ffd93b" : "#ff8fb3");
           hopTimer = HOP_DURATION;
           pops.push({ x: item.x + SIZE.heart / 2, y: item.y + SIZE.heart / 2, age: 0, value: item.golden ? "+2" : "heart", color: item.golden ? "#ffd93b" : "#ff8fb3" });
         } else {
@@ -499,7 +500,7 @@ function update(dt) {
     shootingStarTrailTimer -= dt;
     if (shootingStarTrailTimer <= 0) {
       shootingStarTrailTimer = 0.08;
-      spawnStarSparkles(shootingStar.x + SHOOTING_STAR_SIZE / 2 - shootingStar.dir * 10, shootingStar.y + SHOOTING_STAR_SIZE / 2, "#ffffff", 1);
+      spawnSparkles(shootingStar.x + SHOOTING_STAR_SIZE / 2 - shootingStar.dir * 10, shootingStar.y + SHOOTING_STAR_SIZE / 2, "#ffffff", 1);
     }
     const overlapsPlayerX = shootingStar.x < player.x + SIZE.player &&
       shootingStar.x + SHOOTING_STAR_SIZE > player.x;
@@ -518,7 +519,7 @@ function update(dt) {
       checkNewBest();
       checkHeartBonus();
       checkMilestone();
-      spawnStarSparkles(shootingStar.x + SHOOTING_STAR_SIZE / 2, shootingStar.y + SHOOTING_STAR_SIZE / 2, "#ffffff");
+      spawnSparkles(shootingStar.x + SHOOTING_STAR_SIZE / 2, shootingStar.y + SHOOTING_STAR_SIZE / 2, "#ffffff");
       hopTimer = HOP_DURATION;
       pops.push({
         x: shootingStar.x + SHOOTING_STAR_SIZE / 2,
@@ -683,6 +684,10 @@ try {
 }
 
 const feverMult = () => (feverTimer > 0 ? 2 : 1);
+
+function spawnSparkles(x, y, color, count = SPARKLE_COUNT) {
+  spawnStarSparkles(x, y, color, Math.max(1, Math.round(count * particleScale)));
+}
 
 function checkAchievements() {
   for (const a of ACHIEVEMENTS) {
@@ -1265,6 +1270,10 @@ function frame(time) {
     fpsValue = fpsFrameCount;
     fpsFrameCount = 0;
     fpsWindowStart = time;
+  }
+  if (fpsValue > 0) {
+    if (fpsValue < 45 && particleScale > 0.4) particleScale = Math.max(0.4, particleScale - 0.1);
+    else if (fpsValue > 55 && particleScale < 1) particleScale = Math.min(1, particleScale + 0.05);
   }
   pollGamepad();
   if (state !== "paused") update(dt);
