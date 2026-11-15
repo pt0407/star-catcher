@@ -1,7 +1,7 @@
 import { loadItem, saveItem } from "./persist.js";
 import {
   initializeAudio, isMuted, toggleMute, getVolume, setVolume,
-  getMusicVolume, setMusicVolume, toggleMusicMute,
+  getMusicVolume, setMusicVolume, isMusicMuted, toggleMusicMute,
   playCatchSound, playPauseSound, playNewBestSound, playGustSound, playMissSound,
 } from "./audio.js";
 import { SIZE, FALLBACK, images, isReady, drawSprite } from "./sprites.js";
@@ -122,6 +122,7 @@ let perfectFlashRemaining = 0;
 let perfectFlash = null;
 let starsPopRemaining = 0;
 let lastStage = -1;
+let menuIndex = 0;
 let nightMode = loadItem("starCatcherNight", "false") === "true";
 let fpsEnabled = false;
 let fpsWindowStart = 0;
@@ -534,6 +535,35 @@ function drawPixelText(text, x, y, size, align) {
   ctx.fillText(text, x, y);
 }
 
+function menuItems() {
+  return [
+    { id: "play", label: "play" },
+    { id: "difficulty", label: `difficulty: ${difficulty.name}` },
+    { id: "sound", label: `sound: ${isMuted() ? "off" : "on"}` },
+    { id: "music", label: `music: ${isMusicMuted() ? "off" : "on"}` },
+    { id: "howto", label: "how to play" },
+  ];
+}
+
+function cycleMenuValue(id, direction) {
+  if (id === "difficulty") {
+    difficultyIndex = (difficultyIndex + direction + DIFFICULTIES.length) % DIFFICULTIES.length;
+    difficulty = DIFFICULTIES[difficultyIndex];
+    saveItem("starCatcherDifficulty", String(difficultyIndex));
+  } else if (id === "sound") {
+    toggleMute();
+  } else if (id === "music") {
+    toggleMusicMute();
+  }
+}
+
+function activateMenuItem() {
+  const item = menuItems()[menuIndex];
+  if (item.id === "play") startGame();
+  else if (item.id === "howto") state = "help";
+  else cycleMenuValue(item.id, 1);
+}
+
 function drawText(lines, offsets = []) {
   ctx.fillStyle = "#fff";
   const firstLineY = canvas.height / 2 - ((lines.length - 1) * 40) / 2;
@@ -757,32 +787,47 @@ function draw() {
   }
   drawPixelText(`M: sound ${isMuted() ? "off" : "on"}`, 10, canvas.height - 10, 10, "left");
 
-  if (state === "paused" || state === "over") {
+  if (["paused", "over", "help"].includes(state)) {
     ctx.fillStyle = "rgba(0, 0, 0, 0.55)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
   if (state === "ready") {
     const titleBob = reducedMotion ? 0 : Math.sin(now / 300) * 4;
-    drawText([["Star Catcher", 28], [Math.floor(now / 400) % 2 === 0 ? "Press Space to start" : "", 14]], [titleBob]);
-    ctx.fillStyle = "#fff";
-    const difficultyOptions = DIFFICULTIES.map((option, index) => {
-      const label = `${index + 1} ${option.name}`;
-      return option === difficulty ? `[${label}]` : label;
-    }).join("  ");
-    drawPixelText(difficultyOptions, canvas.width / 2, canvas.height / 2 + 60, 10, "center");
+    drawText([["Star Catcher", 28]], [titleBob]);
+    const items = menuItems();
+    const startY = canvas.height / 2 - 30;
+    items.forEach((item, i) => {
+      const selected = i === menuIndex;
+      const label = selected ? `> ${item.label} <` : item.label;
+      drawPixelText(label, canvas.width / 2, startY + i * 34, selected ? 16 : 14, "center");
+    });
     if (best > 0) {
-      drawPixelText(`Best ${best}`, canvas.width / 2, canvas.height / 2 + 120, 10, "center");
+      drawPixelText(`Best ${best}`, canvas.width / 2, canvas.height - 110, 10, "center");
     }
     if (totalStars > 0) {
-      drawPixelText(`Stars ${totalStars} all time`, canvas.width / 2, canvas.height / 2 + 142, 8, "center");
+      drawPixelText(`Stars ${totalStars} all time`, canvas.width / 2, canvas.height - 92, 8, "center");
     }
     if (totalScore > 0) {
-      drawPixelText(`Points ${totalScore} all time`, canvas.width / 2, canvas.height / 2 + 158, 8, "center");
+      drawPixelText(`Points ${totalScore} all time`, canvas.width / 2, canvas.height - 76, 8, "center");
     }
-    if (!hasSeenControlsTip) {
-      drawPixelText("arrows or a/d to move", canvas.width / 2, canvas.height / 2 + 90, 10, "center");
-    }
+    drawPixelText("up/down pick, enter select", canvas.width / 2, canvas.height - 40, 8, "center");
+  }
+  if (state === "help") {
+    const helpLines = [
+      ["How to play", 24],
+      ["", 10],
+      ["arrows or a/d - move", 14],
+      ["space - start / restart", 14],
+      ["p or esc - pause", 14],
+      ["catch stars, dodge rocks", 14],
+      ["golden stars = 3, comets = 5", 14],
+      ["m sound, shift+m music", 14],
+      ["[ ] volume, , . music vol", 14],
+      ["", 10],
+      ["enter - back", 14],
+    ];
+    drawText(helpLines);
   }
   if (state === "over") {
     const gameOverLines = [["Game over", 28], [`Score ${score}   Best ${best}   ${runTimeText}`, 14]];
@@ -827,6 +872,23 @@ function draw() {
 }
 
 function onKeyDown(e) {
+  if (state === "help") {
+    state = "ready";
+    return;
+  }
+  if (state === "ready" && !e.repeat && (e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "w" || e.key === "s")) {
+    e.preventDefault();
+    const down = e.key === "ArrowDown" || e.key === "s";
+    menuIndex = (menuIndex + (down ? 1 : -1) + menuItems().length) % menuItems().length;
+    playPauseSound();
+    return;
+  }
+  if (state === "ready" && !e.repeat && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+    e.preventDefault();
+    const item = menuItems()[menuIndex];
+    if (["difficulty", "sound", "music"].includes(item.id)) cycleMenuValue(item.id, e.key === "ArrowRight" ? 1 : -1);
+    return;
+  }
   if (["ready", "over"].includes(state) && ["1", "2", "3"].includes(e.key)) {
     difficultyIndex = Number(e.key) - 1;
     difficulty = DIFFICULTIES[difficultyIndex];
@@ -892,7 +954,8 @@ function onKeyDown(e) {
   }
   if (e.key === " " || e.key === "Enter") {
     e.preventDefault();
-    if (state === "ready" || (state === "over" && performance.now() - gameOverTime >= RESTART_DELAY_MS)) startGame();
+    if (state === "ready") activateMenuItem();
+    else if (state === "over" && performance.now() - gameOverTime >= RESTART_DELAY_MS) startGame();
     return;
   }
   if (e.key.startsWith("Arrow")) e.preventDefault();
