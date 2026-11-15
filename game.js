@@ -74,15 +74,16 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
 const FONT = '"Press Start 2P", monospace';
 
 function drawPlayer(x = player.x, yOffset = 0, frame = 0) {
+  const tilt = Math.min(playerSpeed / 500, 1) * 0.16;
   if (!playerFacingLeft) {
-    drawSprite(ctx, "player", x, player.y + yOffset, frame);
+    drawSprite(ctx, "player", x, player.y + yOffset, frame, tilt);
     return;
   }
 
   ctx.save();
   ctx.translate(x * 2 + SIZE.player, 0);
   ctx.scale(-1, 1);
-  drawSprite(ctx, "player", x, player.y + yOffset, frame);
+  drawSprite(ctx, "player", x, player.y + yOffset, frame, tilt);
   ctx.restore();
 }
 
