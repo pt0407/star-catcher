@@ -864,6 +864,7 @@ function draw() {
       drawPixelText(`Points ${totalScore} all time`, canvas.width / 2, canvas.height - 76, 8, "center");
     }
     drawPixelText("up/down pick, enter select", canvas.width / 2, canvas.height - 40, 8, "center");
+    drawPixelText("v0.4", canvas.width - 10, canvas.height - 40, 8, "right");
   }
   if (state === "help") {
     const helpLines = [
