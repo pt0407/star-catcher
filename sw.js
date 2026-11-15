@@ -1,5 +1,5 @@
-const CACHE = "star-catcher-v1";
-const ASSETS = ["./", "./index.html", "./style.css", "./game.js", "./audio.js", "./music.js", "./input.js", "./persist.js", "./sprites.js", "./particles.js", "./starfield.js", "./assets/background.png", "./assets/star.png", "./assets/player.png", "./assets/rock.png", "./assets/heart.png", "./assets/magnet.png"];
+const CACHE = "star-catcher-v2";
+const ASSETS = ["./", "./index.html", "./style.css", "./game.js", "./audio.js", "./music.js", "./input.js", "./persist.js", "./sprites.js", "./particles.js", "./starfield.js", "./assets/background.png", "./assets/star.png", "./assets/player.png", "./assets/rock.png", "./assets/heart.png", "./assets/magnet.png", "./assets/player_sheet.png", "./assets/star_sheet.png", "./assets/rock_sheet.png", "./assets/heart_sheet.png"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
