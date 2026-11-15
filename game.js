@@ -1287,6 +1287,11 @@ function frame(time) {
     if (fpsValue < 45 && particleScale > 0.4) particleScale = Math.max(0.4, particleScale - 0.1);
     else if (fpsValue > 55 && particleScale < 1) particleScale = Math.min(1, particleScale + 0.05);
   }
+  const liveEl = document.getElementById("live");
+  if (liveEl && time - (frame.lastLive || 0) > 500) {
+    frame.lastLive = time;
+    liveEl.textContent = state === "playing" ? `score ${score}, lives ${lives}` : "";
+  }
   pollGamepad();
   if (state !== "paused") update(dt);
   draw();
