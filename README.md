@@ -20,7 +20,7 @@ Live version: https://star-catcher-virid.vercel.app
 
 - Arrow keys or A/D: move
 - Space or Enter: start or restart
-- Drag on the canvas: move (touch works too)
+- Drag on the canvas or use the arrow buttons on touch screens: move
 - P or Esc: pause
 - R: restart mid-run
 - M: mute
