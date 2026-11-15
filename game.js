@@ -670,6 +670,10 @@ const ACHIEVEMENTS = [
   { id: "stage-3", label: "reach stage 3", test: () => stageIndex() >= 2 },
   { id: "stargazer", label: "100 stars total", test: () => totalStars >= 100 },
   { id: "high-roller", label: "score 250", test: () => score >= 250 },
+  { id: "combo-25", label: "combo x25", test: () => streak >= 25 },
+  { id: "aurora", label: "reach the aurora", test: () => stageIndex() >= 4 },
+  { id: "gold-rush", label: "5 golden stars", test: () => goldenCaught >= 5 },
+  { id: "century-club", label: "1000 points all time", test: () => totalScore >= 1000 },
 ];
 let unlocked = new Set();
 try {
